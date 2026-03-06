@@ -1,0 +1,235 @@
+/* ═══════════════════════════════════
+   "Чому саме ми?" block
+   ═══════════════════════════════════ */
+.why-us__title {
+    text-align: center;
+    font-size: 1.375rem;
+    color: #003B5C;
+    margin-bottom: 40px;
+}
+
+@media (min-width: 1024px) {
+    .why-us__title {
+        font-size: clamp(2rem, 3vw, 2.25rem);
+    }
+}
+
+.why-us__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+@media (min-width: 640px) {
+    .why-us__grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .why-us__grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+    }
+}
+
+.why-us__card {
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 14px;
+    padding: 28px 24px;
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.why-us__card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+}
+
+.why-us__icon {
+    color: #0096B8;
+    margin-bottom: 14px;
+    display: inline-flex;
+}
+
+.why-us__card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #003B5C;
+    margin-bottom: 6px;
+}
+
+.why-us__card-text {
+    font-size: 13px;
+    color: #6B7280;
+    line-height: 1.5;
+}
+
+/* ═══════════════════════════════════
+   Dark footer
+   ═══════════════════════════════════ */
+.footer {
+    background: #003B5C;
+    color: #fff;
+    padding: 48px 16px 32px;
+}
+
+@media (min-width: 1024px) {
+    .footer {
+        padding: 56px 24px 36px;
+    }
+}
+
+.footer__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+@media (min-width: 1024px) {
+    .footer__inner {
+        flex-direction: row;
+        align-items: center;
+        gap: 60px;
+    }
+}
+
+/* ── Left: Info ──── */
+.footer__info {
+    flex: 1;
+}
+
+.footer__logo {
+    text-decoration: none;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    display: inline-flex;
+    margin-bottom: 24px;
+}
+
+.footer__logo-h {
+    color: #fff;
+}
+
+.footer__logo-lorka {
+    color: #0096B8;
+}
+
+.footer__columns {
+    display: flex;
+    gap: 48px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+.footer__col-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #0096B8;
+    margin-bottom: 12px;
+}
+
+.footer__list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.footer__list li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.footer__list li svg {
+    flex-shrink: 0;
+    color: #0096B8;
+}
+
+.footer__link {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.footer__link:hover {
+    color: #0096B8;
+}
+
+.footer__legal {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.5;
+}
+
+.footer__copy {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.35);
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ── Right: CTA ──── */
+.footer__cta {
+    flex-shrink: 0;
+    text-align: center;
+}
+
+@media (min-width: 1024px) {
+    .footer__cta {
+        text-align: right;
+    }
+}
+
+.footer__cta-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 10px;
+}
+
+@media (min-width: 1024px) {
+    .footer__cta-title {
+        font-size: 2.25rem;
+    }
+}
+
+.footer__cta-text {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.footer__cta-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+@media (min-width: 1024px) {
+    .footer__cta-buttons {
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 420px) {
+    .footer__cta-buttons {
+        flex-direction: column;
+    }
+
+    .footer__cta-buttons .btn {
+        width: 100%;
+    }
+}

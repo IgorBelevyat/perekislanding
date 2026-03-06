@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # ── Frontend ──────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - postgres
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: unless-stopped
+
+  # ── PostgreSQL ────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-perekis}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-perekis_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-perekis_landing}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+  # ── Backend (uncomment when ready) ────────────────────────
+  # backend:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "4000:4000"
+  #   environment:
+  #     DATABASE_URL: postgresql://${POSTGRES_USER:-perekis}:${POSTGRES_PASSWORD:-perekis_secret}@postgres:5432/${POSTGRES_DB:-perekis_landing}
+  #     NODE_ENV: development
+  #   depends_on:
+  #     - postgres
+  #   restart: unless-stopped
+
+volumes:
+  postgres_data:

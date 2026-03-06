@@ -1,0 +1,160 @@
+.hero {
+    background: linear-gradient(180deg, #ffffff 0%, #F4FAFC 100%);
+    padding: 40px 16px 60px;
+    overflow: hidden;
+}
+
+@media (min-width: 1024px) {
+    .hero {
+        padding: 60px 24px 100px;
+    }
+}
+
+.hero__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    align-items: center;
+}
+
+@media (min-width: 1024px) {
+    .hero__inner {
+        flex-direction: row;
+        gap: 60px;
+        align-items: center;
+    }
+}
+
+/* ── Content (left) ──── */
+.hero__content {
+    flex: 1;
+    max-width: 580px;
+}
+
+.hero__title {
+    font-size: 1.875rem;
+    line-height: 1.15;
+    color: #003B5C;
+    margin-bottom: 16px;
+}
+
+.hero__title-accent {
+    color: #0096B8;
+}
+
+.hero__title-sub {
+    display: block;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #FF7A00;
+    margin-top: 8px;
+}
+
+@media (min-width: 1024px) {
+    .hero__title-sub {
+        font-size: 1.375rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .hero__title {
+        font-size: clamp(2.5rem, 4vw, 3.25rem);
+    }
+}
+
+.hero__subtitle {
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: #6B7280;
+    margin-bottom: 28px;
+}
+
+@media (min-width: 1024px) {
+    .hero__subtitle {
+        font-size: 1.125rem;
+    }
+}
+
+/* Benefits */
+.hero__benefits {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 32px;
+}
+
+.hero__benefit {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+    color: #1E1E1E;
+    font-weight: 500;
+}
+
+.hero__benefit-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+/* CTA Buttons */
+.hero__cta {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+    .hero__cta {
+        flex-direction: column;
+    }
+
+    .hero__cta .btn {
+        width: 100%;
+    }
+}
+
+/* ── Image (right) ──── */
+.hero__image-wrapper {
+    flex: 1;
+    max-width: 560px;
+    position: relative;
+}
+
+.hero__image {
+    width: 100%;
+    height: auto;
+    border-radius: 16px;
+    object-fit: cover;
+    box-shadow: 0 16px 48px rgba(0, 59, 92, 0.15);
+}
+
+.hero__image-badge {
+    position: absolute;
+    bottom: -16px;
+    right: 20px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.hero__badge-text {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: #10B981;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.hero__badge-sub {
+    display: block;
+    font-size: 15px;
+    font-weight: 800;
+    color: #003B5C;
+}

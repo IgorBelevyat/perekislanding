@@ -1,0 +1,104 @@
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+/* Sizes */
+.btn--sm {
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 12px;
+}
+
+.btn--md {
+    padding: 14px 28px;
+    font-size: 16px;
+    border-radius: 12px;
+}
+
+.btn--lg {
+    padding: 16px 36px;
+    font-size: 18px;
+    border-radius: 12px;
+}
+
+/* Full width */
+.btn--full {
+    width: 100%;
+}
+
+/* ── Primary (бірюзовий) ──── */
+.btn--primary {
+    background-color: #0096B8;
+    color: #fff;
+    border-color: #0096B8;
+}
+
+.btn--primary:hover {
+    background-color: #007A96;
+    border-color: #007A96;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 150, 184, 0.3);
+}
+
+.btn--primary:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* ── CTA (помаранчевий) ──── */
+.btn--cta {
+    background-color: #FF7A00;
+    color: #fff;
+    border-color: #FF7A00;
+}
+
+.btn--cta:hover {
+    background-color: #E56D00;
+    border-color: #E56D00;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 122, 0, 0.3);
+}
+
+.btn--cta:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* ── Outline ──── */
+.btn--outline {
+    background-color: transparent;
+    color: #0096B8;
+    border-color: #0096B8;
+}
+
+.btn--outline:hover {
+    background-color: #0096B8;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.btn--outline:active {
+    transform: translateY(0);
+}
+
+/* ── Outline CTA ──── */
+.btn--outline-cta {
+    background-color: transparent;
+    color: #FF7A00;
+    border-color: #FF7A00;
+}
+
+.btn--outline-cta:hover {
+    background-color: #FF7A00;
+    color: #fff;
+    transform: translateY(-1px);
+}

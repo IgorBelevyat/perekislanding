@@ -1,0 +1,150 @@
+.comparison__title {
+    text-align: center;
+    font-size: 1.375rem;
+    color: #003B5C;
+    margin-bottom: 40px;
+}
+
+@media (min-width: 1024px) {
+    .comparison__title {
+        font-size: clamp(2rem, 3vw, 2.25rem);
+    }
+}
+
+/* ── Desktop Table ──── */
+.comparison__table-wrapper {
+    display: none;
+    overflow-x: auto;
+}
+
+@media (min-width: 768px) {
+    .comparison__table-wrapper {
+        display: block;
+    }
+}
+
+.comparison__table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.comparison__th {
+    padding: 18px 24px;
+    text-align: left;
+    font-size: 15px;
+    font-weight: 700;
+    background: #003B5C;
+    color: #fff;
+}
+
+.comparison__th--chlorine {
+    background: #1a4a6b;
+}
+
+.comparison__th--peroxide {
+    background: #0096B8;
+}
+
+.comparison__row:nth-child(even) {
+    background: #F9FAFB;
+}
+
+.comparison__param {
+    padding: 16px 24px;
+    font-weight: 600;
+    color: #003B5C;
+    font-size: 15px;
+}
+
+.comparison__svg {
+    flex-shrink: 0;
+    margin-right: 8px;
+    display: inline-flex;
+    vertical-align: middle;
+}
+
+.comparison__svg--pos {
+    color: #10B981;
+}
+
+.comparison__svg--neg {
+    color: #EF4444;
+}
+
+.comparison__cell {
+    padding: 16px 24px;
+    font-size: 14px;
+    color: #6B7280;
+    vertical-align: middle;
+}
+
+.comparison__cell--pos {
+    color: #1E1E1E;
+}
+
+/* ── Mobile Cards ──── */
+.comparison__cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+@media (min-width: 768px) {
+    .comparison__cards {
+        display: none;
+    }
+}
+
+.comparison-card {
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.comparison-card__param {
+    font-weight: 700;
+    color: #003B5C;
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+
+.comparison-card__row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.comparison-card__item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 8px;
+}
+
+.comparison-card__item--neg {
+    background: #FEF2F2;
+    color: #991B1B;
+}
+
+.comparison-card__item--pos {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.comparison-card__label {
+    font-weight: 600;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.comparison-card__value {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}

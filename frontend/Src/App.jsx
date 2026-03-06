@@ -1,0 +1,38 @@
+import { CartProvider } from '../Stores/CartContext';
+import Header from '../Common components/Header/Header';
+import HeroBlock from '../Blocks/HeroBlock/HeroBlock';
+import ProblemBlock from '../Blocks/ProblemBlock/ProblemBlock';
+import CalculatorBlock from '../Blocks/CalculatorBlock/CalculatorBlock';
+import ComparisonBlock from '../Blocks/ComparisonBlock/ComparisonBlock';
+import HowToUseBlock from '../Blocks/HowToUseBlock/HowToUseBlock';
+import ProductBlock from '../Blocks/ProductBlock/ProductBlock';
+import BundlesBlock from '../Blocks/BundlesBlock/BundlesBlock';
+import ReviewsBlock from '../Blocks/ReviewsBlock/ReviewsBlock';
+import FaqBlock from '../Blocks/FaqBlock/FaqBlock';
+import TrustBlock from '../Blocks/TrustBlock/TrustBlock';
+import CartModal from '../Common components/Cart/CartModal';
+import StickyCartBar from '../Common components/StickyCartBar/StickyCartBar';
+
+function App() {
+    return (
+        <CartProvider>
+            <Header />
+            <main>
+                <HeroBlock />
+                <ProblemBlock />
+                <CalculatorBlock />
+                <ComparisonBlock />
+                <HowToUseBlock />
+                <ProductBlock />
+                <BundlesBlock />
+                <ReviewsBlock />
+                <FaqBlock />
+            </main>
+            <TrustBlock />
+            <CartModal />
+            <StickyCartBar />
+        </CartProvider>
+    );
+}
+
+export default App;
