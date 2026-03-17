@@ -1,18 +1,54 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCart } from '../../Stores/CartContext';
+import logoImg from '../../Src/assets/images/logo.png';
 import './Header.css';
 
 function Header() {
     const { items, setIsCartOpen } = useCart();
     const [menuOpen, setMenuOpen] = useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
+    const [fadeProgress, setFadeProgress] = useState(0);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const scrollY = window.scrollY;
+
+            if (window.innerWidth <= 768) {
+                const vh = window.innerHeight;
+                const startFade = vh * 0.8;
+                const endFade = vh;
+
+                if (scrollY <= startFade) {
+                    setFadeProgress(0);
+                    setIsScrolled(false);
+                } else if (scrollY >= endFade) {
+                    setFadeProgress(1);
+                    setIsScrolled(true);
+                } else {
+                    const progress = (scrollY - startFade) / (endFade - startFade);
+                    setFadeProgress(progress);
+                    setIsScrolled(progress > 0.5);
+                }
+            } else {
+                setIsScrolled(scrollY > 20);
+                setFadeProgress(scrollY > 20 ? 1 : 0);
+            }
+        };
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        handleScroll(); // init
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
     const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
     return (
-        <header className="header">
+        <header
+            className={`header ${!isScrolled ? 'header--transparent' : ''}`}
+            style={{ '--fade-progress': fadeProgress }}
+        >
             <div className="header__inner">
                 <a href="https://hlorka.ua" className="header__logo" target="_blank" rel="noopener noreferrer">
-                    <span className="header__logo-text">H</span>
-                    <span className="header__logo-accent">LORKA</span>
+                    <img src={logoImg} alt="Hlorka Logo" className="header__logo-img" />
                 </a>
 
                 <nav className={`header__nav ${menuOpen ? 'header__nav--open' : ''}`}>

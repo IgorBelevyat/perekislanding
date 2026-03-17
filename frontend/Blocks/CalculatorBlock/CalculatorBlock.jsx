@@ -28,13 +28,13 @@ function CalculatorBlock() {
 
     const calculatedVolume = useMemo(() => {
         if (inputMode === 'dimensions') {
-            const l = parseFloat(length);
-            const w = parseFloat(width);
-            const d = parseFloat(depth);
+            const l = parseFloat(String(length).replace(',', '.'));
+            const w = parseFloat(String(width).replace(',', '.'));
+            const d = parseFloat(String(depth).replace(',', '.'));
             if (l > 0 && w > 0 && d > 0) return l * w * d;
             return null;
         } else {
-            const v = parseFloat(volume);
+            const v = parseFloat(String(volume).replace(',', '.'));
             return v > 0 ? v : null;
         }
     }, [inputMode, length, width, depth, volume]);
@@ -80,6 +80,7 @@ function CalculatorBlock() {
                             volume={result.volume}
                             liters={result.liters}
                             canisters={result.canisters}
+                            kValue={selectedMode?.k}
                         />
                     )}
                 </div>

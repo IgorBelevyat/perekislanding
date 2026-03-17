@@ -1,14 +1,54 @@
+import { useState } from 'react';
 import Button from '../../Common components/Button/Button';
 import { useCart } from '../../Stores/CartContext';
+import { api } from '../../Api/api';
 
-function CalculatorResult({ volume, liters, canisters }) {
+function CalculatorResult({ volume, liters, canisters, kValue }) {
     const { addToCart } = useCart();
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
 
-    const handleAddToCart = () => {
-        addToCart(
-            { id: 'peroxide-50', name: 'Перекис водню 50%, 5 кг', price: 340 },
-            canisters
-        );
+    const handleAddToCart = async () => {
+        setIsLoading(true);
+        setError(null); // Changed from '' to null
+
+        try {
+            // Check if we have dimensions or volume from context/props
+            // Assuming the parent CalculatorBlock calculates volume
+            const calcInputData = { V: Number(volume.toFixed(2)) }; // Updated to use 'volume' prop and format
+
+            const requestData = {
+                bundleId: 'basic', // Using the basic bundle for 5L logic initially
+                calcInput: calcInputData,
+                k: kValue || 0.7, // Add kValue prop in CalculatorBlock
+                includeAddons: false, // We only want the peroxide
+            };
+
+            // Request quote from the server
+            const res = await api.getQuote(requestData);
+
+            // The quote response contains items array and quoteId
+            if (res.items && res.items.length > 0) {
+                // Find the main peroxide item
+                const peroxideItem = res.items[0];
+
+                // Add to cart with proper ID and server pricing
+                addToCart(
+                    {
+                        id: peroxideItem.offerId,
+                        name: peroxideItem.name,
+                        price: peroxideItem.unitPrice
+                    },
+                    peroxideItem.qty,
+                    res.quoteId // Pass quoteId to cart if cart context supports it
+                );
+            }
+        } catch (err) {
+            console.error('Failed to get quote:', err);
+            setError('Не вдалося додати до кошика. Спробуйте ще раз.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -30,9 +70,11 @@ function CalculatorResult({ volume, liters, canisters }) {
 
             <div className="calc-result__divider" />
 
+            {error && <div style={{ color: 'red', marginBottom: '10px', textAlign: 'center' }}>{error}</div>}
+
             <div className="calc-result__cta">
-                <Button variant="cta" size="lg" fullWidth onClick={handleAddToCart}>
-                    Додати {canisters} {canisters === 1 ? 'каністру' : canisters < 5 ? 'каністри' : 'каністр'} у кошик
+                <Button variant="cta" size="lg" fullWidth onClick={handleAddToCart} disabled={isLoading}>
+                    {isLoading ? 'Завантаження...' : `Додати ${canisters} ${canisters === 1 ? 'каністру' : canisters < 5 ? 'каністри' : 'каністр'} у кошик`}
                 </Button>
             </div>
 

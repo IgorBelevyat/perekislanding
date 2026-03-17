@@ -1,9 +1,9 @@
 function CalculatorInputs({ mode, length, width, depth, volume, onLengthChange, onWidthChange, onDepthChange, onVolumeChange }) {
     const handleNumberInput = (setter) => (e) => {
         const val = e.target.value;
-        // Allow empty, digits, and one decimal point
-        if (val === '' || /^\d*\.?\d*$/.test(val)) {
-            setter(val);
+        // Allow empty, digits, and one decimal point or comma
+        if (val === '' || /^\d*[\.,]?\d*$/.test(val)) {
+            setter(val.replace(',', '.'));
         }
     };
 

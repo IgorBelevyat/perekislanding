@@ -1,7 +1,8 @@
 .cart-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 59, 92, 0.4);
+    backdrop-filter: blur(6px);
     z-index: 200;
     display: flex;
     justify-content: flex-end;
@@ -20,8 +21,8 @@
 
 .cart-modal {
     width: 100%;
-    max-width: 420px;
-    height: 100vh;
+    max-width: 500px;
+    height: 100dvh;
     background: #fff;
     box-shadow: -8px 0 32px rgba(0, 0, 0, 0.15);
     display: flex;

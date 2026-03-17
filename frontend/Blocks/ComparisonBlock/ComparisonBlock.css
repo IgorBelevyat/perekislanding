@@ -123,23 +123,26 @@
     display: flex;
     justify-content: space-between;
     font-size: 14px;
-    padding: 8px 12px;
-    border-radius: 8px;
+    padding: 12px 0;
+    border-bottom: 1px solid #E5E7EB;
 }
 
-.comparison-card__item--neg {
-    background: #FEF2F2;
+.comparison-card__item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.comparison-card__item--neg .comparison-card__value {
     color: #991B1B;
 }
 
-.comparison-card__item--pos {
-    background: #D1FAE5;
+.comparison-card__item--pos .comparison-card__value {
     color: #065F46;
 }
 
 .comparison-card__label {
     font-weight: 600;
-    margin-right: 8px;
+    color: #4B5563;
     flex-shrink: 0;
 }
 

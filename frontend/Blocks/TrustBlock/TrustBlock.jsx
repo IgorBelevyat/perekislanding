@@ -1,5 +1,6 @@
 import SectionWrapper from '../../Common components/SectionWrapper/SectionWrapper';
 import Button from '../../Common components/Button/Button';
+import logoImg from '../../Src/assets/images/logo.png';
 import './TrustBlock.css';
 
 const whyUsItems = [
@@ -70,8 +71,7 @@ function TrustBlock() {
                     {/* Left: Contacts & Legal */}
                     <div className="footer__info">
                         <a href="https://hlorka.ua" className="footer__logo" target="_blank" rel="noopener noreferrer">
-                            <span className="footer__logo-h">H</span>
-                            <span className="footer__logo-lorka">LORKA</span>
+                            <img src={logoImg} alt="Hlorka Logo" className="footer__logo-img" />
                         </a>
 
                         <div className="footer__columns">

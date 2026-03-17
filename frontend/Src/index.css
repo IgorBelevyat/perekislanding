@@ -15,13 +15,16 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+  width: 100%;
 }
 
 body {
   font-family: 'Montserrat', 'Inter', system-ui, sans-serif;
   color: #1E1E1E;
   background-color: #fff;
-  overflow-x: hidden;
+  overflow-x: clip;
+  width: 100%;
 }
 
 /* ── Typography ──────────────────────────────── */

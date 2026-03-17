@@ -16,7 +16,7 @@ function CartHistory() {
         <div className="cart-history">
             {orderHistory.map(order => (
                 <div key={order.id} className="cart-history__order">
-                    <p className="cart-history__date">{formatDate(order.date)}</p>
+                    <p className="cart-history__date">Замовлення №{order.orderNumber || String(order.id).slice(0, 8)} від {formatDate(order.date)}</p>
                     {order.items.map((item, i) => (
                         <p key={i} className="cart-history__item">
                             {item.name} × {item.quantity} — {item.price * item.quantity} грн

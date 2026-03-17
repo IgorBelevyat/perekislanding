@@ -1,14 +1,33 @@
 import { useCart } from '../../Stores/CartContext';
 import CartItem from './CartItem';
 import CartHistory from './CartHistory';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './CartModal.css';
 
 function CartModal() {
-    const { items, isCartOpen, setIsCartOpen, getTotal, placeOrder, orderHistory } = useCart();
+    const { items, isCartOpen, setIsCartOpen, getTotal, startCheckout, checkoutStep, orderHistory } = useCart();
     const [showHistory, setShowHistory] = useState(false);
 
-    if (!isCartOpen) return null;
+    // Body scroll lock
+    useEffect(() => {
+        const isVisible = isCartOpen && (checkoutStep === 'cart' || checkoutStep === 'processing');
+        if (isVisible) {
+            document.body.style.overflow = 'hidden';
+            // Also add a class to html to prevent Safari bounce
+            document.documentElement.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
+        }
+
+        return () => {
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
+        };
+    }, [isCartOpen, checkoutStep]);
+
+    // Hide standard cart if we are in checkout flow
+    if (!isCartOpen || (checkoutStep !== 'cart' && checkoutStep !== 'processing')) return null;
 
     return (
         <div className="cart-overlay" onClick={() => setIsCartOpen(false)}>
@@ -38,8 +57,12 @@ function CartModal() {
                             <strong>{getTotal()} грн</strong>
                         </div>
 
-                        <button className="cart-modal__checkout" onClick={() => { placeOrder(); }}>
-                            Оформити замовлення
+                        <button
+                            className="cart-modal__checkout"
+                            onClick={() => startCheckout()}
+                            disabled={checkoutStep === 'processing'}
+                        >
+                            {checkoutStep === 'processing' ? 'Підготовка замовлення...' : 'Оформити замовлення'}
                         </button>
 
                         <p className="cart-modal__hint">

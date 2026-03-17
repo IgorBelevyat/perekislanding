@@ -72,7 +72,14 @@
 .footer {
     background: #003B5C;
     color: #fff;
-    padding: 48px 16px 32px;
+    padding: 48px 16px 110px;
+    /* 110px bottom padding to clear the mobile sticky CTA */
+}
+
+@media (min-width: 768px) {
+    .footer {
+        padding: 56px 24px 36px;
+    }
 }
 
 @media (min-width: 1024px) {
@@ -111,12 +118,12 @@
     margin-bottom: 24px;
 }
 
-.footer__logo-h {
-    color: #fff;
-}
-
-.footer__logo-lorka {
-    color: #0096B8;
+.footer__logo-img {
+    height: 44px;
+    width: auto;
+    display: block;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
 }
 
 .footer__columns {
@@ -216,6 +223,7 @@
     display: flex;
     gap: 12px;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 @media (min-width: 1024px) {

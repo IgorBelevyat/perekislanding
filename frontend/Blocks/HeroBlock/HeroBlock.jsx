@@ -7,19 +7,19 @@ function HeroBlock() {
     const benefits = [
         {
             icon: (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0096B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" /></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" /></svg>
             ),
             text: 'Без запаху хлору — комфорт для всієї сім\'ї',
         },
         {
             icon: (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0096B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
             ),
             text: 'Безпечно для дітей та алергіків',
         },
         {
             icon: (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0096B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>
             ),
             text: 'Простий розрахунок — 3 кроки до чистої води',
         },
@@ -64,6 +64,12 @@ function HeroBlock() {
                         <span className="hero__badge-text">Перевірено</span>
                         <span className="hero__badge-sub">14 000+ басейнів</span>
                     </div>
+                </div>
+
+                <div className="hero__scroll-indicator" aria-hidden="true" onClick={() => document.getElementById('problem')?.scrollIntoView({ behavior: 'smooth' })}>
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
                 </div>
             </div>
         </section>

@@ -12,6 +12,8 @@ import FaqBlock from '../Blocks/FaqBlock/FaqBlock';
 import TrustBlock from '../Blocks/TrustBlock/TrustBlock';
 import CartModal from '../Common components/Cart/CartModal';
 import StickyCartBar from '../Common components/StickyCartBar/StickyCartBar';
+import CheckoutModal from '../Common components/Checkout/CheckoutModal';
+import OrderResult from '../Common components/Checkout/OrderResult';
 
 function App() {
     return (
@@ -30,6 +32,8 @@ function App() {
             </main>
             <TrustBlock />
             <CartModal />
+            <CheckoutModal />
+            <OrderResult />
             <StickyCartBar />
         </CartProvider>
     );

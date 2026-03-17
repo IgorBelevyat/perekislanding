@@ -13,6 +13,7 @@
 
 .reviews {
     position: relative;
+    max-width: 100%;
 }
 
 .reviews__controls {
@@ -56,25 +57,40 @@
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    padding: 16px 0 24px;
-    margin: -16px 0 -16px;
+    padding: 16px 0 32px 0;
+    margin: -16px 0 -32px 0;
+}
+
+.reviews__slider::before,
+.reviews__slider::after {
+    content: '';
+    flex: 0 0 4px; /* pushes the first/last item inwards */
 }
 
 @media (min-width: 1024px) {
-    .reviews__slider--fade-right {
-        -webkit-mask-image: linear-gradient(to right, #000 0%, #000 80%, transparent 100%);
-        mask-image: linear-gradient(to right, #000 0%, #000 80%, transparent 100%);
+    .reviews__slider {
+        padding: 16px 0 32px 0;
+        margin: -16px 0 -32px 0;
     }
+    .reviews__slider::before,
+    .reviews__slider::after {
+        flex: 0 0 8px;
+    }
+}
 
-    .reviews__slider--fade-left {
-        -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 20%, #000 100%);
-        mask-image: linear-gradient(to right, transparent 0%, #000 20%, #000 100%);
-    }
+.reviews__slider--fade-right {
+    -webkit-mask-image: linear-gradient(to right, #000 0%, #000 80%, transparent 100%);
+    mask-image: linear-gradient(to right, #000 0%, #000 80%, transparent 100%);
+}
 
-    .reviews__slider--fade-left.reviews__slider--fade-right {
-        -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 10%, #000 80%, transparent 100%);
-        mask-image: linear-gradient(to right, transparent 0%, #000 10%, #000 80%, transparent 100%);
-    }
+.reviews__slider--fade-left {
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 20%, #000 100%);
+    mask-image: linear-gradient(to right, transparent 0%, #000 20%, #000 100%);
+}
+
+.reviews__slider--fade-left.reviews__slider--fade-right {
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 10%, #000 80%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, #000 10%, #000 80%, transparent 100%);
 }
 
 .reviews__slider::-webkit-scrollbar {
