@@ -275,3 +275,182 @@
 .calc-result__trust span {
     margin: 0 8px;
 }
+
+/* ── Scenarios container ──── */
+.calc-result__scenarios {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 4px;
+}
+
+.calc-result__primary-action {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+}
+
+.calc-result__primary-price {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #003B5C;
+    margin-bottom: 4px;
+}
+
+.calc-result__primary-benefit {
+    display: inline-block;
+    background: #DCFCE7;
+    color: #10B981;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.calc-result__error {
+    color: #EF4444;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.calc-result__extra {
+    margin-top: 4px;
+}
+
+/* ── Or divider ──── */
+.calc-result__or-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 4px 0;
+}
+
+.calc-result__or-divider::before,
+.calc-result__or-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #E5E7EB;
+}
+
+.calc-result__or-divider span {
+    font-size: 12px;
+    font-weight: 600;
+    color: #9CA3AF;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+/* ── Upsell card ──── */
+.calc-upsell {
+    border: 1px solid #E5E7EB;
+    border-radius: 14px;
+    padding: 16px 20px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.calc-upsell:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.calc-upsell--highlight {
+    border-color: #FF7A00;
+    border-width: 2px;
+    box-shadow: 0 4px 20px rgba(255, 122, 0, 0.1);
+    background: #FFFBF5;
+}
+
+.calc-upsell__body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.calc-upsell__info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-align: left;
+}
+
+.calc-upsell__title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #003B5C;
+}
+
+.calc-upsell__contents {
+    font-size: 13px;
+    color: #6B7280;
+}
+
+.calc-upsell__pricing {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.calc-upsell__price {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #003B5C;
+}
+
+.calc-upsell__benefit {
+    display: inline-block;
+    background: #DCFCE7;
+    color: #10B981;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 10px;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+/* ── Mobile tweaks ──── */
+@media (max-width: 480px) {
+    .calc-upsell__body {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .calc-upsell__pricing {
+        align-items: flex-start;
+        flex-direction: row;
+        gap: 10px;
+    }
+
+    .calc-upsell {
+        padding: 14px 16px;
+    }
+
+    .calc-result__row {
+        gap: 16px;
+    }
+
+    .calc-result__scenarios .btn {
+        font-size: 14px;
+        white-space: normal;
+        line-height: 1.3;
+        padding: 12px 16px;
+    }
+
+    .calc-result__extra .btn {
+        font-size: 13px;
+    }
+}
+

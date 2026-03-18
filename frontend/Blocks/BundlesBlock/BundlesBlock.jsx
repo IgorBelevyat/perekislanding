@@ -1,32 +1,14 @@
-import { useState, useEffect } from 'react';
 import SectionWrapper from '../../Common components/SectionWrapper/SectionWrapper';
 import Button from '../../Common components/Button/Button';
-import { api } from '../../Api/api';
 import { useCart } from '../../Stores/CartContext';
+import { useBundles } from '../../Hooks/useBundles';
 import './BundlesBlock.css';
 
 function BundlesBlock() {
-    const [bundles, setBundles] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const { addToCart, clearCart } = useCart();
-
-    useEffect(() => {
-        let isMounted = true;
-        api.getBundles()
-            .then(data => {
-                if (!isMounted || !data.bundles) return;
-                setBundles(data.bundles);
-            })
-            .catch(err => console.error('Failed to fetch bundles:', err))
-            .finally(() => {
-                if (isMounted) setIsLoading(false);
-            });
-
-        return () => { isMounted = false; };
-    }, []);
+    const { bundles, isLoading } = useBundles();
+    const { addToCart } = useCart();
 
     const handleOrderBundle = (bundle) => {
-        // We now allow multiple distinct bundles to coexist in the cart
         bundle.customItems.forEach((cItem) => {
             addToCart(
                 {

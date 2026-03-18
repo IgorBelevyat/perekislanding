@@ -4,8 +4,8 @@ export const QUOTE_TTL_MS = 30 * 60 * 1000; // 30 minutes
 // ─── Redis TTL (seconds) ───────────────
 export const REDIS_TTL = {
     // RetailCRM prices cache
-    RC_OFFER: 120,           // 2 min
-    RC_OFFER_STALE: 30,      // extra 30s stale-while-revalidate
+    RC_OFFER: 120,           // 2 min primary cache
+    RC_OFFER_STALE: 3600,    // 1 hour — enables stale-while-revalidate; actual stale key lives 24h in Redis
 
     // Nova Poshta
     NP_CITIES: 43200,        // 12 hours

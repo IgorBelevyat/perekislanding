@@ -38,6 +38,64 @@ export function CartProvider({ children }) {
         localStorage.setItem(HISTORY_KEY, JSON.stringify(orderHistory));
     }, [orderHistory]);
 
+    // On-load: validate prices for all items already in cart (including bundle items)
+    useEffect(() => {
+        if (items.length === 0) return;
+
+        const validatePrices = async () => {
+            try {
+                const customItems = items.map(i => {
+                    const payloadItem = {
+                        offerId: i.id,
+                        qty: i.quantity,
+                        isBundleItem: i.isBundleItem
+                    };
+                    if (i.bundleId) payloadItem.bundleId = i.bundleId;
+                    return payloadItem;
+                });
+
+                const res = await api.getQuote({ customItems });
+
+                let pricesDrifted = false;
+                setItems(prev => {
+                    const updated = prev.map(cartItem => {
+                        const serverItem = res.items?.find(si =>
+                            si.offerId === cartItem.id &&
+                            Boolean(si.isBundleItem) === Boolean(cartItem.isBundleItem) &&
+                            si.bundleId === cartItem.bundleId
+                        );
+                        if (serverItem && serverItem.unitPrice !== cartItem.price) {
+                            pricesDrifted = true;
+                            return {
+                                ...cartItem,
+                                price: serverItem.unitPrice,
+                                basePrice: serverItem.basePrice,
+                                priceChanged: true,
+                                oldPrice: cartItem.price
+                            };
+                        }
+                        // Clear stale priceChanged flag if price is now correct
+                        if (cartItem.priceChanged && serverItem && serverItem.unitPrice === cartItem.price) {
+                            const { priceChanged, oldPrice, ...rest } = cartItem;
+                            return rest;
+                        }
+                        return cartItem;
+                    });
+                    return updated;
+                });
+
+                if (pricesDrifted) {
+                    setPriceAlertMessage('Ціни на деякі товари у кошику змінилися. Суми оновлено до актуальних цін.');
+                }
+            } catch (err) {
+                console.error('Failed to validate cart prices on load:', err);
+            }
+        };
+
+        validatePrices();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Only on mount
+
     const addToCart = (product, quantity = 1, options = {}) => {
         const bundleId = options.bundleId || null;
         const cartItemId = bundleId 

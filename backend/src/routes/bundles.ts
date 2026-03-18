@@ -81,7 +81,9 @@ router.get(
                 });
             }
 
-            const benefit = baseTotal - actualTotal;
+            // Benefit = savings on peroxide only (other items not counted)
+            const peroxideBundlePrice = peroxide?.prices[priceType] ?? peroxideBasePrice;
+            const benefit = (peroxideBasePrice * peroxideQty) - (peroxideBundlePrice * peroxideQty);
 
             return {
                 id,
