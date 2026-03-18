@@ -19,10 +19,15 @@ function CartHistory() {
                     <p className="cart-history__date">Замовлення №{order.orderNumber || String(order.id).slice(0, 8)} від {formatDate(order.date)}</p>
                     {order.items.map((item, i) => (
                         <p key={i} className="cart-history__item">
-                            {item.name} × {item.quantity} — {item.price * item.quantity} грн
+                            {item.name} × {item.quantity} — {item.price * item.quantity} {item.price === 0 ? '(У подарунок)' : 'грн'}
                         </p>
                     ))}
                     <p className="cart-history__total">Разом: {order.total} грн</p>
+                    {order.benefit > 0 && (
+                        <p className="cart-history__total" style={{ color: '#10B981', marginTop: '0', border: 'none' }}>
+                            Ваша вигода: {order.benefit} грн
+                        </p>
+                    )}
                     <button className="cart-history__reorder" onClick={() => reorder(order)}>
                         Замовити знову
                     </button>

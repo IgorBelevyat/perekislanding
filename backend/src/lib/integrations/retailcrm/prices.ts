@@ -4,11 +4,41 @@ import { REDIS_TTL } from '../../config/constants';
 import { fetchProducts } from './client';
 import type { RetailCrmOffer } from './types';
 import { logger } from '../../security/logger';
+import { env } from '../../config/env';
+
+const MOCK_PRICES: Record<string, CachedOffer> = {
+    [env.OFFER_ID_PEROXIDE || 'peroxide']: {
+        offerId: env.OFFER_ID_PEROXIDE || 'peroxide',
+        name: 'Перекис водню 50%',
+        currency: 'UAH',
+        updatedAt: new Date().toISOString(),
+        prices: {
+            'base': 599,
+            [env.PRICE_TYPE_NASEZON || 'nasezon']: 569,
+            [env.PRICE_TYPE_OPTIMAL || 'optimal']: 549,
+            [env.PRICE_TYPE_PRO || 'pro']: 539,
+        }
+    },
+    [env.OFFER_ID_TEST_STRIPS || 'strips']: {
+        offerId: env.OFFER_ID_TEST_STRIPS || 'strips',
+        name: 'Тест-смужки для перекису',
+        currency: 'UAH',
+        updatedAt: new Date().toISOString(),
+        prices: { 'base': 180 }
+    },
+    [env.OFFER_ID_MEASURING_CUP || 'cup']: {
+        offerId: env.OFFER_ID_MEASURING_CUP || 'cup',
+        name: 'Мірна тара',
+        currency: 'UAH',
+        updatedAt: new Date().toISOString(),
+        prices: { 'base': 150 }
+    }
+};
 
 interface CachedOffer {
     offerId: string;
     name: string;
-    price: number;
+    prices: Record<string, number>;
     currency: string;
     updatedAt: string;
 }
@@ -26,10 +56,22 @@ export async function getOfferPrice(offerExternalId: string): Promise<CachedOffe
                 for (const product of products) {
                     const offer = product.offers.find((o) => o.externalId === offerExternalId);
                     if (offer) {
+                        const priceMap: Record<string, number> = {};
+                        // Map all available retailcrm prices
+                        if (offer.prices && offer.prices.length > 0) {
+                            offer.prices.forEach(p => {
+                                priceMap[p.priceType] = p.price;
+                            });
+                        }
+                        // Always ensure we have at least 'base' mapped to the default price
+                        if (!priceMap['base'] && offer.price) {
+                            priceMap['base'] = offer.price;
+                        }
+
                         return {
                             offerId: offer.externalId,
                             name: offer.name,
-                            price: offer.price,
+                            prices: priceMap,
                             currency: offer.currency ?? 'UAH',
                             updatedAt: new Date().toISOString(),
                         };
@@ -41,6 +83,13 @@ export async function getOfferPrice(offerExternalId: string): Promise<CachedOffe
         );
     } catch (err) {
         logger.error('Failed to get offer price', { offerExternalId, error: (err as Error).message });
+        
+        // Ultimate fallback: return mock if cache and CRM are down
+        if (MOCK_PRICES[offerExternalId]) {
+            logger.warn('Using fallback MOCK prices for offer', { offerExternalId });
+            return MOCK_PRICES[offerExternalId];
+        }
+        
         throw err;
     }
 }

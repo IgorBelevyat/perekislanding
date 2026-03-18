@@ -24,10 +24,9 @@ export const quoteRequestSchema = z.object({
     customItems: z.array(z.object({
         offerId: z.string(),
         qty: z.number().int().positive(),
+        isBundleItem: z.boolean().optional(),
+        bundleId: z.string().optional(),
     })).optional(),
-}).refine(data => {
-    if (data.customItems) return true;
-    return data.bundleId && data.calcInput && data.k;
-}, { message: "Must provide either customItems or bundleId+calcInput+k" });
+});
 
 export type QuoteRequest = z.infer<typeof quoteRequestSchema>;

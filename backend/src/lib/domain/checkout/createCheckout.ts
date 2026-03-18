@@ -98,11 +98,25 @@ export async function processCheckout(
                 lastName: input.customer.lastName,
                 phone: input.customer.phone,
                 email: input.customer.email,
-                items: itemsSnapshot.map((item: any) => ({
+                items: itemsSnapshot.map((item: any, idx: number) => ({
+                    externalId: `${orderId}-${idx}`,
                     offer: { externalId: item.offerId },
                     productName: item.name,
                     quantity: item.qty,
                     initialPrice: item.unitPrice,
+                    ...(item.priceType ? { priceType: { code: item.priceType } } : {}),
+                    properties: [
+                        {
+                            code: 'row_id',
+                            name: 'Рядок кошика',
+                            value: `${orderId}-${idx}`
+                        },
+                        ...(item.bundleId ? [{
+                            code: 'bundle_type',
+                            name: 'З набору',
+                            value: item.bundleId
+                        }] : [])
+                    ]
                 })),
                 delivery: {
                     code: deliveryCode,

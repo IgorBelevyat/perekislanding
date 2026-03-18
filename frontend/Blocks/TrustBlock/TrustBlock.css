@@ -179,6 +179,13 @@
     line-height: 1.5;
 }
 
+.footer__link--ups {
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.8px;
+    font-weight: 600; /* Match contact links weight */
+}
+
 .footer__copy {
     font-size: 13px;
     color: rgba(255, 255, 255, 0.35);

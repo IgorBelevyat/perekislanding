@@ -94,7 +94,16 @@
     gap: 12px;
 }
 
-/* Total */
+/* Total & Benefit */
+.cart-modal__benefit {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 24px 16px;
+    color: #10B981;
+    font-size: 16px;
+    font-weight: 600;
+}
+
 .cart-modal__total {
     display: flex;
     justify-content: space-between;

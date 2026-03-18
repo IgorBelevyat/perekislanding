@@ -20,6 +20,7 @@ export function CartProvider({ children }) {
     const [items, setItems] = useState(() => loadFromStorage(STORAGE_KEY, []));
     const [orderHistory, setOrderHistory] = useState(() => loadFromStorage(HISTORY_KEY, []));
     const [isCartOpen, setIsCartOpen] = useState(false);
+    const [activeBundleId, setActiveBundleId] = useState(null);
 
     // Checkout states
     const [checkoutStep, setCheckoutStep] = useState('cart'); // 'cart' | 'checkout' | 'processing' | 'success' | 'failed'
@@ -37,13 +38,18 @@ export function CartProvider({ children }) {
         localStorage.setItem(HISTORY_KEY, JSON.stringify(orderHistory));
     }, [orderHistory]);
 
-    const addToCart = (product, quantity = 1) => {
+    const addToCart = (product, quantity = 1, options = {}) => {
+        const bundleId = options.bundleId || null;
+        const cartItemId = bundleId 
+            ? `${product.id}-${bundleId}` 
+            : `${product.id}-regular`;
+
         setItems(prev => {
-            const existing = prev.find(i => i.id === product.id);
+            const existing = prev.find(i => i.cartItemId === cartItemId);
             if (existing) {
                 const priceHasChanged = existing.price !== product.price;
                 return prev.map(i => {
-                    if (i.id === product.id) {
+                    if (i.cartItemId === cartItemId) {
                         return {
                             ...i,
                             quantity: i.quantity + quantity,
@@ -57,21 +63,21 @@ export function CartProvider({ children }) {
                     return i;
                 });
             }
-            return [...prev, { ...product, quantity }];
+            return [...prev, { ...product, quantity, cartItemId, isBundleItem: !!bundleId, bundleId }];
         });
         setIsCartOpen(true); // Automatically open cart when adding items
     };
 
-    const updateQuantity = (id, quantity) => {
+    const updateQuantity = (cartItemId, quantity) => {
         if (quantity <= 0) {
-            removeFromCart(id);
+            removeFromCart(cartItemId);
             return;
         }
-        setItems(prev => prev.map(i => i.id === id ? { ...i, quantity } : i));
+        setItems(prev => prev.map(i => i.cartItemId === cartItemId ? { ...i, quantity } : i));
     };
 
-    const removeFromCart = (id) => {
-        setItems(prev => prev.filter(i => i.id !== id));
+    const removeFromCart = (cartItemId) => {
+        setItems(prev => prev.filter(i => i.cartItemId !== cartItemId));
     };
 
     const clearCart = () => setItems([]);
@@ -80,22 +86,36 @@ export function CartProvider({ children }) {
         return items.reduce((sum, item) => sum + item.price * item.quantity, 0);
     };
 
+    const getBenefit = () => {
+        return items.reduce((sum, item) => {
+            const base = item.basePrice || item.price;
+            return sum + ((base - item.price) * item.quantity);
+        }, 0);
+    };
+
     // Prepare a fresh quote from the current cart right before opening checkout
     const startCheckout = async () => {
         if (items.length === 0) return;
         setCheckoutStep('processing'); // Show loading state in modal
         try {
-            const customItems = items.map(i => ({
-                offerId: i.id,
-                qty: i.quantity
-            }));
-            const res = await api.getQuote({ customItems });
+            const customItems = items.map(i => {
+                const payloadItem = {
+                    offerId: i.id,
+                    qty: i.quantity,
+                    isBundleItem: i.isBundleItem
+                };
+                if (i.bundleId) payloadItem.bundleId = i.bundleId;
+                return payloadItem;
+            });
+            const payload = { customItems };
+            const res = await api.getQuote(payload);
 
             // Check for price drift
             let pricesDrifted = false;
             setItems(prev => {
                 const updated = prev.map(cartItem => {
-                    const serverItem = res.items?.find(si => si.offerId === cartItem.id);
+                    // Match the returned API quote item by context (isBundleItem flag) AND bundleId
+                    const serverItem = res.items?.find(si => si.offerId === cartItem.id && Boolean(si.isBundleItem) === Boolean(cartItem.isBundleItem) && si.bundleId === cartItem.bundleId);
                     if (serverItem && serverItem.unitPrice !== cartItem.price) {
                         pricesDrifted = true;
                         return {
@@ -131,6 +151,7 @@ export function CartProvider({ children }) {
             date: new Date().toISOString(),
             items: [...items],
             total: getTotal(),
+            benefit: getBenefit(),
             status: resultData.status || 'success'
         };
         setOrderHistory(prev => [order, ...prev]);
@@ -148,15 +169,21 @@ export function CartProvider({ children }) {
 
     const reorder = async (order) => {
         try {
-            const customItems = order.items.map(i => ({
-                offerId: i.id,
-                qty: i.quantity
-            }));
-            const res = await api.getQuote({ customItems });
+            const customItems = order.items.map(i => {
+                const payloadItem = {
+                    offerId: i.id,
+                    qty: i.quantity,
+                    isBundleItem: i.isBundleItem
+                };
+                if (i.bundleId) payloadItem.bundleId = i.bundleId;
+                return payloadItem;
+            });
+            const payload = { customItems };
+            const res = await api.getQuote(payload);
 
             let pricesDrifted = false;
             const updatedItems = order.items.map(oldItem => {
-                const serverItem = res.items?.find(si => si.offerId === oldItem.id);
+                const serverItem = res.items?.find(si => si.offerId === oldItem.id && Boolean(si.isBundleItem) === Boolean(oldItem.isBundleItem) && si.bundleId === oldItem.bundleId);
                 if (serverItem && serverItem.unitPrice !== oldItem.price) {
                     pricesDrifted = true;
                     return { ...oldItem, price: serverItem.unitPrice, priceChanged: true };
@@ -164,14 +191,14 @@ export function CartProvider({ children }) {
                 return oldItem;
             });
 
-            updatedItems.forEach(item => addToCart(item, item.quantity));
+            updatedItems.forEach(item => addToCart(item, item.quantity, { bundleId: item.bundleId }));
 
             if (pricesDrifted) {
                 setPriceAlertMessage('Ціни на деякі товари відрізняються від вашого попереднього замовлення. Вони були додані до кошика з актуальними цінами.');
             }
         } catch (error) {
             console.error('Failed to validate reorder prices:', error);
-            order.items.forEach(item => addToCart(item, item.quantity));
+            order.items.forEach(item => addToCart(item, item.quantity, { bundleId: item.bundleId }));
         }
         setIsCartOpen(true);
     };
@@ -187,7 +214,10 @@ export function CartProvider({ children }) {
             removeFromCart,
             clearCart,
             getTotal,
+            getBenefit,
             reorder,
+            activeBundleId,
+            setActiveBundleId,
             // Checkout specific
             checkoutStep,
             setCheckoutStep,

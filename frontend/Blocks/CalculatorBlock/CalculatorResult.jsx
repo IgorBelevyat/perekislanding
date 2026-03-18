@@ -79,7 +79,7 @@ function CalculatorResult({ volume, liters, canisters, kValue }) {
             </div>
 
             <p className="calc-result__trust">
-                <span>✓ Оплата при отриманні</span>
+                <span>✓ Можна змінити кількість у кошику</span>
                 <span>✓ Доставка по Україні</span>
             </p>
         </div>

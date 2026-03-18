@@ -3,6 +3,7 @@ import { prisma } from '../../db/prisma';
 import { getOfferPrices } from '../../integrations/retailcrm/prices';
 import { fullCalculation } from '../calculator/formulas';
 import { QUOTE_TTL_MS } from '../../config/constants';
+import { env } from '../../config/env';
 import { logger } from '../../security/logger';
 import type { QuoteRequest } from '../../validation/quote.schema';
 
@@ -10,14 +11,19 @@ export interface QuoteItem {
     offerId: string;
     name: string;
     qty: number;
-    unitPrice: number;
-    total: number;
+    unitPrice: number;    // discounted or base price (what user actually pays)
+    basePrice: number;    // standard retail price before bundle discount
+    total: number;        // unitPrice * qty
+    baseTotal: number;    // basePrice * qty
+    isBundleItem?: boolean; // identifies bundle context match
+    bundleId?: string;    // exact package ID this item belongs to
+    priceType?: string;   // specific CRM price type
 }
 
 export interface QuoteResult {
     quoteId: string;
     items: QuoteItem[];
-    totals: { subtotal: number; total: number };
+    totals: { subtotal: number; total: number; benefit: number; };
     calcResult: {
         volumeM3: number;
         dosageLiters: number;
@@ -41,6 +47,12 @@ export async function buildQuote(input: QuoteRequest): Promise<QuoteResult> {
     let selectedOfferIds: string[] = [];
     let calcInputData: any = input.calcInput || {};
 
+    // Optional: Legacy global packagePriceType if we somehow needed it outside customItems
+    let globalPackagePriceType = 'base';
+    if (input.bundleId === 'nasezon') globalPackagePriceType = env.PRICE_TYPE_NASEZON || 'base';
+    else if (input.bundleId === 'optimal') globalPackagePriceType = env.PRICE_TYPE_OPTIMAL || 'base';
+    else if (input.bundleId === 'pro') globalPackagePriceType = env.PRICE_TYPE_PRO || 'base';
+
     // Custom Cart Items flow
     if (input.customItems?.length) {
         selectedOfferIds = input.customItems.map(i => i.offerId);
@@ -52,12 +64,41 @@ export async function buildQuote(input: QuoteRequest): Promise<QuoteResult> {
                 logger.warn('Offer not found in RetailCRM', { offerId: customItem.offerId });
                 continue;
             }
+
+            const basePrice = offer.prices['base'] ?? 0;
+            let activePrice = basePrice;
+            let activePriceType = 'base';
+
+            // Apply package specific discounts ONLY if it was added as part of a bundle
+            if (customItem.isBundleItem && customItem.bundleId) {
+                let packagePriceType = 'base';
+                if (customItem.bundleId === 'nasezon') packagePriceType = env.PRICE_TYPE_NASEZON || 'base';
+                else if (customItem.bundleId === 'optimal') packagePriceType = env.PRICE_TYPE_OPTIMAL || 'base';
+                else if (customItem.bundleId === 'pro') packagePriceType = env.PRICE_TYPE_PRO || 'base';
+
+                if (customItem.offerId === env.OFFER_ID_PEROXIDE || 
+                    customItem.offerId === env.OFFER_ID_TEST_STRIPS || 
+                    customItem.offerId === env.OFFER_ID_MEASURING_CUP) {
+                    activePrice = offer.prices[packagePriceType] ?? basePrice;
+                    // If CRM actually knows about this price type for this product
+                    if (offer.prices[packagePriceType] !== undefined) {
+                        activePriceType = packagePriceType;
+                    }
+                }
+            }
+
             items.push({
                 offerId: customItem.offerId,
                 name: offer.name,
                 qty: customItem.qty,
-                unitPrice: offer.price,
-                total: offer.price * customItem.qty,
+                basePrice: basePrice,
+                unitPrice: activePrice,
+                baseTotal: basePrice * customItem.qty,
+                total: activePrice * customItem.qty,
+                // Send this back so the frontend can match it in `CartContext`
+                isBundleItem: customItem.isBundleItem,
+                bundleId: customItem.bundleId,
+                priceType: activePriceType !== 'base' ? activePriceType : undefined
             });
         }
     } else {
@@ -95,20 +136,26 @@ export async function buildQuote(input: QuoteRequest): Promise<QuoteResult> {
                 continue;
             }
 
+            // Calculator flow always uses base price since no package was explicitly clicked
+            const basePrice = offer.prices['base'] ?? 0;
             const qty = offerId === bundle.baseOfferId ? calcResult.requiredCanisters : 1;
             items.push({
                 offerId,
                 name: offer.name,
                 qty,
-                unitPrice: offer.price,
-                total: offer.price * qty,
+                basePrice: basePrice,
+                unitPrice: basePrice,
+                baseTotal: basePrice * qty,
+                total: basePrice * qty,
             });
         }
     }
 
     // 6. Calculate totals
-    const subtotal = items.reduce((sum, item) => sum + item.total, 0);
-    const totals = { subtotal, total: subtotal }; // discount logic can go here
+    const subtotal = items.reduce((sum, item) => sum + item.baseTotal, 0); // Cart shows sum without discounts as "subtotal" initially? Or subtotal = total. Let's make subtotal = baseTotal, total = actual total
+    const total = items.reduce((sum, item) => sum + item.total, 0);
+    const benefit = subtotal - total;
+    const totals = { subtotal, total, benefit };
 
     // 7. Save quote snapshot in DB
     const expiresAt = new Date(Date.now() + QUOTE_TTL_MS);

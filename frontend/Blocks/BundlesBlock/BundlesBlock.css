@@ -80,6 +80,10 @@
     background: #003B5C;
 }
 
+.bundle-card__tag--success {
+    background: #10B981;
+}
+
 /* ── Tier title ──── */
 .bundle-card__tier {
     font-size: 1.375rem;
@@ -174,6 +178,18 @@
     font-size: 14px;
     color: #6B7280;
     font-weight: 600;
+}
+
+.bundle-card__benefit-inline {
+    background: #DCFCE7;
+    color: #10B981;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 12px;
+    white-space: nowrap;
+    text-transform: uppercase;
+    margin-right: auto;
 }
 
 .bundle-card__total-price {

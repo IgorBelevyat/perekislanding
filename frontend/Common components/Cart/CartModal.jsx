@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import './CartModal.css';
 
 function CartModal() {
-    const { items, isCartOpen, setIsCartOpen, getTotal, startCheckout, checkoutStep, orderHistory } = useCart();
+    const { items, isCartOpen, setIsCartOpen, getTotal, getBenefit, startCheckout, checkoutStep, orderHistory } = useCart();
     const [showHistory, setShowHistory] = useState(false);
 
     // Body scroll lock
@@ -48,7 +48,7 @@ function CartModal() {
                     <>
                         <div className="cart-modal__items">
                             {items.map(item => (
-                                <CartItem key={item.id} item={item} />
+                                <CartItem key={item.cartItemId} item={item} />
                             ))}
                         </div>
 
@@ -56,6 +56,13 @@ function CartModal() {
                             <span>Разом:</span>
                             <strong>{getTotal()} грн</strong>
                         </div>
+
+                        {getBenefit() > 0 && (
+                            <div className="cart-modal__benefit">
+                                <span>Ваша вигода:</span>
+                                <strong>{getBenefit()} грн</strong>
+                            </div>
+                        )}
 
                         <button
                             className="cart-modal__checkout"

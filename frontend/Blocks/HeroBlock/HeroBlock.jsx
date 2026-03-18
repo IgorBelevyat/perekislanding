@@ -13,15 +13,25 @@ function HeroBlock() {
         },
         {
             icon: (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="23 18 13.5 8.5 8.5 13.5 1 6" /><polyline points="17 18 23 18 23 12" />
+                </svg>
             ),
-            text: 'Безпечно для дітей та алергіків',
+            text: 'Економія 40 % порівняно з хлором',
         },
         {
             icon: (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
             ),
-            text: 'Простий розрахунок — 3 кроки до чистої води',
+            text: 'Безпечно при правильному дозуванні',
+        },
+        {
+            icon: (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+                </svg>
+            ),
+            text: 'Нічого зайвого — розкладається на воду та кисень',
         },
     ];
 
@@ -30,13 +40,12 @@ function HeroBlock() {
             <div className="hero__inner">
                 <div className="hero__content">
                     <h1 className="hero__title">
-                        Чиста вода в басейні <span className="hero__title-accent">без хлору</span>
-                        <span className="hero__title-sub">Економія до 40% порівняно з хлором</span>
+                        Зелена вода в басейні? Очистіть її за 24 години <span className="hero__title-accent">без хлору</span>
+                        <span className="hero__title-sub">Медичний перекис водню 50% для очищення приватних басейнів.</span>
                     </h1>
 
                     <p className="hero__subtitle">
-                        50% перекис водню — професійний засіб для очищення басейну.
-                        Дешевше в 2–3 рази, безпечніше для здоров'я.
+                        Простий розрахунок, зрозуміле дозування, швидкий результат.
                     </p>
 
                     <ul className="hero__benefits">
@@ -56,6 +65,7 @@ function HeroBlock() {
                             Купити
                         </Button>
                     </div>
+                    <p className="hero__cta-note"><span className="hero__cta-note-star">*</span>без дзвінків і консультацій</p>
                 </div>
 
                 <div className="hero__image-wrapper">

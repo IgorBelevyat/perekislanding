@@ -27,6 +27,11 @@ async function fetchApi(endpoint, options = {}) {
 
 export const api = {
     /**
+     * Fetch precalculated bundles.
+     */
+    getBundles: () => fetchApi('/bundles'),
+
+    /**
      * Fetch products and bundles with real prices.
      */
     getProducts: () => fetchApi('/products'),

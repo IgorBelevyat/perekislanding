@@ -13,7 +13,7 @@ function ProblemBlock() {
                 </svg>
             ),
             title: 'Чому зеленіє вода?',
-            text: 'Сонце, бактерії та водорості перетворюють басейн у болото за кілька днів без правильної обробки.',
+            text: 'Сонце, органіка та водорості можуть зіпсувати воду за кілька днів без правильної обробки.',
         },
         {
             icon: (
@@ -22,8 +22,8 @@ function ProblemBlock() {
                     <path d="M15 15l10 10M25 15L15 25" stroke="#EF4444" strokeWidth="2.5" strokeLinecap="round" />
                 </svg>
             ),
-            title: 'Чому хлор — не ідеальний?',
-            text: 'Різкий запах, подразнення очей і шкіри, складне дозування, небезпечно для дітей та алергіків.',
+            title: 'Чому хлор не всім підходить?',
+            text: 'Різкий запах, подразнення очей і шкіри, складне дозування та дискомфорт для сімейного басейну.',
         },
         {
             icon: (
@@ -32,17 +32,14 @@ function ProblemBlock() {
                     <path d="M14 20l4 4 8-8" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
             ),
-            title: 'Перекис 50% — простіше',
-            text: 'Без запаху, безпечно для шкіри, просте дозування. Розкладається на воду та кисень — нічого зайвого.',
+            title: 'Чому 50% перекис простіший?',
+            text: 'Чіткий розрахунок, без різкого запаху, комфортніше для користування і без зайвих складних схем та агресивної хімії.',
         },
     ];
 
     return (
         <SectionWrapper bg="white" id="problem">
             <div className="problem">
-                <h2 className="problem__title">
-                    Проблема <span className="problem__title-divider">→</span> Рішення
-                </h2>
                 <div className="problem__grid">
                     {problems.map((p, i) => (
                         <ProblemCard key={i} icon={p.icon} title={p.title} text={p.text} />

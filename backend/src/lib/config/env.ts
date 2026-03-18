@@ -17,6 +17,17 @@ const envSchema = z.object({
     // RetailCRM
     RETAILCRM_URL: z.string().url().optional(),
     RETAILCRM_API_KEY: z.string().optional(),
+    
+    // RetailCRM Offer IDs
+    OFFER_ID_PEROXIDE: z.string().optional(),
+    OFFER_ID_TEST_STRIPS: z.string().optional(),
+    OFFER_ID_MEASURING_CUP: z.string().optional(),
+    
+    // RetailCRM Price Types
+    PRICE_TYPE_BASE: z.string().optional(),
+    PRICE_TYPE_NASEZON: z.string().optional(),
+    PRICE_TYPE_OPTIMAL: z.string().optional(),
+    PRICE_TYPE_PRO: z.string().optional(),
 
     // Nova Poshta
     NP_API_KEY: z.string().optional(),

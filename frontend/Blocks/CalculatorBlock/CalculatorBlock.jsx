@@ -11,9 +11,9 @@ const CANISTER_KG = 5;
 const CANISTER_LITERS = CANISTER_KG / DENSITY; // ≈ 4.17 л
 
 const MODES = [
-    { id: 'prevention', label: 'Профілактика', k: 0.5, description: 'Регулярне підтримання чистоти' },
-    { id: 'standard', label: 'Стандартна', k: 0.7, description: 'Рекомендовано для більшості басейнів', recommended: true },
-    { id: 'shock', label: 'Шокова', k: 1.0, description: 'Сильне забруднення або перший запуск' },
+    { id: 'prevention', label: 'Легка очистка', k: 0.5, description: 'Для регулярного підтримання чистоти' },
+    { id: 'standard', label: 'Стандартна очистка', k: 0.7, description: 'Для більшості випадків забруднень середньої інтенсивності', recommended: true },
+    { id: 'shock', label: 'Інтенсивна очистка', k: 1.0, description: 'Для сильно забрудненої води' },
 ];
 
 function CalculatorBlock() {
@@ -49,7 +49,7 @@ function CalculatorBlock() {
     return (
         <SectionWrapper bg="light" id="calculator">
             <div className="calculator">
-                <h2 className="calculator__title">Розрахуйте дозування</h2>
+                <h2 className="calculator__title">Розрахуйте точне дозування <br /> саме під ваш басейн</h2>
                 <p className="calculator__subtitle">
                     Введіть параметри вашого басейну та отримайте точний розрахунок
                 </p>

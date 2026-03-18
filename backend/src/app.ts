@@ -13,6 +13,7 @@ import checkoutRouter from './routes/checkout';
 import paymentsRouter from './routes/payments';
 import healthRouter from './routes/health';
 import productsRouter from './routes/products';
+import bundlesRoutes from './routes/bundles';
 
 const app = express();
 
@@ -50,6 +51,7 @@ app.use('/api/checkout', checkoutRouter);
 app.use('/api/payments', paymentsRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/health', healthRouter);
+app.use('/api/bundles', bundlesRoutes);
 
 // ─── 404 for unknown API routes ────────────────────────────
 app.use('/api/*', (_req, res) => {

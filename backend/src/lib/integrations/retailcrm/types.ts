@@ -6,6 +6,7 @@ export interface RetailCrmOffer {
     xmlId?: string;
     name: string;
     price: number;
+    prices?: { priceType: string; price: number }[];
     currency: string;
     quantity?: number;
     unit?: string;
