@@ -98,6 +98,7 @@ export function CartProvider({ children }) {
 
     const addToCart = (product, quantity = 1, options = {}) => {
         const bundleId = options.bundleId || null;
+        const minQty = options.minQty || 1;
         const cartItemId = bundleId 
             ? `${product.id}-${bundleId}` 
             : `${product.id}-regular`;
@@ -112,6 +113,7 @@ export function CartProvider({ children }) {
                             ...i,
                             quantity: i.quantity + quantity,
                             price: product.price,
+                            basePrice: product.basePrice,
                             ...(priceHasChanged && {
                                 priceChanged: true,
                                 oldPrice: i.oldPrice || i.price
@@ -121,17 +123,26 @@ export function CartProvider({ children }) {
                     return i;
                 });
             }
-            return [...prev, { ...product, quantity, cartItemId, isBundleItem: !!bundleId, bundleId }];
+            return [...prev, { ...product, quantity, cartItemId, isBundleItem: !!bundleId, bundleId, minQty }];
         });
         setIsCartOpen(true); // Automatically open cart when adding items
     };
 
     const updateQuantity = (cartItemId, quantity) => {
-        if (quantity <= 0) {
-            removeFromCart(cartItemId);
-            return;
-        }
-        setItems(prev => prev.map(i => i.cartItemId === cartItemId ? { ...i, quantity } : i));
+        setItems(prev => {
+            const item = prev.find(i => i.cartItemId === cartItemId);
+            if (!item) return prev;
+
+            if (item.minQty && quantity < item.minQty) {
+                return prev; // strictly prevent going below bundle minimum
+            }
+
+            if (quantity <= 0) {
+                return prev.filter(i => i.cartItemId !== cartItemId);
+            }
+
+            return prev.map(i => i.cartItemId === cartItemId ? { ...i, quantity } : i);
+        });
     };
 
     const removeFromCart = (cartItemId) => {

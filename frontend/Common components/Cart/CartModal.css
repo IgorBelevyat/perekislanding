@@ -212,8 +212,16 @@
     color: #003B5C;
 }
 
-.cart-item__qty-btn:hover {
+.cart-item__qty-btn:hover:not(:disabled) {
     background: #F4FAFC;
+    color: #0096B8;
+}
+
+.cart-item__qty-btn:disabled {
+    background: #F9FAFB;
+    color: #D1D5DB;
+    border-color: #F3F4F6;
+    cursor: not-allowed;
 }
 
 .cart-item__qty {

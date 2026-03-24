@@ -11,9 +11,9 @@ const CANISTER_KG = 5;
 const CANISTER_LITERS = CANISTER_KG / DENSITY; // ≈ 4.17 л
 
 const MODES = [
-    { id: 'prevention', label: 'Легка очистка', k: 0.5, description: 'Для регулярного підтримання чистоти' },
-    { id: 'standard', label: 'Стандартна очистка', k: 0.7, description: 'Для більшості випадків забруднень середньої інтенсивності', recommended: true },
-    { id: 'shock', label: 'Інтенсивна очистка', k: 1.0, description: 'Для сильно забрудненої води' },
+    { id: 'prevention', label: 'Легка очистка', k: 0.35, description: 'Для регулярного підтримання чистоти' },
+    { id: 'standard', label: 'Стандартна очистка', k: 0.5, description: 'Для більшості випадків забруднень середньої інтенсивності', recommended: true },
+    { id: 'shock', label: 'Інтенсивна очистка', k: 0.7, description: 'Для сильно забрудненої води' },
 ];
 
 function CalculatorBlock() {
@@ -74,6 +74,8 @@ function CalculatorBlock() {
                         selected={cleaningMode}
                         onSelect={setCleaningMode}
                     />
+
+
 
                     {result && (
                         <CalculatorResult

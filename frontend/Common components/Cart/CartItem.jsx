@@ -22,7 +22,11 @@ function CartItem({ item }) {
                 </div>
             </div>
             <div className="cart-item__controls">
-                <button className="cart-item__qty-btn" onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)}>−</button>
+                <button 
+                    className="cart-item__qty-btn" 
+                    onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)}
+                    disabled={item.minQty ? item.quantity <= item.minQty : false}
+                >−</button>
                 <span className="cart-item__qty">{item.quantity}</span>
                 <button className="cart-item__qty-btn" onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}>+</button>
                 <button className="cart-item__remove" onClick={() => removeFromCart(item.cartItemId)} aria-label="Видалити">✕</button>

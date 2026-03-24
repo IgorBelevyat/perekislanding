@@ -10,7 +10,7 @@ import { CALC } from '../../config/constants';
  *   C = CEILING(L / 4.17)
  *
  * Where:
- *   k = 0.5 (preventive), 0.7 (standard), 1.0 (shock)
+ *   k = 0.35 (preventive), 0.5 (standard), 0.7 (shock)
  *   Canister: 5 kg, density ρ = 1.2 kg/L → 5 / 1.2 = 4.17 L per canister
  */
 

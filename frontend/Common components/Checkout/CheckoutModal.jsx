@@ -4,6 +4,14 @@ import { api } from '../../Api/api';
 import Button from '../Button/Button';
 import './CheckoutModal.css';
 
+const COURIER_CITIES = [
+    'місто Київ',
+    'с. Вишневе',
+    'с. Петропавлівська Борщагівка',
+    'с. Софіївська Борщагівка',
+    'с. Чайки'
+];
+
 function CheckoutModal() {
     const {
         checkoutStep,
@@ -19,7 +27,10 @@ function CheckoutModal() {
         firstName: '',
         lastName: '',
         phone: '+380',
-        paymentMethod: 'cod'
+        email: '',
+        companyName: '',
+        edrpou: '',
+        paymentMethod: 'online' // Changed default to online
     });
 
     const [delivery, setDelivery] = useState({
@@ -30,7 +41,7 @@ function CheckoutModal() {
         warehouseQuery: '',
         warehouseRef: '',
         warehouseName: '',
-        courierCity: 'Київ',
+        courierCity: COURIER_CITIES[0], // Changed initial value
         courierStreet: '',
         courierHouse: '',
         courierEntrance: '',
@@ -43,15 +54,27 @@ function CheckoutModal() {
     const [isSearchingWarehouses, setIsSearchingWarehouses] = useState(false);
     const [showCityDropdown, setShowCityDropdown] = useState(false);
     const [showWarehouseDropdown, setShowWarehouseDropdown] = useState(false);
+    const [showCourierDropdown, setShowCourierDropdown] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
+    const [safetyAgreed, setSafetyAgreed] = useState(false);
 
+    // Update payment method based on delivery type
     useEffect(() => {
-        if (delivery.type === 'pickup') {
-            setFormData(prev => ({ ...prev, paymentMethod: 'online' }));
-        } else if (delivery.type === 'courier') {
-            setFormData(prev => ({ ...prev, paymentMethod: 'cod' }));
-        }
+        setFormData(prev => {
+            if (prev.paymentMethod === 'cashless') {
+                return prev; // Cashless works for all delivery types
+            }
+            if (delivery.type === 'pickup' && prev.paymentMethod === 'cod') {
+                return { ...prev, paymentMethod: 'online' };
+            }
+            if (delivery.type === 'courier' && prev.paymentMethod === 'cod') {
+                // Keep COD if it was selected, since courier now supports COD
+                return prev;
+            }
+            // For nova_poshta, COD or online are both fine
+            return prev;
+        });
     }, [delivery.type]);
 
     // Debounced city search
@@ -194,18 +217,21 @@ function CheckoutModal() {
                     warehouseName: delivery.warehouseName
                 };
 
-            const orderData = {
+            let data = {
                 quoteId,
                 customer: {
                     firstName: formData.firstName.trim(),
                     lastName: formData.lastName.trim(),
-                    phone: formData.phone
+                    phone: formData.phone.replace(/\D/g, ''),
+                    email: formData.email || undefined,
+                    companyName: formData.companyName || undefined,
+                    edrpou: formData.edrpou || undefined,
                 },
                 delivery: deliveryPayload,
-                paymentMethod: formData.paymentMethod
+                paymentMethod: formData.paymentMethod,
             };
 
-            const res = await api.checkout(orderData, idempotencyKey);
+            const res = await api.checkout(data, idempotencyKey);
 
             // For COD, we just show success
             // For online, backend returns paymentUrl or data/signature, handling depends on LiqPay integration
@@ -353,7 +379,60 @@ function CheckoutModal() {
                             {delivery.type === 'courier' && (
                                 <div className="checkout-form__delivery-fields">
                                     <div className="checkout-form__row">
-                                        <input className="checkout-form__input" type="text" placeholder="Місто (Київ)" value={delivery.courierCity} onChange={e => setDelivery(d => ({ ...d, courierCity: e.target.value }))} required />
+                                        <div className="checkout-form__field" style={{ position: 'relative', width: '100%' }}>
+                                            <div 
+                                                className="checkout-form__input" 
+                                                style={{ 
+                                                    display: 'flex', 
+                                                    alignItems: 'center', 
+                                                    justifyContent: 'space-between', 
+                                                    cursor: 'pointer',
+                                                    background: '#fff',
+                                                    userSelect: 'none'
+                                                }}
+                                                onClick={() => setShowCourierDropdown(!showCourierDropdown)}
+                                            >
+                                                <span>{delivery.courierCity}</span>
+                                                <svg 
+                                                    width="12" 
+                                                    height="8" 
+                                                    viewBox="0 0 12 8" 
+                                                    fill="none" 
+                                                    style={{
+                                                        transform: showCourierDropdown ? 'rotate(180deg)' : 'none',
+                                                        transition: 'transform 0.2s ease'
+                                                    }}
+                                                >
+                                                    <path d="M1 1.5L6 6.5L11 1.5" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                </svg>
+                                            </div>
+                                            {showCourierDropdown && (
+                                                <>
+                                                    <div 
+                                                        style={{ position: 'fixed', inset: 0, zIndex: 9 }} 
+                                                        onClick={() => setShowCourierDropdown(false)} 
+                                                    />
+                                                    <ul className="checkout-form__dropdown" style={{ zIndex: 10, marginTop: '4px' }}>
+                                                        {COURIER_CITIES.map(city => (
+                                                            <li 
+                                                                key={city} 
+                                                                onClick={() => {
+                                                                    setDelivery(d => ({ ...d, courierCity: city }));
+                                                                    setShowCourierDropdown(false);
+                                                                }}
+                                                                style={{
+                                                                    backgroundColor: delivery.courierCity === city ? 'rgba(0, 150, 255, 0.05)' : undefined,
+                                                                    color: delivery.courierCity === city ? 'var(--color-primary)' : undefined,
+                                                                    fontWeight: delivery.courierCity === city ? '600' : '400'
+                                                                }}
+                                                            >
+                                                                {city}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </>
+                                            )}
+                                        </div>
                                     </div>
                                     <div className="checkout-form__row">
                                         <input className="checkout-form__input" type="text" placeholder="Вулиця" value={delivery.courierStreet} onChange={e => setDelivery(d => ({ ...d, courierStreet: e.target.value }))} required />
@@ -385,25 +464,91 @@ function CheckoutModal() {
                                         onChange={handleInputChange}
                                         disabled={delivery.type === 'pickup'}
                                     />
-                                    <span>Післяплата (при отриманні) {delivery.type === 'courier' && '(тільки готівкою)'}</span>
+                                    <span>Післяплата (при отриманні)</span>
                                 </label>
-                                <label className={`checkout-form__radio ${delivery.type === 'courier' ? 'checkout-form__radio--disabled' : ''}`}>
+                                <label className="checkout-form__radio">
                                     <input
                                         type="radio"
                                         name="paymentMethod"
                                         value="online"
                                         checked={formData.paymentMethod === 'online'}
                                         onChange={handleInputChange}
-                                        disabled={delivery.type === 'courier'}
                                     />
                                     <span>Онлайн картою (LiqPay)</span>
                                 </label>
+                                <label className="checkout-form__radio">
+                                    <input
+                                        type="radio"
+                                        name="paymentMethod"
+                                        value="cashless"
+                                        checked={formData.paymentMethod === 'cashless'}
+                                        onChange={handleInputChange}
+                                    />
+                                    <span>За безготівковим рахунком</span>
+                                </label>
                             </div>
-                            {delivery.type === 'courier' && <p className="checkout-form__hint">Для кур'єрської доставки можлива лише оплата готівкою при отриманні.</p>}
-                            {delivery.type === 'pickup' && <p className="checkout-form__hint">Для самовивозу можлива лише онлайн оплата.</p>}
+
+                            {formData.paymentMethod === 'cashless' && (
+                                <div style={{ marginTop: '1rem' }}>
+                                    <div className="checkout-form__row">
+                                        <input
+                                            className="checkout-form__input"
+                                            type="text"
+                                            name="companyName"
+                                            placeholder="Назва організації *"
+                                            value={formData.companyName}
+                                            onChange={handleInputChange}
+                                            required={formData.paymentMethod === 'cashless'}
+                                        />
+                                    </div>
+                                    <div className="checkout-form__row">
+                                        <input
+                                            className="checkout-form__input"
+                                            type="text"
+                                            name="edrpou"
+                                            placeholder="Код ЄДРПОУ *"
+                                            value={formData.edrpou}
+                                            onChange={handleInputChange}
+                                            required={formData.paymentMethod === 'cashless'}
+                                        />
+                                    </div>
+                                    <div className="checkout-form__delivery-info" style={{ marginTop: '0.75rem' }}>
+                                        <p>Для безготівкої оплати менеджер звяжеться з вами за номером телефону.</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {delivery.type === 'courier' && (
+                                <p className="checkout-form__hint">
+                                    Оплата за кур'єрські послуги 250 гривень і можлива тільки готівкою.
+                                </p>
+                            )}
+                            {delivery.type === 'pickup' && <p className="checkout-form__hint">Для самовивозу можлива лише онлайн або безготівкова оплата.</p>}
                         </div>
 
-                        <Button type="submit" variant="cta" size="lg" fullWidth disabled={isSubmitting}>
+                        <div className="checkout-form__agreement">
+                            <label className="checkout-form__checkbox">
+                                <input 
+                                    type="checkbox" 
+                                    checked={safetyAgreed} 
+                                    onChange={(e) => setSafetyAgreed(e.target.checked)} 
+                                    required 
+                                />
+                                <span className="checkout-form__checkbox-custom">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                        <polyline points="20 6 9 17 4 12" />
+                                    </svg>
+                                </span>
+                                <span className="checkout-form__checkbox-text">
+                                    Я ознайомився(-лась) з <a href="#safety-rules" onClick={(e) => { 
+                                        window.dispatchEvent(new Event('open-safety-rules'));
+                                        resetCheckout();
+                                    }}>правилами безпечного використання</a>
+                                </span>
+                            </label>
+                        </div>
+
+                        <Button type="submit" variant="cta" size="lg" fullWidth disabled={isSubmitting || !safetyAgreed}>
                             {isSubmitting ? 'Обробка...' : 'Підтвердити замовлення'}
                         </Button>
                     </form>

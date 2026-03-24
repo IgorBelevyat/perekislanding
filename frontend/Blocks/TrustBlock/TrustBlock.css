@@ -76,7 +76,7 @@
     /* 110px bottom padding to clear the mobile sticky CTA */
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
     .footer {
         padding: 56px 24px 36px;
     }

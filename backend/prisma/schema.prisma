@@ -80,6 +80,7 @@ model Order {
 enum PaymentMethod {
   ONLINE
   COD
+  CASHLESS
 }
 
 enum PaymentStatus {

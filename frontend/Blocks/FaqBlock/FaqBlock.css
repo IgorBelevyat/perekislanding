@@ -25,6 +25,7 @@
     border-radius: 12px;
     overflow: hidden;
     transition: box-shadow 0.2s;
+    background: #fff;
 }
 
 .faq-item--open {

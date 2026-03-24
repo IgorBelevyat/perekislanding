@@ -37,8 +37,8 @@ export const CALC = {
     PEROXIDE_DENSITY: 1.2,  // kg/L (ρ of 50% H2O2)
     CANISTER_LITERS: 4.17,  // 5 kg ÷ 1.2 = 4.17 L
     K_FACTORS: {
-        preventive: 0.5,    // Профілактика
-        standard: 0.7,      // Стандартна (рекомендована)
-        shock: 1.0,         // Шокова
+        preventive: 0.35,   // Легка очистка
+        standard: 0.5,      // Стандартна очистка
+        shock: 0.7,         // Інтенсивна очистка
     },
 } as const;

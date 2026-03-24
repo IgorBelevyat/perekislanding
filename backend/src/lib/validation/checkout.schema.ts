@@ -21,6 +21,8 @@ const customerSchema = z.object({
     lastName: z.string().min(2).max(50).trim(),
     phone: phoneSchema,
     email: z.string().email().optional().or(z.literal('')),
+    companyName: z.string().min(2).max(100).trim().optional(),
+    edrpou: z.string().min(8).max(10).trim().optional(),
 });
 
 // ─── Delivery schema ─────────────────────────────────────
@@ -46,7 +48,7 @@ const deliverySchema = z.discriminatedUnion('type', [
 ]);
 
 // ─── Payment method ───────────────────────────────────────
-const paymentMethodSchema = z.enum(['online', 'cod']);
+const paymentMethodSchema = z.enum(['online', 'cod', 'cashless']);
 
 // ─── Checkout request schema ──────────────────────────────
 export const checkoutRequestSchema = z.object({
@@ -62,12 +64,13 @@ export const checkoutRequestSchema = z.object({
             path: ['paymentMethod'],
         });
     }
-    if (data.delivery.type === 'courier' && data.paymentMethod !== 'cod') {
-        ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Доставка кур'єром можлива лише з оплатою при отриманні",
-            path: ['paymentMethod'],
-        });
+    if (data.paymentMethod === 'cashless') {
+        if (!data.customer.companyName) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Введіть назву організації", path: ['customer', 'companyName'] });
+        }
+        if (!data.customer.edrpou) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Введіть ЄДРПОУ", path: ['customer', 'edrpou'] });
+        }
     }
 });
 

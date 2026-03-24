@@ -30,7 +30,7 @@
     pointer-events: none;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
     .hero {
         background: linear-gradient(180deg, #ffffff 0%, #F4FAFC 100%);
         padding: 40px 24px 60px;
@@ -71,7 +71,7 @@
     /* Take up all space */
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
     .hero__inner {
         padding: 0;
         gap: 40px;
@@ -106,7 +106,7 @@
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
     .hero__title {
         font-size: 1.875rem;
         color: #003B5C;
@@ -120,7 +120,7 @@
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
     .hero__title-accent {
         color: #0096B8;
         text-shadow: none;
@@ -135,7 +135,7 @@
     margin-top: 6px;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
     .hero__title-sub {
         font-size: 1.125rem;
         margin-top: 8px;
@@ -162,7 +162,7 @@
     margin-bottom: 20px;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
     .hero__subtitle {
         font-size: 1.0625rem;
         line-height: 1.6;
@@ -186,7 +186,7 @@
     margin-bottom: 24px;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
     .hero__benefits {
         gap: 14px;
         margin-bottom: 32px;
@@ -202,7 +202,7 @@
     font-weight: 500;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
     .hero__benefit {
         font-size: 15px;
         color: #1E1E1E;
@@ -216,7 +216,7 @@
     color: #4cdbff;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
     .hero__benefit-icon {
         color: #0096B8;
     }
@@ -252,7 +252,7 @@
     margin-right: 2px;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
     .hero__cta-note {
         color: #4d525c;
         margin-top: 14px;
@@ -283,7 +283,7 @@
     box-shadow: none;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
     .hero__image-wrapper {
         position: relative;
         inset: auto;
@@ -308,7 +308,7 @@
     display: none;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
     .hero__image-badge {
         display: block;
         position: absolute;
@@ -373,7 +373,7 @@
     }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
     .hero__scroll-indicator {
         display: none;
         /* Hide indicator on desktop/tablet */

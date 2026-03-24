@@ -48,7 +48,7 @@ function CalculatorResult({ volume, liters, canisters, kValue }) {
             addToCart(
                 { id: cItem.offerId, name: cItem.name, price: cItem.price, basePrice: cItem.basePrice },
                 cItem.qty,
-                { bundleId: bundle.id }
+                { bundleId: bundle.id, minQty: cItem.name.includes('Перекис') ? cItem.qty : undefined }
             );
         });
     };
@@ -172,6 +172,29 @@ function CalculatorResult({ volume, liters, canisters, kValue }) {
                 <span>✓ Можна змінити кількість у кошику</span>
                 <span>✓ Доставка по Україні</span>
             </p>
+
+            <div style={{ marginTop: '1rem', width: '100%', textAlign: 'center' }}>
+                <span style={{ color: '#E53E3E', fontSize: '15px', marginRight: '4px' }}>*</span>
+                <a 
+                    href="#safety-rules" 
+                    onClick={(e) => {
+                        // e.preventDefault(); // allow hash change for scrolling
+                        window.dispatchEvent(new Event('open-safety-rules'));
+                    }}
+                    style={{ 
+                        color: '#4B5563', 
+                        fontSize: '13px', 
+                        textDecoration: 'underline', 
+                        textUnderlineOffset: '3px',
+                        transition: 'color 0.2s ease',
+                        display: 'inline-block'
+                    }}
+                    onMouseEnter={(e) => e.target.style.color = '#0096B8'}
+                    onMouseLeave={(e) => e.target.style.color = '#4B5563'}
+                >
+                    розрахунок на калькуляторі є орієнтовним
+                </a>
+            </div>
         </div>
     );
 }

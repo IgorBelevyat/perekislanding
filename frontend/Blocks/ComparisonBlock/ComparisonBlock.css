@@ -17,7 +17,7 @@
     overflow-x: auto;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
     .comparison__table-wrapper {
         display: block;
     }
@@ -87,67 +87,41 @@
 }
 
 /* ── Mobile Cards ──── */
-.comparison__cards {
+.comparison__mobile-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
 }
 
-@media (min-width: 768px) {
-    .comparison__cards {
+@media (min-width: 769px) {
+    .comparison__mobile-list {
         display: none;
     }
 }
 
-.comparison-card {
-    background: #fff;
-    border: 1px solid #E5E7EB;
-    border-radius: 12px;
-    padding: 16px;
-}
-
-.comparison-card__param {
-    font-weight: 700;
-    color: #003B5C;
-    font-size: 15px;
-    margin-bottom: 10px;
-}
-
-.comparison-card__row {
+.comparison__benefits-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 16px;
 }
 
-.comparison-card__item {
+.comparison__benefits-list li {
     display: flex;
-    justify-content: space-between;
-    font-size: 14px;
-    padding: 12px 0;
-    border-bottom: 1px solid #E5E7EB;
-}
-
-.comparison-card__item:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-}
-
-.comparison-card__item--neg .comparison-card__value {
-    color: #991B1B;
-}
-
-.comparison-card__item--pos .comparison-card__value {
-    color: #065F46;
-}
-
-.comparison-card__label {
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 16px;
     font-weight: 600;
-    color: #4B5563;
-    flex-shrink: 0;
+    color: #003B5C;
+    background: #fff;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 59, 92, 0.06);
 }
 
-.comparison-card__value {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
+.comparison__benefits-list li span {
+    margin-top: 0;
+    color: #1F2937;
+    font-weight: 500;
 }

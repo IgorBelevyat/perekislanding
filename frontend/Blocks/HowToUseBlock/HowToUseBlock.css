@@ -26,7 +26,7 @@
     margin: 0 auto;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
     .howto__grid {
         grid-template-columns: repeat(3, 1fr);
         gap: 40px;
@@ -69,7 +69,7 @@
     display: none;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
     .howto-step__arrow {
         display: flex;
         position: absolute;

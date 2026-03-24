@@ -66,13 +66,13 @@ export async function processCheckout(
     // 3. Create order in RetailCRM
     let retailcrmOrderId: string | null = null;
     try {
-        let deliveryCode = 'nova-poshta';
+        let deliveryCode = env.CRM_DELIVERY_TYPE_NP || 'nova-poshta';
         let addressData: any = {};
 
         if (input.delivery.type === 'pickup') {
-            deliveryCode = 'self-delivery';
+            deliveryCode = env.CRM_DELIVERY_TYPE_PICKUP || 'self-delivery';
         } else if (input.delivery.type === 'courier') {
-            deliveryCode = 'courier';
+            deliveryCode = env.CRM_DELIVERY_TYPE_COURIER || 'courier';
             addressData = {
                 city: input.delivery.city,
                 street: input.delivery.street,
@@ -81,7 +81,7 @@ export async function processCheckout(
                 flat: input.delivery.apartment || undefined,
             };
         } else if (input.delivery.type === 'nova_poshta') {
-            deliveryCode = 'nova-poshta';
+            deliveryCode = env.CRM_DELIVERY_TYPE_NP || 'nova-poshta';
             addressData = {
                 city: input.delivery.cityName,
                 // Passing warehouse as street allows the CRM to parse them cleanly into two separate inputs
@@ -89,11 +89,24 @@ export async function processCheckout(
             };
         }
 
+        let customerComment: string | undefined = undefined;
+        if (input.paymentMethod === 'cashless' && input.customer.companyName && input.customer.edrpou) {
+            customerComment = `Увага, замовлення за безготівковим розрахунком\nНазва організації: ${input.customer.companyName}\nКод ЄДРПОУ: ${input.customer.edrpou}`;
+        }
+
+        let paymentType = env.CRM_PAYMENT_TYPE_COD || 'cash-on-delivery';
+        if (input.paymentMethod === 'online') {
+            paymentType = env.CRM_PAYMENT_TYPE_ONLINE || 'liqpay';
+        } else if (input.paymentMethod === 'cashless') {
+            paymentType = env.CRM_PAYMENT_TYPE_CASHLESS || 'bank-transfer';
+        }
+
         const rcResult = await createRetailCrmOrder({
-            site: 'landing',
+            site: 'landing-hlorka-ua',
             order: {
                 externalId: orderId,
                 number: shortId,
+                customerComment,
                 firstName: input.customer.firstName,
                 lastName: input.customer.lastName,
                 phone: input.customer.phone,
@@ -122,7 +135,7 @@ export async function processCheckout(
                     code: deliveryCode,
                     address: Object.keys(addressData).length > 0 ? addressData : undefined,
                 },
-                paymentType: input.paymentMethod === 'online' ? 'liqpay' : 'cash-on-delivery',
+                paymentType: paymentType,
             },
         });
         retailcrmOrderId = String(rcResult.id);
@@ -141,8 +154,8 @@ export async function processCheckout(
             delivery: input.delivery as any,
             itemsSnapshot: itemsSnapshot as any,
             total: totalsSnapshot.total,
-            paymentMethod: input.paymentMethod === 'online' ? 'ONLINE' : 'COD',
-            paymentStatus: input.paymentMethod === 'online' ? 'PENDING' : 'COD',
+            paymentMethod: input.paymentMethod === 'online' ? 'ONLINE' : input.paymentMethod === 'cashless' ? 'CASHLESS' : 'COD',
+            paymentStatus: input.paymentMethod === 'online' ? 'PENDING' : 'PENDING',
             status: input.paymentMethod === 'online' ? 'AWAITING_PAYMENT' : 'CONFIRMED',
             idempotencyKey,
         },

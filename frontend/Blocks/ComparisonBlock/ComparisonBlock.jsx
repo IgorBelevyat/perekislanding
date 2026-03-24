@@ -9,6 +9,13 @@ const IconCheck = () => (
     <svg className="comparison__svg comparison__svg--pos" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" opacity="0.15" fill="currentColor" stroke="none" /><polyline points="9 12 11.5 14.5 16 9.5" /></svg>
 );
 
+const IconListDot = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0096B8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '2px' }}>
+        <circle cx="12" cy="12" r="12" fill="rgba(0, 150, 184, 0.15)" stroke="none" />
+        <polyline points="7 12 10.5 15.5 17 8.5" />
+    </svg>
+);
+
 const data = [
     { param: 'Запах', chlorine: 'Різкий хімічний', peroxide: 'Відсутній', chlorineNeg: true, peroxidePos: true },
     { param: 'Подразнення шкіри та очей', chlorine: 'Так, часто', peroxide: 'Ні', chlorineNeg: true, peroxidePos: true },
@@ -51,23 +58,15 @@ function ComparisonBlock() {
                 </table>
             </div>
 
-            {/* Mobile Cards */}
-            <div className="comparison__cards">
-                {data.map((row, i) => (
-                    <div key={i} className="comparison-card">
-                        <p className="comparison-card__param">{row.param}</p>
-                        <div className="comparison-card__row">
-                            <div className="comparison-card__item comparison-card__item--neg">
-                                <span className="comparison-card__label">Хлор</span>
-                                <span className="comparison-card__value"><IconX /> {row.chlorine}</span>
-                            </div>
-                            <div className="comparison-card__item comparison-card__item--pos">
-                                <span className="comparison-card__label">Перекис</span>
-                                <span className="comparison-card__value"><IconCheck /> {row.peroxide}</span>
-                            </div>
-                        </div>
-                    </div>
-                ))}
+            {/* Mobile List */}
+            <div className="comparison__mobile-list">
+                <ul className="comparison__benefits-list">
+                    <li><IconListDot /> <span>відсутній запах</span></li>
+                    <li><IconListDot /> <span>не подразнює шкіру та очі</span></li>
+                    <li><IconListDot /> <span>просто розрахувати дозування</span></li>
+                    <li><IconListDot /> <span>безпечний для дітей</span></li>
+                    <li><IconListDot /> <span>розкладається на воду та кисень</span></li>
+                </ul>
             </div>
         </SectionWrapper>
     );

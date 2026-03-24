@@ -72,13 +72,12 @@ export async function buildQuote(input: QuoteRequest): Promise<QuoteResult> {
             // Apply package specific discounts ONLY if it was added as part of a bundle
             if (customItem.isBundleItem && customItem.bundleId) {
                 let packagePriceType = 'base';
-                if (customItem.bundleId === 'nasezon') packagePriceType = env.PRICE_TYPE_NASEZON || 'base';
-                else if (customItem.bundleId === 'optimal') packagePriceType = env.PRICE_TYPE_OPTIMAL || 'base';
-                else if (customItem.bundleId === 'pro') packagePriceType = env.PRICE_TYPE_PRO || 'base';
+                let minQtyAllowed = 1;
+                if (customItem.bundleId === 'nasezon') { packagePriceType = env.PRICE_TYPE_NASEZON || 'base'; minQtyAllowed = 1; }
+                else if (customItem.bundleId === 'optimal') { packagePriceType = env.PRICE_TYPE_OPTIMAL || 'base'; minQtyAllowed = 2; }
+                else if (customItem.bundleId === 'pro') { packagePriceType = env.PRICE_TYPE_PRO || 'base'; minQtyAllowed = 6; }
 
-                if (customItem.offerId === env.OFFER_ID_PEROXIDE || 
-                    customItem.offerId === env.OFFER_ID_TEST_STRIPS || 
-                    customItem.offerId === env.OFFER_ID_MEASURING_CUP) {
+                if (customItem.offerId === env.OFFER_ID_PEROXIDE && customItem.qty >= minQtyAllowed) {
                     activePrice = offer.prices[packagePriceType] ?? basePrice;
                     // If CRM actually knows about this price type for this product
                     if (offer.prices[packagePriceType] !== undefined) {

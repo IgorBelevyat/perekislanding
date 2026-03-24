@@ -19,15 +19,24 @@ const envSchema = z.object({
     RETAILCRM_API_KEY: z.string().optional(),
     
     // RetailCRM Offer IDs
-    OFFER_ID_PEROXIDE: z.string().optional(),
     OFFER_ID_TEST_STRIPS: z.string().optional(),
     OFFER_ID_MEASURING_CUP: z.string().optional(),
     
-    // RetailCRM Price Types
-    PRICE_TYPE_BASE: z.string().optional(),
-    PRICE_TYPE_NASEZON: z.string().optional(),
-    PRICE_TYPE_OPTIMAL: z.string().optional(),
-    PRICE_TYPE_PRO: z.string().optional(),
+    // Pricing configuration
+    OFFER_ID_PEROXIDE: z.string().optional().default('101'),
+    PRICE_TYPE_NASEZON: z.string().optional().default('base'),
+    PRICE_TYPE_OPTIMAL: z.string().optional().default('base'),
+    PRICE_TYPE_PRO: z.string().optional().default('base'),
+
+    // CRM Payment Types
+    CRM_PAYMENT_TYPE_ONLINE: z.string().optional().default('liqpay'),
+    CRM_PAYMENT_TYPE_COD: z.string().optional().default('cash-on-delivery'),
+    CRM_PAYMENT_TYPE_CASHLESS: z.string().optional().default('bank-transfer'),
+
+    // CRM Delivery Types
+    CRM_DELIVERY_TYPE_NP: z.string().optional().default('novaposhta'),
+    CRM_DELIVERY_TYPE_COURIER: z.string().optional().default('courier'),
+    CRM_DELIVERY_TYPE_PICKUP: z.string().optional().default('pickup'),
 
     // Nova Poshta
     NP_API_KEY: z.string().optional(),

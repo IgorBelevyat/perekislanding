@@ -9,6 +9,7 @@ import ProductBlock from '../Blocks/ProductBlock/ProductBlock';
 import BundlesBlock from '../Blocks/BundlesBlock/BundlesBlock';
 import ReviewsBlock from '../Blocks/ReviewsBlock/ReviewsBlock';
 import FaqBlock from '../Blocks/FaqBlock/FaqBlock';
+import SafetyBlock from '../Blocks/SafetyBlock/SafetyBlock';
 import TrustBlock from '../Blocks/TrustBlock/TrustBlock';
 import CartModal from '../Common components/Cart/CartModal';
 import StickyCartBar from '../Common components/StickyCartBar/StickyCartBar';
@@ -29,6 +30,7 @@ function App() {
                 <BundlesBlock />
                 <ReviewsBlock />
                 <FaqBlock />
+                <SafetyBlock />
             </main>
             <TrustBlock />
             <CartModal />

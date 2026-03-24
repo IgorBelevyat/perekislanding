@@ -256,3 +256,71 @@
 .checkout-form__delivery-info strong {
     color: var(--color-text);
 }
+
+/* Custom Checkbox for Safety Rules Agreement */
+.checkout-form__agreement {
+    margin: 24px 0;
+}
+
+.checkout-form__checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkout-form__checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkout-form__checkbox-custom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    background-color: #fff;
+    border: 2px solid #E5E7EB;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    margin-top: 2px;
+}
+
+.checkout-form__checkbox input:checked ~ .checkout-form__checkbox-custom {
+    background-color: #FF7A00;
+    border-color: #FF7A00;
+}
+
+.checkout-form__checkbox-custom svg {
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.2s ease;
+}
+
+.checkout-form__checkbox input:checked ~ .checkout-form__checkbox-custom svg {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.checkout-form__checkbox-text {
+    font-size: 14px;
+    color: #4B5563;
+    line-height: 1.4;
+}
+
+.checkout-form__checkbox-text a {
+    color: #0096B8;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.2s ease;
+}
+
+.checkout-form__checkbox-text a:hover {
+    color: #007A99;
+}

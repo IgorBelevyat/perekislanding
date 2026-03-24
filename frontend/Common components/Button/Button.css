@@ -11,6 +11,14 @@
     white-space: nowrap;
 }
 
+.btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    pointer-events: none;
+    box-shadow: none;
+    transform: none;
+}
+
 /* Sizes */
 .btn--sm {
     padding: 10px 20px;

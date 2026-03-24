@@ -23,7 +23,7 @@
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
     .product__card {
         flex-direction: row;
         padding: 40px;

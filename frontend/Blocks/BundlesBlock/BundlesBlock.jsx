@@ -19,7 +19,8 @@ function BundlesBlock() {
                 },
                 cItem.qty,
                 {
-                    bundleId: bundle.id
+                    bundleId: bundle.id,
+                    minQty: cItem.name.includes('Перекис') ? cItem.qty : undefined
                 }
             );
         });

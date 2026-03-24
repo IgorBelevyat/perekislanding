@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import SectionWrapper from '../../Common components/SectionWrapper/SectionWrapper';
 import ReviewCard from './ReviewCard';
 import './ReviewsBlock.css';
@@ -39,14 +39,19 @@ const reviews = [
 function ReviewsBlock() {
     const scrollRef = useRef(null);
     const [canScrollLeft, setCanScrollLeft] = useState(false);
-    const [canScrollRight, setCanScrollRight] = useState(true);
+    const [canScrollRight, setCanScrollRight] = useState(false);
 
     const checkScroll = () => {
         const el = scrollRef.current;
         if (!el) return;
-        setCanScrollLeft(el.scrollLeft > 10);
-        setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
+        setCanScrollLeft(el.scrollLeft > 50);
+        setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 50);
     };
+
+    useEffect(() => {
+        // Check on mount after layout
+        requestAnimationFrame(checkScroll);
+    }, []);
 
     const scroll = (direction) => {
         const el = scrollRef.current;
@@ -56,7 +61,7 @@ function ReviewsBlock() {
     };
 
     return (
-        <SectionWrapper bg="light" id="reviews">
+        <SectionWrapper bg="white" id="reviews">
             <div className="reviews">
                 <h2 className="reviews__title">Відгуки наших клієнтів</h2>
 

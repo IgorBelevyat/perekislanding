@@ -28,7 +28,7 @@
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
     .calculator__card {
         padding: 40px;
     }
@@ -243,7 +243,7 @@
     color: #003B5C;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
     .calc-result__value {
         font-size: 2.25rem;
     }

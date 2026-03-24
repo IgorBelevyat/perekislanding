@@ -6,6 +6,13 @@ import { api } from '../../Api/api';
 import productImg from '../../Src/assets/images/product-canister.png';
 import './ProductBlock.css';
 
+const IconCheckSmall = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0096B8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '3px', marginRight: '8px' }}>
+        <circle cx="12" cy="12" r="12" fill="rgba(0, 150, 184, 0.15)" stroke="none" />
+        <polyline points="7 12 10.5 15.5 17 8.5" />
+    </svg>
+);
+
 const DEFAULT_PRODUCT = {
     id: 'peroxide-5l', // Match the mock externalId
     name: 'Перекис водню 50%, 5 л',
@@ -79,11 +86,11 @@ function ProductBlock() {
                         )}
                     </div>
 
-                    <ul className="product__features">
-                        <li>✓ Концентрація 50% — максимальна ефективність</li>
-                        <li>✓ Зручна каністра з клапаном</li>
-                        <li>✓ Вітчизняне виробництво</li>
-                        <li>✓ Термін придатності — 12 місяців</li>
+                    <ul className="product__features" style={{ listStyle: 'none', paddingLeft: 0 }}>
+                        <li style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '8px' }}><IconCheckSmall /> <span>Концентрація 50% — максимальна ефективність</span></li>
+                        <li style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '8px' }}><IconCheckSmall /> <span>Зручна каністра з клапаном</span></li>
+                        <li style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '8px' }}><IconCheckSmall /> <span>Вітчизняне виробництво</span></li>
+                        <li style={{ display: 'flex', alignItems: 'flex-start' }}><IconCheckSmall /> <span>Термін придатності — 12 місяців</span></li>
                     </ul>
 
                     <div className="product__quantity">
@@ -101,7 +108,7 @@ function ProductBlock() {
                     </Button>
 
                     <p className="product__trust">
-                        Оплата при отриманні · Доставка Новою Поштою · Повернення 14 днів
+                        Оплата при отриманні · Доставка Новою Поштою · Повернення 14 днів · <a href="#certificates" style={{ color: 'inherit', textDecoration: 'underline', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = '#0096B8'} onMouseLeave={(e) => e.target.style.color = 'inherit'}>Сертифікати якості</a>
                     </p>
                 </div>
             </div>
