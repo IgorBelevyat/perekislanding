@@ -164,7 +164,6 @@ export async function processCheckout(
     // 5. Mark quote as used
     await prisma.quote.update({ where: { id: quote.id }, data: { status: 'USED' } });
 
-    // 6. Handle payment
     let paymentUrl: string | undefined;
     if (input.paymentMethod === 'online') {
         const host = env.NODE_ENV === 'production' ? 'https://landing.hlorka.ua' : 'http://localhost:3000';
@@ -173,7 +172,7 @@ export async function processCheckout(
             amount: totalsSnapshot.total,
             currency: 'UAH',
             description: `Замовлення №${shortId}`,
-            resultUrl: `${host}/success?orderId=${order.id}`,
+            resultUrl: `${host}/?orderId=${order.id}`,
             serverUrl: `${host}/api/payments/liqpay/callback`,
         });
         paymentUrl = getCheckoutUrl(formData);
@@ -202,6 +201,8 @@ export async function processCheckout(
                 transaction_id: order.id,
                 value: totalsSnapshot.total,
                 currency: 'UAH',
+                payment_type: input.paymentMethod,
+                shipping_tier: input.delivery.type,
                 items: itemsSnapshot.map((item: any) => ({
                     item_id: item.offerId,
                     item_name: item.name,

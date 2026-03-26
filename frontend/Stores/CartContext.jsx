@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { api } from '../Api/api';
 import PriceAlertModal from '../Common components/Cart/PriceAlertModal';
+import { trackAddToCart, trackRemoveFromCart } from '../utils/analytics';
 
 const CartContext = createContext();
 
@@ -37,6 +38,19 @@ export function CartProvider({ children }) {
     useEffect(() => {
         localStorage.setItem(HISTORY_KEY, JSON.stringify(orderHistory));
     }, [orderHistory]);
+
+    // Check URL for LiqPay success redirect
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('orderId');
+        if (orderId) {
+            setOrderResult({ orderId, status: 'success' });
+            setCheckoutStep('success');
+            // Clean up URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+            setItems([]); // Clear cart after successful online payment
+        }
+    }, []);
 
     // On-load: validate prices for all items already in cart (including bundle items)
     useEffect(() => {
@@ -125,6 +139,7 @@ export function CartProvider({ children }) {
             }
             return [...prev, { ...product, quantity, cartItemId, isBundleItem: !!bundleId, bundleId, minQty }];
         });
+        trackAddToCart(product, quantity);
         setIsCartOpen(true); // Automatically open cart when adding items
     };
 
@@ -138,6 +153,7 @@ export function CartProvider({ children }) {
             }
 
             if (quantity <= 0) {
+                trackRemoveFromCart(item);
                 return prev.filter(i => i.cartItemId !== cartItemId);
             }
 
@@ -146,7 +162,11 @@ export function CartProvider({ children }) {
     };
 
     const removeFromCart = (cartItemId) => {
-        setItems(prev => prev.filter(i => i.cartItemId !== cartItemId));
+        setItems(prev => {
+            const item = prev.find(i => i.cartItemId === cartItemId);
+            if (item) trackRemoveFromCart(item);
+            return prev.filter(i => i.cartItemId !== cartItemId);
+        });
     };
 
     const clearCart = () => setItems([]);

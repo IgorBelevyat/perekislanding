@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { trackCalculatorUsed } from '../../utils/analytics';
 import SectionWrapper from '../../Common components/SectionWrapper/SectionWrapper';
 import CalculatorTabs from './CalculatorTabs';
 import CalculatorInputs from './CalculatorInputs';
@@ -45,6 +46,15 @@ function CalculatorBlock() {
         const canisters = Math.ceil(liters / CANISTER_LITERS);
         return { volume: calculatedVolume, liters: Math.round(liters * 100) / 100, canisters };
     }, [calculatedVolume, selectedMode]);
+
+    // Track calculator usage (debounced to avoid spamming while typing)
+    useEffect(() => {
+        if (!result) return;
+        const handler = setTimeout(() => {
+            trackCalculatorUsed(result.volume, result.canisters);
+        }, 1500);
+        return () => clearTimeout(handler);
+    }, [result]);
 
     return (
         <SectionWrapper bg="light" id="calculator">

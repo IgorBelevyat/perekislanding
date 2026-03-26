@@ -233,9 +233,15 @@ function CheckoutModal() {
 
             const res = await api.checkout(data, idempotencyKey);
 
-            // For COD, we just show success
-            // For online, backend returns paymentUrl or data/signature, handling depends on LiqPay integration
-            // For now, simulate success for both
+            if (res.payment?.paymentUrl) {
+                // Redirect user to LiqPay payment page
+                // We don't call completeOrder here, because they haven't paid yet. 
+                // We rely on the redirect back to ?orderId=... to confirm.
+                window.location.href = res.payment.paymentUrl;
+                return;
+            }
+
+            // For COD or Cashless, we just show success immediately
             completeOrder({ ...res, status: 'success' });
 
         } catch (err) {
