@@ -27,7 +27,7 @@ router.get('/', asyncHandler(async (req, res) => {
                 id,
                 name: offer.name,
                 isMainProduct: id === env.OFFER_ID_PEROXIDE,
-                price: offer.prices['base'] ?? 0,
+                price: offer.prices[env.PRICE_TYPE_BASE] ?? Object.values(offer.prices)[0] ?? 0,
                 currency: offer.currency || 'UAH',
             }));
 

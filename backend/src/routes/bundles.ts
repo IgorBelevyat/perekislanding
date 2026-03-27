@@ -23,9 +23,9 @@ router.get(
         const cup = priceMap.get(env.OFFER_ID_MEASURING_CUP || '');
 
         // Fallback generic info if no data is found
-        const peroxideBasePrice = peroxide?.prices['base'] ?? 420;
-        const stripsBasePrice = strips?.prices['base'] ?? 180;
-        const cupBasePrice = cup?.prices['base'] ?? 150;
+        const peroxideBasePrice = peroxide?.prices[env.PRICE_TYPE_BASE] ?? 420;
+        const stripsBasePrice = strips?.prices[env.PRICE_TYPE_BASE] ?? 180;
+        const cupBasePrice = cup?.prices[env.PRICE_TYPE_BASE] ?? 150;
 
         // Helper to calculate a bundle package
         const calculateBundle = (

@@ -65,13 +65,13 @@ export async function buildQuote(input: QuoteRequest): Promise<QuoteResult> {
                 continue;
             }
 
-            const basePrice = offer.prices['base'] ?? 0;
+            const basePrice = offer.prices[env.PRICE_TYPE_BASE] ?? 0;
             let activePrice = basePrice;
-            let activePriceType = 'base';
+            let activePriceType = env.PRICE_TYPE_BASE;
 
             // Apply package specific discounts ONLY if it was added as part of a bundle
             if (customItem.isBundleItem && customItem.bundleId) {
-                let packagePriceType = 'base';
+                let packagePriceType = env.PRICE_TYPE_BASE;
                 let minQtyAllowed = 1;
                 if (customItem.bundleId === 'nasezon') { packagePriceType = env.PRICE_TYPE_NASEZON || 'base'; minQtyAllowed = 1; }
                 else if (customItem.bundleId === 'optimal') { packagePriceType = env.PRICE_TYPE_OPTIMAL || 'base'; minQtyAllowed = 2; }
@@ -136,7 +136,7 @@ export async function buildQuote(input: QuoteRequest): Promise<QuoteResult> {
             }
 
             // Calculator flow always uses base price since no package was explicitly clicked
-            const basePrice = offer.prices['base'] ?? 0;
+            const basePrice = offer.prices[env.PRICE_TYPE_BASE] ?? 0;
             const qty = offerId === bundle.baseOfferId ? calcResult.requiredCanisters : 1;
             items.push({
                 offerId,

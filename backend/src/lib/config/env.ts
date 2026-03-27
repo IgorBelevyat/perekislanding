@@ -24,6 +24,7 @@ const envSchema = z.object({
     
     // Pricing configuration
     OFFER_ID_PEROXIDE: z.string().optional().default('101'),
+    PRICE_TYPE_BASE: z.string().optional().default('base'),
     PRICE_TYPE_NASEZON: z.string().optional().default('base'),
     PRICE_TYPE_OPTIMAL: z.string().optional().default('base'),
     PRICE_TYPE_PRO: z.string().optional().default('base'),

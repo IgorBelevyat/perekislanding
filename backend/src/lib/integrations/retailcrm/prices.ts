@@ -13,7 +13,7 @@ const MOCK_PRICES: Record<string, CachedOffer> = {
         currency: 'UAH',
         updatedAt: new Date().toISOString(),
         prices: {
-            'base': 599,
+            [env.PRICE_TYPE_BASE]: 599,
             [env.PRICE_TYPE_NASEZON || 'nasezon']: 569,
             [env.PRICE_TYPE_OPTIMAL || 'optimal']: 549,
             [env.PRICE_TYPE_PRO || 'pro']: 539,
@@ -24,14 +24,14 @@ const MOCK_PRICES: Record<string, CachedOffer> = {
         name: 'Тест-смужки для перекису',
         currency: 'UAH',
         updatedAt: new Date().toISOString(),
-        prices: { 'base': 180 }
+        prices: { [env.PRICE_TYPE_BASE]: 180 }
     },
     [env.OFFER_ID_MEASURING_CUP || 'cup']: {
         offerId: env.OFFER_ID_MEASURING_CUP || 'cup',
         name: 'Мірна тара',
         currency: 'UAH',
         updatedAt: new Date().toISOString(),
-        prices: { 'base': 150 }
+        prices: { [env.PRICE_TYPE_BASE]: 150 }
     }
 };
 
@@ -63,9 +63,9 @@ export async function getOfferPrice(offerExternalId: string): Promise<CachedOffe
                                 priceMap[p.priceType] = p.price;
                             });
                         }
-                        // Always ensure we have at least 'base' mapped to the default price
-                        if (!priceMap['base'] && offer.price) {
-                            priceMap['base'] = offer.price;
+                        // Always ensure we have at least PRICE_TYPE_BASE mapped to the default price
+                        if (!priceMap[env.PRICE_TYPE_BASE] && offer.price) {
+                            priceMap[env.PRICE_TYPE_BASE] = offer.price;
                         }
 
                         return {
