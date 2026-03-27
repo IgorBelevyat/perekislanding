@@ -75,6 +75,13 @@ function CartModal() {
                         <p className="cart-modal__hint">
                             Оплата при отриманні · Доставка Новою Поштою
                         </p>
+
+                        <button
+                            className="cart-modal__continue"
+                            onClick={() => setIsCartOpen(false)}
+                        >
+                            Продовжити покупки
+                        </button>
                     </>
                 )}
 

@@ -66,6 +66,25 @@ function HowToUseBlock() {
                     </div>
                 ))}
             </div>
+
+            <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+                <span style={{ color: '#E53E3E', fontSize: '15px', marginRight: '4px' }}>*</span>
+                <a
+                    href="#safety"
+                    style={{
+                        color: '#4B5563',
+                        fontSize: '13px',
+                        textDecoration: 'underline',
+                        textUnderlineOffset: '3px',
+                        transition: 'color 0.2s ease',
+                        display: 'inline-block'
+                    }}
+                    onMouseEnter={(e) => e.target.style.color = '#0096B8'}
+                    onMouseLeave={(e) => e.target.style.color = '#4B5563'}
+                >
+                    повна інструкція з використання
+                </a>
+            </div>
         </SectionWrapper>
     );
 }

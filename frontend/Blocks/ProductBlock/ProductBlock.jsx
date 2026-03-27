@@ -14,10 +14,9 @@ const IconCheckSmall = () => (
 );
 
 const DEFAULT_PRODUCT = {
-    id: 'peroxide-5l', // Match the mock externalId
+    id: 'peroxide-5l',
     name: 'Перекис водню 50%, 5 л',
     price: 420, // Fallback price
-    oldPrice: 550,
 };
 
 function ProductBlock() {
@@ -31,16 +30,15 @@ function ProductBlock() {
         api.getProducts()
             .then(data => {
                 if (isMounted && data.products) {
-                    // Find the 5L peroxide
-                    const p5l = data.products.find(p => p.id === 'peroxide-5l');
+                    // Find the main peroxide product (flagged by the backend via OFFER_ID_PEROXIDE .env)
+                    const p5l = data.products.find(p => p.isMainProduct);
                     if (p5l) {
                         setProduct(prev => ({
                             ...prev,
+                            id: p5l.id,       // Real CRM offer ID for correct cart/checkout
                             name: p5l.name,
                             price: p5l.price,
                             imageUrl: p5l.imageUrl,
-                            // Old price could be calculated or fetched if supported, 
-                            // for now we just keep the hardcoded one or remove it if not needed
                         }));
                     }
                 }
@@ -79,9 +77,6 @@ function ProductBlock() {
                         ) : (
                             <>
                                 <span className="product__price">{product.price} грн</span>
-                                {product.oldPrice && (
-                                    <span className="product__old-price">{product.oldPrice} грн</span>
-                                )}
                             </>
                         )}
                     </div>

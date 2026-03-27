@@ -177,6 +177,8 @@ export function CartProvider({ children }) {
 
     const getBenefit = () => {
         return items.reduce((sum, item) => {
+            // Skip gift items (price=0) — they're bonuses, not savings
+            if (item.price === 0) return sum;
             const base = item.basePrice || item.price;
             return sum + ((base - item.price) * item.quantity);
         }, 0);

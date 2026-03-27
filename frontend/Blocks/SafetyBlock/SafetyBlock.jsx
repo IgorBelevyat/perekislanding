@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import SectionWrapper from '../../Common components/SectionWrapper/SectionWrapper';
 import certificatePdf from '../../Src/assets/FIles/Certificate.pdf';
+import instructionPdf from '../../Src/assets/FIles/Instruction.pdf';
 import './SafetyBlock.css';
 
 /* ── SVG Icons (matching site style — thin stroke, rounded) ──── */
@@ -205,6 +206,22 @@ function SafetyBlock() {
                         <div className="safety-item__header-left">
                             <span className="safety-item__icon-left"><IconCert /></span>
                             <span>Сертифікати якості</span>
+                        </div>
+                        <span className="safety-item__external-icon"><IconExternal /></span>
+                    </div>
+                </a>
+
+                {/* Item 3: Instruction PDF link */}
+                <a
+                    href={instructionPdf}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="safety-item safety-item--link"
+                >
+                    <div className="safety-item__header safety-item__header--link">
+                        <div className="safety-item__header-left">
+                            <span className="safety-item__icon-left"><IconCert /></span>
+                            <span>Повна інструкція з використання</span>
                         </div>
                         <span className="safety-item__external-icon"><IconExternal /></span>
                     </div>

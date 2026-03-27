@@ -18,7 +18,7 @@ const MODES = [
 ];
 
 function CalculatorBlock() {
-    const [inputMode, setInputMode] = useState('dimensions'); // dimensions | volume
+    const [inputMode, setInputMode] = useState('volume'); // volume | dimensions
     const [length, setLength] = useState('');
     const [width, setWidth] = useState('');
     const [depth, setDepth] = useState('');

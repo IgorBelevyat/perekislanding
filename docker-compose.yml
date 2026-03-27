@@ -6,6 +6,8 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        VITE_GA4_MEASUREMENT_ID: ${GA4_MEASUREMENT_ID}
     ports:
       - "127.0.0.1:3000:80"
     depends_on:
@@ -38,7 +40,7 @@ services:
       - redis
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:4000/api/health || exit 1"]
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:4000/api/health || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 3

@@ -47,7 +47,7 @@ router.get(
                 { 
                     offerId: peroxide?.offerId || 'per', 
                     qty: peroxideQty,
-                    name: `Перекис водню 50%`,
+                    name: peroxide?.name || 'Перекис водню 50%',
                     price: peroxide?.prices[priceType] ?? peroxideBasePrice,
                     basePrice: peroxideBasePrice
                 }
@@ -61,7 +61,7 @@ router.get(
                 customItems.push({ 
                     offerId: strips?.offerId || 'str', 
                     qty: 1,
-                    name: 'Тест-смужки для перекису',
+                    name: strips?.name || 'Тест-смужки для перекису',
                     price: activePrice,
                     basePrice: stripsBasePrice
                 });
@@ -75,7 +75,7 @@ router.get(
                 customItems.push({ 
                     offerId: cup?.offerId || 'cup', 
                     qty: 1,
-                    name: 'Мірна тара',
+                    name: cup?.name || 'Мірна тара',
                     price: activePrice,
                     basePrice: cupBasePrice
                 });

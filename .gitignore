@@ -20,8 +20,9 @@ build/
 .DS_Store
 Thumbs.db
 
-# Docker
-postgres_data/
+# Docker volumes (auto-created, not nginx config)
+data/postgres/
+data/redis/
 
 # Logs
 *.log

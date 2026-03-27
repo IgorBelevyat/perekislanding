@@ -40,6 +40,10 @@ async function main() {
 
         // Show each product with its offers
         for (const product of (data.products ?? [])) {
+            // Фільтруємо товар і його офери за ІД 337674164
+            const isMatch = product.externalId === '337674164' || product.offers?.some((o: any) => o.externalId === '337674164');
+            if (!isMatch) continue;
+
             console.log(`📦 Product #${product.id}: ${product.name}`);
             console.log(`   externalId: ${product.externalId ?? '(empty)'}`);
             console.log(`   article: ${product.article ?? '(empty)'}`);

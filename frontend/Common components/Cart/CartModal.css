@@ -140,7 +140,29 @@
     text-align: center;
     font-size: 13px;
     color: #6B7280;
-    padding: 0 24px 16px;
+    padding: 0 24px 12px;
+}
+
+/* Continue shopping */
+.cart-modal__continue {
+    margin: 0 24px 16px;
+    padding: 12px;
+    background: transparent;
+    color: #0096B8;
+    border: 1.5px solid #0096B8;
+    border-radius: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: calc(100% - 48px);
+}
+
+.cart-modal__continue:hover {
+    background: #F4FAFC;
+    border-color: #007A96;
+    color: #007A96;
 }
 
 /* History toggle */
