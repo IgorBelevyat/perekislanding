@@ -21,8 +21,8 @@ const customerSchema = z.object({
     lastName: z.string().min(2).max(50).trim(),
     phone: phoneSchema,
     email: z.string().email().optional().or(z.literal('')),
-    companyName: z.string().min(2).max(100).trim().optional(),
-    edrpou: z.string().min(8).max(10).trim().optional(),
+    companyName: z.string().max(100).trim().optional().or(z.literal('')).transform(v => v || undefined),
+    edrpou: z.string().max(10).trim().optional().or(z.literal('')).transform(v => v || undefined),
 });
 
 // ─── Delivery schema ─────────────────────────────────────

@@ -38,6 +38,7 @@ const envSchema = z.object({
     CRM_DELIVERY_TYPE_NP: z.string().optional().default('novaposhta'),
     CRM_DELIVERY_TYPE_COURIER: z.string().optional().default('courier'),
     CRM_DELIVERY_TYPE_PICKUP: z.string().optional().default('pickup'),
+    CRM_SITE_CODE: z.string().optional(),
 
     // Nova Poshta
     NP_API_KEY: z.string().optional(),
@@ -45,6 +46,9 @@ const envSchema = z.object({
     // LiqPay
     LIQPAY_PUBLIC_KEY: z.string().optional(),
     LIQPAY_PRIVATE_KEY: z.string().optional(),
+
+    // Frontend URL (for payment redirects)
+    SITE_URL: z.string().url().optional().default('http://localhost:3000'),
 
     // GA4
     GA4_MEASUREMENT_ID: z.string().optional(),

@@ -97,7 +97,7 @@ export async function createOrder(payload: RetailCrmCreateOrderPayload): Promise
         const body = new URLSearchParams();
         body.set('apiKey', API_KEY());
         body.set('order', JSON.stringify(payload.order));
-        body.set('site', payload.site);
+        if (payload.site) body.set('site', payload.site);
 
         const response = await fetch(url.toString(), {
             method: 'POST',

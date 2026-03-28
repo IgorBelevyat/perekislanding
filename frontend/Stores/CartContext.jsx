@@ -43,8 +43,9 @@ export function CartProvider({ children }) {
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const orderId = urlParams.get('orderId');
+        const orderNumber = urlParams.get('orderNumber');
         if (orderId) {
-            setOrderResult({ orderId, status: 'success' });
+            setOrderResult({ orderId, orderNumber: orderNumber || orderId, status: 'success' });
             setCheckoutStep('success');
             // Clean up URL
             window.history.replaceState({}, document.title, window.location.pathname);

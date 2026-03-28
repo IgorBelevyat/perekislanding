@@ -35,7 +35,7 @@ export interface RetailCrmCustomer {
 }
 
 export interface RetailCrmCreateOrderPayload {
-    site: string;
+    site?: string;
     order: {
         externalId: string;
         number?: string;

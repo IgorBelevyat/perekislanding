@@ -102,7 +102,7 @@ export async function processCheckout(
         }
 
         const rcResult = await createRetailCrmOrder({
-            site: 'landing-hlorka-ua',
+            ...(env.CRM_SITE_CODE ? { site: env.CRM_SITE_CODE } : {}),
             order: {
                 externalId: orderId,
                 number: shortId,
@@ -166,13 +166,13 @@ export async function processCheckout(
 
     let paymentUrl: string | undefined;
     if (input.paymentMethod === 'online') {
-        const host = env.NODE_ENV === 'production' ? 'https://landing.hlorka.ua' : 'http://localhost:3000';
+        const host = env.SITE_URL;
         const formData = createPaymentFormData({
             orderId: order.id,
             amount: totalsSnapshot.total,
             currency: 'UAH',
             description: `Замовлення №${shortId}`,
-            resultUrl: `${host}/?orderId=${order.id}`,
+            resultUrl: `${host}/?orderId=${order.id}&orderNumber=${shortId}`,
             serverUrl: `${host}/api/payments/liqpay/callback`,
         });
         paymentUrl = getCheckoutUrl(formData);
