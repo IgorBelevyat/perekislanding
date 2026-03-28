@@ -5,7 +5,35 @@ import './CheckoutModal.css';
 function OrderResult() {
     const { checkoutStep, orderResult, resetCheckout } = useCart();
 
-    if (checkoutStep !== 'success' && checkoutStep !== 'failed') return null;
+    if (checkoutStep !== 'success' && checkoutStep !== 'failed' && checkoutStep !== 'processing') return null;
+
+    if (checkoutStep === 'processing') {
+        return (
+            <div
+                className="checkout-overlay"
+                style={{ alignItems: 'center', justifyContent: 'center', padding: '1rem' }}
+            >
+                <div
+                    className="checkout-modal"
+                    style={{
+                        height: 'auto',
+                        margin: 'auto',
+                        borderRadius: '16px',
+                        maxWidth: '450px',
+                        animation: 'fadeIn 0.3s ease-out'
+                    }}
+                    onClick={e => e.stopPropagation()}
+                >
+                    <div className="checkout-modal__content" style={{ textAlign: 'center', padding: '2.5rem' }}>
+                        <div style={{ width: '48px', height: '48px', margin: '0 auto 1.5rem', border: '4px solid #e0e0e0', borderTopColor: '#FF8C00', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+                        <h2 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: 'var(--color-text)', fontWeight: '700' }}>Перевіряємо оплату...</h2>
+                        <p style={{ color: 'var(--color-text-light)', lineHeight: '1.6' }}>Зачекайте, будь ласка</p>
+                    </div>
+                </div>
+                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            </div>
+        );
+    }
 
     const isSuccess = checkoutStep === 'success';
 
@@ -32,7 +60,7 @@ function OrderResult() {
                 </div>
 
                 <div className="checkout-modal__content" style={{ textAlign: 'center', padding: '0 2.5rem 2.5rem' }}>
-                    {isSuccess ? (
+                    {isSuccess && orderResult?.status !== 'pending' ? (
                         <>
                             <div style={{ width: '64px', height: '64px', background: '#e6f7eb', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
                                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -43,6 +71,23 @@ function OrderResult() {
                             <p style={{ color: 'var(--color-text-light)', marginBottom: '2rem', lineHeight: '1.6' }}>
                                 Дякуємо за покупку. Номер вашого замовлення: <br /><strong style={{ color: 'var(--color-text)' }}>{orderResult?.orderNumber || orderResult?.orderId || orderResult?.id}</strong>.<br /><br />
                                 Ми зв'яжемося з вами найближчим часом для підтвердження.
+                            </p>
+                            <Button variant="cta" size="lg" fullWidth onClick={resetCheckout}>
+                                Повернутися на сайт
+                            </Button>
+                        </>
+                    ) : isSuccess && orderResult?.status === 'pending' ? (
+                        <>
+                            <div style={{ width: '64px', height: '64px', background: '#fff3e0', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="#f57c00" strokeWidth="2" />
+                                    <path d="M12 8V12L15 15" stroke="#f57c00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                            </div>
+                            <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: '#f57c00', fontWeight: '700' }}>Оплата обробляється</h2>
+                            <p style={{ color: 'var(--color-text-light)', marginBottom: '2rem', lineHeight: '1.6' }}>
+                                Замовлення №<strong style={{ color: 'var(--color-text)' }}>{orderResult?.orderNumber || orderResult?.orderId}</strong> створено.<br /><br />
+                                Статус оплати ще обробляється. Ми зв'яжемося з вами для підтвердження.
                             </p>
                             <Button variant="cta" size="lg" fullWidth onClick={resetCheckout}>
                                 Повернутися на сайт

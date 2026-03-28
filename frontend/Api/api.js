@@ -68,4 +68,10 @@ export const api = {
             },
             body: JSON.stringify(orderData)
         }),
+
+    /**
+     * Check order payment status (after LiqPay redirect).
+     */
+    getOrderStatus: (orderId) =>
+        fetchApi(`/payments/order/${encodeURIComponent(orderId)}`),
 };

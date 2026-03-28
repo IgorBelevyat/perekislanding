@@ -39,18 +39,49 @@ export function CartProvider({ children }) {
         localStorage.setItem(HISTORY_KEY, JSON.stringify(orderHistory));
     }, [orderHistory]);
 
-    // Check URL for LiqPay success redirect
+    // Check URL for LiqPay redirect and verify actual payment status
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const orderId = urlParams.get('orderId');
         const orderNumber = urlParams.get('orderNumber');
-        if (orderId) {
-            setOrderResult({ orderId, orderNumber: orderNumber || orderId, status: 'success' });
-            setCheckoutStep('success');
-            // Clean up URL
-            window.history.replaceState({}, document.title, window.location.pathname);
-            setItems([]); // Clear cart after successful online payment
-        }
+        if (!orderId) return;
+
+        // Clean up URL immediately
+        window.history.replaceState({}, document.title, window.location.pathname);
+
+        // Show processing state while we check
+        setCheckoutStep('processing');
+
+        const checkPaymentStatus = async (retries = 0) => {
+            try {
+                const data = await api.getOrderStatus(orderId);
+
+                if (data.paymentStatus === 'PAID') {
+                    setOrderResult({ orderId, orderNumber: orderNumber || orderId, status: 'success' });
+                    setCheckoutStep('success');
+                    setItems([]); // Clear cart after successful payment
+                } else if (data.paymentStatus === 'FAILED') {
+                    setOrderResult({ orderId, orderNumber: orderNumber || orderId, status: 'failed' });
+                    setCheckoutStep('failed');
+                } else if (data.paymentStatus === 'PENDING' && retries < 5) {
+                    // LiqPay callback may not have arrived yet — retry after short delay
+                    setTimeout(() => checkPaymentStatus(retries + 1), 2000);
+                } else {
+                    // After retries, still PENDING — show as pending/awaiting
+                    setOrderResult({ orderId, orderNumber: orderNumber || orderId, status: 'pending' });
+                    setCheckoutStep('success'); // Show success-like screen with "pending" message
+                    setItems([]);
+                }
+            } catch (err) {
+                console.error('Failed to check payment status:', err);
+                // Fallback: show success (order was created, callback will process later)
+                setOrderResult({ orderId, orderNumber: orderNumber || orderId, status: 'success' });
+                setCheckoutStep('success');
+                setItems([]);
+            }
+        };
+
+        checkPaymentStatus();
     }, []);
 
     // On-load: validate prices for all items already in cart (including bundle items)

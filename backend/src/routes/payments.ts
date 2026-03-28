@@ -109,4 +109,39 @@ router.post(
     }),
 );
 
+/**
+ * GET /api/payments/order/:orderId
+ * Frontend checks actual payment status after LiqPay redirect.
+ * Returns: { status, paymentStatus, orderNumber }
+ */
+router.get(
+    '/order/:orderId',
+    asyncHandler(async (req, res) => {
+        const orderId = req.params.orderId as string;
+
+        const order = await prisma.order.findUnique({
+            where: { id: orderId },
+            select: {
+                id: true,
+                status: true,
+                paymentStatus: true,
+                paymentMethod: true,
+                createdAt: true,
+            },
+        });
+
+        if (!order) {
+            res.status(404).json({ error: 'Order not found' });
+            return;
+        }
+
+        res.json({
+            orderId: order.id,
+            status: order.status,
+            paymentStatus: order.paymentStatus,
+            paymentMethod: order.paymentMethod,
+        });
+    }),
+);
+
 export default router;

@@ -34,15 +34,23 @@ export function decodeCallbackData(dataBase64: string): LiqPayCallbackData {
 
 /**
  * Check if the payment status indicates a successful payment.
+ * LiqPay docs: https://www.liqpay.ua/documentation/api/callback
  */
 export function isPaymentSuccessful(status: string): boolean {
-    // LiqPay statuses that mean money received
-    return ['success', 'sandbox'].includes(status);
+    return [
+        'success',          // Payment completed
+        'sandbox',          // Sandbox/test mode success
+        'wait_compensation', // Successful, will be transferred in daily settlement
+    ].includes(status);
 }
 
 /**
- * Check if the payment status indicates a failure.
+ * Check if the payment status indicates a failure or cancellation.
  */
 export function isPaymentFailed(status: string): boolean {
-    return ['failure', 'error', 'reversed'].includes(status);
+    return [
+        'failure',   // Payment failed
+        'error',     // Error in payment data
+        'reversed',  // Payment was refunded
+    ].includes(status);
 }
