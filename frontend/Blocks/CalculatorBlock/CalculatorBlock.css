@@ -421,6 +421,7 @@
     font-size: 1.25rem;
     font-weight: 800;
     color: #003B5C;
+    white-space: nowrap;
 }
 
 .calc-upsell__benefit {

@@ -63,7 +63,8 @@ export function CartProvider({ children }) {
                     const payloadItem = {
                         offerId: i.id,
                         qty: i.quantity,
-                        isBundleItem: i.isBundleItem
+                        isBundleItem: i.isBundleItem,
+                        isGift: i.price === 0 && i.isBundleItem
                     };
                     if (i.bundleId) payloadItem.bundleId = i.bundleId;
                     return payloadItem;
@@ -194,7 +195,8 @@ export function CartProvider({ children }) {
                 const payloadItem = {
                     offerId: i.id,
                     qty: i.quantity,
-                    isBundleItem: i.isBundleItem
+                    isBundleItem: i.isBundleItem,
+                    isGift: i.price === 0 && i.isBundleItem
                 };
                 if (i.bundleId) payloadItem.bundleId = i.bundleId;
                 return payloadItem;
@@ -265,7 +267,8 @@ export function CartProvider({ children }) {
                 const payloadItem = {
                     offerId: i.id,
                     qty: i.quantity,
-                    isBundleItem: i.isBundleItem
+                    isBundleItem: i.isBundleItem,
+                    isGift: i.price === 0 && i.isBundleItem
                 };
                 if (i.bundleId) payloadItem.bundleId = i.bundleId;
                 return payloadItem;

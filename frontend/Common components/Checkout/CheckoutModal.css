@@ -78,6 +78,8 @@
 .checkout-modal__summary-item {
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
     font-size: 0.9rem;
     margin-bottom: 0.5rem;
     color: var(--color-text-light);

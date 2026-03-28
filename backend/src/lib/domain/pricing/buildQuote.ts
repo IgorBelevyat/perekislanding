@@ -69,8 +69,12 @@ export async function buildQuote(input: QuoteRequest): Promise<QuoteResult> {
             let activePrice = basePrice;
             let activePriceType = env.PRICE_TYPE_BASE;
 
+            // Gift items in bundles have price = 0
+            if (customItem.isGift) {
+                activePrice = 0;
+            }
             // Apply package specific discounts ONLY if it was added as part of a bundle
-            if (customItem.isBundleItem && customItem.bundleId) {
+            else if (customItem.isBundleItem && customItem.bundleId) {
                 let packagePriceType = env.PRICE_TYPE_BASE;
                 let minQtyAllowed = 1;
                 if (customItem.bundleId === 'nasezon') { packagePriceType = env.PRICE_TYPE_NASEZON || 'base'; minQtyAllowed = 1; }

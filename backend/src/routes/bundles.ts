@@ -41,43 +41,44 @@ router.get(
         ) => {
             let baseTotal = peroxideQty * peroxideBasePrice;
             let actualTotal = peroxideQty * (peroxide?.prices[priceType] ?? peroxideBasePrice);
-            
+
             let descriptionItems = [`${peroxideQty} × 5 кг`];
-            const customItems = [
-                { 
-                    offerId: peroxide?.offerId || 'per', 
+            const customItems: { offerId: string; qty: number; name: string; price: number; basePrice: number; isGift: boolean }[] = [
+                {
+                    offerId: peroxide?.offerId || 'per',
                     qty: peroxideQty,
                     name: peroxide?.name || 'Перекис водню 50%',
                     price: peroxide?.prices[priceType] ?? peroxideBasePrice,
-                    basePrice: peroxideBasePrice
+                    basePrice: peroxideBasePrice,
+                    isGift: false
                 }
             ];
 
             if (includesStrips) {
                 baseTotal += stripsBasePrice;
-                const activePrice = strips?.prices[priceType] ?? stripsBasePrice;
-                actualTotal += activePrice;
-                descriptionItems.push('🎁 тест-смужки');
-                customItems.push({ 
-                    offerId: strips?.offerId || 'str', 
+                // Strips are a gift in bundles — price is 0
+                descriptionItems.push('тест-смужки');
+                customItems.push({
+                    offerId: strips?.offerId || 'str',
                     qty: 1,
                     name: strips?.name || 'Тест-смужки для перекису',
-                    price: activePrice,
-                    basePrice: stripsBasePrice
+                    price: 0,
+                    basePrice: stripsBasePrice,
+                    isGift: true
                 });
             }
 
             if (includesCup) {
                 baseTotal += cupBasePrice;
-                const activePrice = cup?.prices[priceType] ?? cupBasePrice;
-                actualTotal += activePrice;
+                // Cup is a gift in bundles — price is 0
                 descriptionItems.push('мірна тара');
-                customItems.push({ 
-                    offerId: cup?.offerId || 'cup', 
+                customItems.push({
+                    offerId: cup?.offerId || 'cup',
                     qty: 1,
                     name: cup?.name || 'Мірна тара',
-                    price: activePrice,
-                    basePrice: cupBasePrice
+                    price: 0,
+                    basePrice: cupBasePrice,
+                    isGift: true
                 });
             }
 

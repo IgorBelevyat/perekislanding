@@ -13,10 +13,10 @@ function StickyCartBar() {
         let isMounted = true;
         api.getProducts().then(data => {
             if (isMounted && data.products) {
-                const p5l = data.products.find(p => p.id === 'peroxide-5l');
-                if (p5l) {
-                    setPrice(p5l.price);
-                    setName(p5l.name);
+                const mainProduct = data.products.find(p => p.isMainProduct);
+                if (mainProduct) {
+                    setPrice(mainProduct.price);
+                    setName(mainProduct.name);
                 }
             }
         }).catch(err => console.error('Failed to fetch price for sticky bar:', err));

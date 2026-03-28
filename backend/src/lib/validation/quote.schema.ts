@@ -26,6 +26,7 @@ export const quoteRequestSchema = z.object({
         qty: z.number().int().positive(),
         isBundleItem: z.boolean().optional(),
         bundleId: z.string().optional(),
+        isGift: z.boolean().optional(),
     })).optional(),
 });
 

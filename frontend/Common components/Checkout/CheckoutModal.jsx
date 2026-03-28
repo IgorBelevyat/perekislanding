@@ -265,12 +265,14 @@ function CheckoutModal() {
                         {items.map(item => (
                             <div key={item.id} className="checkout-modal__summary-item">
                                 <span>{item.quantity} × {item.name}</span>
-                                <span>{item.price * item.quantity} ₴</span>
+                                <span style={{ whiteSpace: 'nowrap' }}>
+                                    {item.price === 0 ? 'У подарунок' : `${item.price * item.quantity} ₴`}
+                                </span>
                             </div>
                         ))}
                         <div className="checkout-modal__summary-total">
                             <strong>До сплати:</strong>
-                            <strong>{getTotal()} ₴</strong>
+                            <strong style={{ whiteSpace: 'nowrap' }}>{getTotal()} ₴</strong>
                         </div>
                     </div>
 
