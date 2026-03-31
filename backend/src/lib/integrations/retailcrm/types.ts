@@ -39,6 +39,9 @@ export interface RetailCrmCreateOrderPayload {
     order: {
         externalId: string;
         number?: string;
+        customer?: {
+            externalId: string;
+        };
         firstName: string;
         lastName?: string;
         phone: string;
@@ -54,8 +57,18 @@ export interface RetailCrmCreateOrderPayload {
                 flat?: string;
                 block?: string;
             };
+            data?: {
+                receiverCity?: string;
+                receiverCityRef?: string;
+                receiverWarehouseTypeRef?: string;
+                [key: string]: unknown;
+            };
         };
-        paymentType?: string;
+        payments?: {
+            type: string;
+            amount?: number;
+            status?: string;
+        }[];
         customerComment?: string;
     };
 }

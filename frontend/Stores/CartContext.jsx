@@ -67,10 +67,9 @@ export function CartProvider({ children }) {
                     // LiqPay callback may not have arrived yet — retry after short delay
                     setTimeout(() => checkPaymentStatus(retries + 1), 2000);
                 } else {
-                    // After retries, still PENDING — show as pending/awaiting
-                    setOrderResult({ orderId, orderNumber: orderNumber || orderId, status: 'pending' });
-                    setCheckoutStep('success'); // Show success-like screen with "pending" message
-                    setItems([]);
+                    // After retries, still PENDING = user likely cancelled on LiqPay
+                    setOrderResult({ orderId, orderNumber: orderNumber || orderId, status: 'failed' });
+                    setCheckoutStep('failed');
                 }
             } catch (err) {
                 console.error('Failed to check payment status:', err);

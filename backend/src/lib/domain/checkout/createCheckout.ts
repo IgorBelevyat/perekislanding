@@ -63,85 +63,98 @@ export async function processCheckout(
     const num = parseInt(hash.substring(0, 10), 16);
     const shortId = (num % 100000000).toString().padStart(8, '0');
 
-    // 3. Create order in RetailCRM
+    // 3. Build CRM order payload (used now for COD/cashless, or deferred for online)
     let retailcrmOrderId: string | null = null;
-    try {
-        let deliveryCode = env.CRM_DELIVERY_TYPE_NP || 'nova-poshta';
-        let addressData: any = {};
 
-        if (input.delivery.type === 'pickup') {
-            deliveryCode = env.CRM_DELIVERY_TYPE_PICKUP || 'self-delivery';
-        } else if (input.delivery.type === 'courier') {
-            deliveryCode = env.CRM_DELIVERY_TYPE_COURIER || 'courier';
-            addressData = {
-                city: input.delivery.city,
-                street: input.delivery.street,
-                building: input.delivery.house,
-                block: input.delivery.entrance || undefined,
-                flat: input.delivery.apartment || undefined,
-            };
-        } else if (input.delivery.type === 'nova_poshta') {
-            deliveryCode = env.CRM_DELIVERY_TYPE_NP || 'nova-poshta';
-            addressData = {
-                city: input.delivery.cityName,
-                // Passing warehouse as street allows the CRM to parse them cleanly into two separate inputs
-                street: input.delivery.warehouseName,
-            };
-        }
+    let deliveryCode = env.CRM_DELIVERY_TYPE_NP || 'nova-poshta';
+    let addressData: any = {};
+    let deliveryData: any = null;
 
-        let customerComment: string | undefined = undefined;
-        if (input.paymentMethod === 'cashless' && input.customer.companyName && input.customer.edrpou) {
-            customerComment = `Увага, замовлення за безготівковим розрахунком\nНазва організації: ${input.customer.companyName}\nКод ЄДРПОУ: ${input.customer.edrpou}`;
-        }
+    if (input.delivery.type === 'pickup') {
+        deliveryCode = env.CRM_DELIVERY_TYPE_PICKUP || 'self-delivery';
+    } else if (input.delivery.type === 'courier') {
+        deliveryCode = env.CRM_DELIVERY_TYPE_COURIER || 'courier';
+        addressData = {
+            city: input.delivery.city,
+            street: input.delivery.street,
+            building: input.delivery.house,
+            block: input.delivery.entrance || undefined,
+            flat: input.delivery.apartment || undefined,
+        };
+    } else if (input.delivery.type === 'nova_poshta') {
+        deliveryCode = env.CRM_DELIVERY_TYPE_NP || 'nova-poshta';
+        // Use structured NP data for CRM directory binding
+        deliveryData = {
+            receiverCity: input.delivery.cityName,
+            receiverCityRef: input.delivery.cityRef,
+            receiverWarehouseTypeRef: input.delivery.warehouseRef,
+        };
+    }
 
-        let paymentType = env.CRM_PAYMENT_TYPE_COD || 'cash-on-delivery';
-        if (input.paymentMethod === 'online') {
-            paymentType = env.CRM_PAYMENT_TYPE_ONLINE || 'liqpay';
-        } else if (input.paymentMethod === 'cashless') {
-            paymentType = env.CRM_PAYMENT_TYPE_CASHLESS || 'bank-transfer';
-        }
+    let customerComment: string | undefined = undefined;
+    if (input.paymentMethod === 'cashless' && input.customer.companyName && input.customer.edrpou) {
+        customerComment = `Увага, замовлення за безготівковим розрахунком\nНазва організації: ${input.customer.companyName}\nКод ЄДРПОУ: ${input.customer.edrpou}`;
+    }
 
-        const rcResult = await createRetailCrmOrder({
-            ...(env.CRM_SITE_CODE ? { site: env.CRM_SITE_CODE } : {}),
-            order: {
-                externalId: orderId,
-                number: shortId,
-                customerComment,
-                firstName: input.customer.firstName,
-                lastName: input.customer.lastName,
-                phone: input.customer.phone,
-                email: input.customer.email,
-                items: itemsSnapshot.map((item: any, idx: number) => ({
-                    externalId: `${orderId}-${idx}`,
-                    offer: { externalId: item.offerId },
-                    productName: item.name,
-                    quantity: item.qty,
-                    initialPrice: item.unitPrice,
-                    ...(item.priceType ? { priceType: { code: item.priceType } } : {}),
-                    properties: [
-                        {
-                            code: 'row_id',
-                            name: 'Рядок кошика',
-                            value: `${orderId}-${idx}`
-                        },
-                        ...(item.bundleId ? [{
-                            code: 'bundle_type',
-                            name: 'З набору',
-                            value: item.bundleId
-                        }] : [])
-                    ]
-                })),
-                delivery: {
-                    code: deliveryCode,
-                    address: Object.keys(addressData).length > 0 ? addressData : undefined,
-                },
-                paymentType: paymentType,
+    let paymentType = env.CRM_PAYMENT_TYPE_COD || 'cash-on-delivery';
+    if (input.paymentMethod === 'online') {
+        paymentType = env.CRM_PAYMENT_TYPE_ONLINE || 'liqpay';
+    } else if (input.paymentMethod === 'cashless') {
+        paymentType = env.CRM_PAYMENT_TYPE_CASHLESS || 'bank-transfer';
+    }
+
+    const crmPayload = {
+        ...(env.CRM_SITE_CODE ? { site: env.CRM_SITE_CODE } : {}),
+        order: {
+            externalId: orderId,
+            number: shortId,
+            customerComment,
+            ...(input.customerExternalId ? { customer: { externalId: input.customerExternalId } } : {}),
+            firstName: input.customer.firstName,
+            lastName: input.customer.lastName,
+            phone: input.customer.phone,
+            email: input.customer.email,
+            items: itemsSnapshot.map((item: any, idx: number) => ({
+                externalId: `${orderId}-${idx}`,
+                offer: { externalId: item.offerId },
+                productName: item.name,
+                quantity: item.qty,
+                initialPrice: item.unitPrice,
+                ...(item.priceType ? { priceType: { code: item.priceType } } : {}),
+                properties: [
+                    {
+                        code: 'row_id',
+                        name: 'Рядок кошика',
+                        value: `${orderId}-${idx}`
+                    },
+                    ...(item.bundleId ? [{
+                        code: 'bundle_type',
+                        name: 'З набору',
+                        value: item.bundleId
+                    }] : [])
+                ]
+            })),
+            delivery: {
+                code: deliveryCode,
+                ...(Object.keys(addressData).length > 0 ? { address: addressData } : {}),
+                ...(deliveryData ? { data: deliveryData } : {}),
             },
-        });
-        retailcrmOrderId = String(rcResult.id);
-    } catch (err) {
-        logger.error('RetailCRM order creation failed', { error: (err as Error).message });
-        // Continue without RetailCRM — we still create a local order
+            payments: [{
+                type: paymentType,
+                status: input.paymentMethod === 'online' ? 'not-paid' : undefined,
+            }],
+        },
+    };
+
+    // For COD/cashless — send to CRM immediately.
+    // For online — defer CRM push until LiqPay confirms payment.
+    if (input.paymentMethod !== 'online') {
+        try {
+            const rcResult = await createRetailCrmOrder(crmPayload);
+            retailcrmOrderId = String(rcResult.id);
+        } catch (err) {
+            logger.error('RetailCRM order creation failed', { error: (err as Error).message });
+        }
     }
 
     // 4. Create local order

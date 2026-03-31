@@ -53,6 +53,7 @@ const paymentMethodSchema = z.enum(['online', 'cod', 'cashless']);
 // ─── Checkout request schema ──────────────────────────────
 export const checkoutRequestSchema = z.object({
     quoteId: z.string().uuid(),
+    customerExternalId: z.string().uuid().optional(),
     customer: customerSchema,
     delivery: deliverySchema,
     paymentMethod: paymentMethodSchema,

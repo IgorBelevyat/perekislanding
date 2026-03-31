@@ -56,7 +56,6 @@ router.get(
 
             if (includesStrips) {
                 baseTotal += stripsBasePrice;
-                // Strips are a gift in bundles — price is 0
                 descriptionItems.push('тест-смужки');
                 customItems.push({
                     offerId: strips?.offerId || 'str',
@@ -70,7 +69,6 @@ router.get(
 
             if (includesCup) {
                 baseTotal += cupBasePrice;
-                // Cup is a gift in bundles — price is 0
                 descriptionItems.push('мірна тара');
                 customItems.push({
                     offerId: cup?.offerId || 'cup',

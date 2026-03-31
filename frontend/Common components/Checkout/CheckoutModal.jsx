@@ -217,8 +217,21 @@ function CheckoutModal() {
                     warehouseName: delivery.warehouseName
                 };
 
+            // Get or create persistent customer ID for CRM deduplication
+            let customerExternalId = localStorage.getItem('hlorka_customer_id');
+            if (!customerExternalId) {
+                customerExternalId = typeof crypto !== 'undefined' && crypto.randomUUID
+                    ? crypto.randomUUID()
+                    : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                        const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                        return v.toString(16);
+                    });
+                localStorage.setItem('hlorka_customer_id', customerExternalId);
+            }
+
             let data = {
                 quoteId,
+                customerExternalId,
                 customer: {
                     firstName: formData.firstName.trim(),
                     lastName: formData.lastName.trim(),
