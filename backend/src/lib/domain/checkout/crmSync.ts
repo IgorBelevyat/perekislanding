@@ -48,10 +48,17 @@ export function buildCrmPayload(order: {
         };
     } else if (delivery.type === 'nova_poshta') {
         deliveryCode = env.CRM_DELIVERY_TYPE_NP || 'nova-poshta';
+        // Address block — needed for CRM UI to display city name
+        addressData = {
+            city: delivery.cityName,
+        };
+        // NP-specific data — refs for CRM directory integration
         deliveryData = {
             receiverCity: delivery.cityName,
             receiverCityRef: delivery.cityRef,
             receiverWarehouseTypeRef: delivery.warehouseRef,
+            pickuppointId: delivery.warehouseRef,
+            pickuppoint: delivery.warehouseName,
         };
     }
 
