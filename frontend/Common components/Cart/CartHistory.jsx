@@ -12,27 +12,55 @@ function CartHistory() {
         });
     };
 
+    // Calculate benefit (savings) from server-side items
+    const calcBenefit = (items) => {
+        return (items || []).reduce((sum, item) => {
+            const unitPrice = item.unitPrice ?? item.price ?? 0;
+            const basePrice = item.basePrice ?? unitPrice;
+            const qty = item.qty ?? item.quantity ?? 0;
+            if (unitPrice === 0) return sum; // gift items
+            return sum + (basePrice - unitPrice) * qty;
+        }, 0);
+    };
+
+    // Generate a short display order number from UUID
+    const shortOrderNumber = (orderId) => {
+        if (!orderId) return '—';
+        // Take first 8 characters of the UUID as a display number
+        return orderId.replace(/-/g, '').slice(0, 8).toUpperCase();
+    };
+
     return (
         <div className="cart-history">
-            {orderHistory.map(order => (
-                <div key={order.id} className="cart-history__order">
-                    <p className="cart-history__date">Замовлення №{order.orderNumber || String(order.id).slice(0, 8)} від {formatDate(order.date)}</p>
-                    {order.items.map((item, i) => (
-                        <p key={i} className="cart-history__item">
-                            {item.name} × {item.quantity} — {item.price * item.quantity} {item.price === 0 ? '(У подарунок)' : 'грн'}
+            {orderHistory.map(order => {
+                const benefit = calcBenefit(order.items);
+                return (
+                    <div key={order.id} className="cart-history__order">
+                        <p className="cart-history__date">
+                            Замовлення №{shortOrderNumber(order.id)} від {formatDate(order.date)}
                         </p>
-                    ))}
-                    <p className="cart-history__total">Разом: {order.total} грн</p>
-                    {order.benefit > 0 && (
-                        <p className="cart-history__total" style={{ color: '#10B981', marginTop: '0', border: 'none' }}>
-                            Ваша вигода: {order.benefit} грн
-                        </p>
-                    )}
-                    <button className="cart-history__reorder" onClick={() => reorder(order)}>
-                        Замовити знову
-                    </button>
-                </div>
-            ))}
+                        {(order.items || []).map((item, i) => {
+                            const qty = item.qty ?? item.quantity ?? 1;
+                            const price = item.unitPrice ?? item.price ?? 0;
+                            const lineTotal = price * qty;
+                            return (
+                                <p key={i} className="cart-history__item">
+                                    {item.name} × {qty} — {lineTotal} {price === 0 ? '(У подарунок)' : 'грн'}
+                                </p>
+                            );
+                        })}
+                        <p className="cart-history__total">Разом: {order.total} грн</p>
+                        {benefit > 0 && (
+                            <p className="cart-history__total" style={{ color: '#10B981', marginTop: '0', border: 'none' }}>
+                                Ваша вигода: {benefit} грн
+                            </p>
+                        )}
+                        <button className="cart-history__reorder" onClick={() => reorder(order)}>
+                            Замовити знову
+                        </button>
+                    </div>
+                );
+            })}
         </div>
     );
 }

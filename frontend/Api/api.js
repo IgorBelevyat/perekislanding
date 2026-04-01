@@ -74,4 +74,10 @@ export const api = {
      */
     getOrderStatus: (orderId) =>
         fetchApi(`/payments/order/${encodeURIComponent(orderId)}`),
+
+    /**
+     * Get order history for a customer.
+     */
+    getOrderHistory: (customerId) =>
+        fetchApi(`/orders/history?customerId=${encodeURIComponent(customerId)}`),
 };

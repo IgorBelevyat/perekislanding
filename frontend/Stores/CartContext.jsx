@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { api } from '../Api/api';
 import PriceAlertModal from '../Common components/Cart/PriceAlertModal';
 import { trackAddToCart, trackRemoveFromCart } from '../utils/analytics';
@@ -6,7 +6,7 @@ import { trackAddToCart, trackRemoveFromCart } from '../utils/analytics';
 const CartContext = createContext();
 
 const STORAGE_KEY = 'perekis_cart';
-const HISTORY_KEY = 'perekis_order_history';
+const CUSTOMER_ID_KEY = 'hlorka_customer_id';
 
 function loadFromStorage(key, fallback) {
     try {
@@ -19,7 +19,7 @@ function loadFromStorage(key, fallback) {
 
 export function CartProvider({ children }) {
     const [items, setItems] = useState(() => loadFromStorage(STORAGE_KEY, []));
-    const [orderHistory, setOrderHistory] = useState(() => loadFromStorage(HISTORY_KEY, []));
+    const [orderHistory, setOrderHistory] = useState([]);
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [activeBundleId, setActiveBundleId] = useState(null);
 
@@ -34,10 +34,22 @@ export function CartProvider({ children }) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
     }, [items]);
 
-    // Persist history
+    // Fetch order history from server
+    const fetchOrderHistory = useCallback(async () => {
+        try {
+            const customerId = localStorage.getItem(CUSTOMER_ID_KEY);
+            if (!customerId) return;
+            const data = await api.getOrderHistory(customerId);
+            setOrderHistory(data.orders || []);
+        } catch (err) {
+            console.error('Failed to fetch order history:', err);
+        }
+    }, []);
+
+    // Load order history on mount
     useEffect(() => {
-        localStorage.setItem(HISTORY_KEY, JSON.stringify(orderHistory));
-    }, [orderHistory]);
+        fetchOrderHistory();
+    }, [fetchOrderHistory]);
 
     // Check URL for LiqPay redirect and verify actual payment status
     useEffect(() => {
@@ -60,6 +72,7 @@ export function CartProvider({ children }) {
                     setOrderResult({ orderId, orderNumber: orderNumber || orderId, status: 'success' });
                     setCheckoutStep('success');
                     setItems([]); // Clear cart after successful payment
+                    fetchOrderHistory(); // Refresh history from server
                 } else if (data.paymentStatus === 'FAILED') {
                     setOrderResult({ orderId, orderNumber: orderNumber || orderId, status: 'failed' });
                     setCheckoutStep('failed');
@@ -77,11 +90,12 @@ export function CartProvider({ children }) {
                 setOrderResult({ orderId, orderNumber: orderNumber || orderId, status: 'success' });
                 setCheckoutStep('success');
                 setItems([]);
+                fetchOrderHistory();
             }
         };
 
         checkPaymentStatus();
-    }, []);
+    }, [fetchOrderHistory]);
 
     // On-load: validate prices for all items already in cart (including bundle items)
     useEffect(() => {
@@ -269,19 +283,11 @@ export function CartProvider({ children }) {
 
     // Called when the checkout form is successfully submitted
     const completeOrder = (resultData) => {
-        const order = {
-            id: resultData.orderId || Date.now(),
-            orderNumber: resultData.orderNumber || resultData.orderId || Date.now(),
-            date: new Date().toISOString(),
-            items: [...items],
-            total: getTotal(),
-            benefit: getBenefit(),
-            status: resultData.status || 'success'
-        };
-        setOrderHistory(prev => [order, ...prev]);
         setOrderResult(resultData);
         setCheckoutStep(resultData.status === 'failed' ? 'failed' : 'success');
         clearCart();
+        // Refresh history from server (the order is now in the DB)
+        fetchOrderHistory();
     };
 
     const resetCheckout = () => {
@@ -293,12 +299,15 @@ export function CartProvider({ children }) {
 
     const reorder = async (order) => {
         try {
-            const customItems = order.items.map(i => {
+            // Server-side items have: { offerId, name, qty, unitPrice, bundleId?, isBundleItem? }
+            // Map them to quote request format
+            const serverItems = order.items || [];
+            const customItems = serverItems.map(i => {
                 const payloadItem = {
-                    offerId: i.id,
-                    qty: i.quantity,
-                    isBundleItem: i.isBundleItem,
-                    isGift: i.price === 0 && i.isBundleItem
+                    offerId: i.offerId || i.id,
+                    qty: i.qty || i.quantity,
+                    isBundleItem: !!i.isBundleItem,
+                    isGift: (i.unitPrice === 0 || i.price === 0) && !!i.isBundleItem
                 };
                 if (i.bundleId) payloadItem.bundleId = i.bundleId;
                 return payloadItem;
@@ -307,23 +316,55 @@ export function CartProvider({ children }) {
             const res = await api.getQuote(payload);
 
             let pricesDrifted = false;
-            const updatedItems = order.items.map(oldItem => {
-                const serverItem = res.items?.find(si => si.offerId === oldItem.id && Boolean(si.isBundleItem) === Boolean(oldItem.isBundleItem) && si.bundleId === oldItem.bundleId);
-                if (serverItem && serverItem.unitPrice !== oldItem.price) {
+            const cartItems = serverItems.map(oldItem => {
+                const oid = oldItem.offerId || oldItem.id;
+                const oldPrice = oldItem.unitPrice ?? oldItem.price;
+                const oldQty = oldItem.qty ?? oldItem.quantity;
+
+                const serverItem = res.items?.find(si =>
+                    si.offerId === oid &&
+                    Boolean(si.isBundleItem) === Boolean(oldItem.isBundleItem) &&
+                    si.bundleId === oldItem.bundleId
+                );
+
+                // Build cart-compatible item
+                const cartItem = {
+                    id: oid,
+                    name: oldItem.name || oldItem.productName,
+                    price: serverItem ? serverItem.unitPrice : oldPrice,
+                    basePrice: serverItem?.basePrice || oldPrice,
+                    quantity: oldQty,
+                    isBundleItem: !!oldItem.isBundleItem,
+                    bundleId: oldItem.bundleId || null,
+                };
+
+                if (serverItem && serverItem.unitPrice !== oldPrice) {
                     pricesDrifted = true;
-                    return { ...oldItem, price: serverItem.unitPrice, priceChanged: true };
+                    cartItem.priceChanged = true;
                 }
-                return oldItem;
+                return cartItem;
             });
 
-            updatedItems.forEach(item => addToCart(item, item.quantity, { bundleId: item.bundleId }));
+            cartItems.forEach(item => addToCart(item, item.quantity, { bundleId: item.bundleId }));
 
             if (pricesDrifted) {
                 setPriceAlertMessage('Ціни на деякі товари відрізняються від вашого попереднього замовлення. Вони були додані до кошика з актуальними цінами.');
             }
         } catch (error) {
             console.error('Failed to validate reorder prices:', error);
-            order.items.forEach(item => addToCart(item, item.quantity, { bundleId: item.bundleId }));
+            // Fallback: add items directly with server-side field mapping
+            const serverItems = order.items || [];
+            serverItems.forEach(item => {
+                const cartItem = {
+                    id: item.offerId || item.id,
+                    name: item.name || item.productName,
+                    price: item.unitPrice ?? item.price,
+                    quantity: item.qty ?? item.quantity,
+                    isBundleItem: !!item.isBundleItem,
+                    bundleId: item.bundleId || null,
+                };
+                addToCart(cartItem, cartItem.quantity, { bundleId: cartItem.bundleId });
+            });
         }
         setIsCartOpen(true);
     };

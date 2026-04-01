@@ -82,84 +82,16 @@ router.post(
             logger.info('Payment confirmed', { orderId: order_id });
 
             // Push to RetailCRM now that payment is confirmed
+            // If it fails, the outbox worker will retry automatically
             if (!order.retailcrmOrderId) {
                 try {
-                    const { createOrder: createRetailCrmOrder } = await import('../lib/integrations/retailcrm/client');
-                    const { env } = await import('../lib/config/env');
-
-                    const customer = order.customer as any;
-                    const delivery = order.delivery as any;
-                    const items = order.itemsSnapshot as any[];
-                    const orderNum = order.id;
-
-                    // Reconstruct short ID from order UUID (same algorithm as checkout)
-                    const crypto = await import('crypto');
-                    const hash = crypto.createHash('sha256').update(order.id).digest('hex');
-                    const num = parseInt(hash.substring(0, 10), 16);
-                    const shortId = (num % 100000000).toString().padStart(8, '0');
-
-                    let deliveryCode = env.CRM_DELIVERY_TYPE_NP || 'nova-poshta';
-                    let addressData: any = {};
-                    let npDeliveryData: any = null;
-
-                    if (delivery.type === 'pickup') {
-                        deliveryCode = env.CRM_DELIVERY_TYPE_PICKUP || 'self-delivery';
-                    } else if (delivery.type === 'courier') {
-                        deliveryCode = env.CRM_DELIVERY_TYPE_COURIER || 'courier';
-                        addressData = {
-                            city: delivery.city,
-                            street: delivery.street,
-                            building: delivery.house,
-                            block: delivery.entrance || undefined,
-                            flat: delivery.apartment || undefined,
-                        };
-                    } else if (delivery.type === 'nova_poshta') {
-                        deliveryCode = env.CRM_DELIVERY_TYPE_NP || 'nova-poshta';
-                        npDeliveryData = {
-                            receiverCity: delivery.cityName,
-                            receiverCityRef: delivery.cityRef,
-                            receiverWarehouseTypeRef: delivery.warehouseRef,
-                        };
-                    }
-
-                    const paymentType = env.CRM_PAYMENT_TYPE_ONLINE || 'liqpay';
-
-                    const rcResult = await createRetailCrmOrder({
-                        ...(env.CRM_SITE_CODE ? { site: env.CRM_SITE_CODE } : {}),
-                        order: {
-                            externalId: order.id,
-                            number: shortId,
-                            firstName: customer.firstName,
-                            lastName: customer.lastName,
-                            phone: customer.phone,
-                            email: customer.email,
-                            items: items.map((item: any, idx: number) => ({
-                                externalId: `${order.id}-${idx}`,
-                                offer: { externalId: item.offerId },
-                                productName: item.name,
-                                quantity: item.qty,
-                                initialPrice: item.unitPrice,
-                                ...(item.priceType ? { priceType: { code: item.priceType } } : {}),
-                            })),
-                            delivery: {
-                                code: deliveryCode,
-                                ...(Object.keys(addressData).length > 0 ? { address: addressData } : {}),
-                                ...(npDeliveryData ? { data: npDeliveryData } : {}),
-                            },
-                            payments: [{
-                                type: paymentType,
-                                status: 'paid',
-                            }],
-                        },
-                    });
-
-                    await prisma.order.update({
-                        where: { id: order_id },
-                        data: { retailcrmOrderId: String(rcResult.id) },
-                    });
-                    logger.info('CRM order created after payment', { orderId: order_id, crmId: rcResult.id });
+                    const { pushOrderToCrm } = await import('../lib/domain/checkout/crmSync');
+                    await pushOrderToCrm(order_id);
                 } catch (crmErr) {
-                    logger.error('CRM order creation after payment failed', { orderId: order_id, error: (crmErr as Error).message });
+                    logger.error('CRM order creation after payment failed (outbox will retry)', {
+                        orderId: order_id,
+                        error: (crmErr as Error).message,
+                    });
                 }
             }
         } else if (isPaymentFailed(status)) {

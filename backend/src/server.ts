@@ -3,6 +3,7 @@ import { env } from './lib/config/env';
 import { prisma } from './lib/db/prisma';
 import { getRedis, disconnectRedis } from './lib/cache/redis';
 import { logger } from './lib/security/logger';
+import { retryFailedCrmOrders } from './lib/domain/checkout/crmSync';
 
 async function main() {
     logger.info(`Starting server in ${env.NODE_ENV} mode...`);
@@ -32,9 +33,22 @@ async function main() {
         logger.info(`Health check: http://localhost:${env.PORT}/api/health`);
     });
 
+    // ─── CRM Outbox Worker ─────────────────────────────────────
+    // Retry failed CRM pushes every 3 minutes
+    const CRM_OUTBOX_INTERVAL_MS = 3 * 60 * 1000;
+    const outboxTimer = setInterval(() => {
+        retryFailedCrmOrders().catch(err => {
+            logger.error('CRM outbox worker uncaught error', { error: (err as Error).message });
+        });
+    }, CRM_OUTBOX_INTERVAL_MS);
+    logger.info(`CRM outbox worker started (every ${CRM_OUTBOX_INTERVAL_MS / 1000}s)`);
+
     // ─── Graceful shutdown ─────────────────────────────────────
     const shutdown = async (signal: string) => {
         logger.info(`${signal} received — shutting down gracefully`);
+
+        // Stop the outbox worker
+        clearInterval(outboxTimer);
 
         server.close(async () => {
             try {

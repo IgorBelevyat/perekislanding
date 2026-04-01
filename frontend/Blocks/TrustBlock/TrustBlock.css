@@ -72,8 +72,8 @@
 .footer {
     background: #003B5C;
     color: #fff;
-    padding: 48px 16px 110px;
-    /* 110px bottom padding to clear the mobile sticky CTA */
+    padding: 48px 16px 160px;
+    /* 160px bottom padding to clear the mobile sticky CTA on zoom */
 }
 
 @media (min-width: 769px) {

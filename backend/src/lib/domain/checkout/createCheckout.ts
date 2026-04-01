@@ -1,8 +1,8 @@
 import { prisma } from '../../db/prisma';
-import { createOrder as createRetailCrmOrder } from '../../integrations/retailcrm/client';
 import { createPaymentFormData, getCheckoutUrl } from '../../integrations/liqpay/client';
 import { setIdempotencyResult } from '../../security/idempotency';
 import { sendGA4Event } from '../../integrations/ga4/client';
+import { pushOrderToCrm } from './crmSync';
 import { logger } from '../../security/logger';
 import { env } from '../../config/env';
 import crypto from 'crypto';
@@ -63,107 +63,15 @@ export async function processCheckout(
     const num = parseInt(hash.substring(0, 10), 16);
     const shortId = (num % 100000000).toString().padStart(8, '0');
 
-    // 3. Build CRM order payload (used now for COD/cashless, or deferred for online)
+    // 3. Create local order FIRST (so outbox can pick it up if CRM push fails)
     let retailcrmOrderId: string | null = null;
 
-    let deliveryCode = env.CRM_DELIVERY_TYPE_NP || 'nova-poshta';
-    let addressData: any = {};
-    let deliveryData: any = null;
-
-    if (input.delivery.type === 'pickup') {
-        deliveryCode = env.CRM_DELIVERY_TYPE_PICKUP || 'self-delivery';
-    } else if (input.delivery.type === 'courier') {
-        deliveryCode = env.CRM_DELIVERY_TYPE_COURIER || 'courier';
-        addressData = {
-            city: input.delivery.city,
-            street: input.delivery.street,
-            building: input.delivery.house,
-            block: input.delivery.entrance || undefined,
-            flat: input.delivery.apartment || undefined,
-        };
-    } else if (input.delivery.type === 'nova_poshta') {
-        deliveryCode = env.CRM_DELIVERY_TYPE_NP || 'nova-poshta';
-        // Use structured NP data for CRM directory binding
-        deliveryData = {
-            receiverCity: input.delivery.cityName,
-            receiverCityRef: input.delivery.cityRef,
-            receiverWarehouseTypeRef: input.delivery.warehouseRef,
-        };
-    }
-
-    let customerComment: string | undefined = undefined;
-    if (input.paymentMethod === 'cashless' && input.customer.companyName && input.customer.edrpou) {
-        customerComment = `Увага, замовлення за безготівковим розрахунком\nНазва організації: ${input.customer.companyName}\nКод ЄДРПОУ: ${input.customer.edrpou}`;
-    }
-
-    let paymentType = env.CRM_PAYMENT_TYPE_COD || 'cash-on-delivery';
-    if (input.paymentMethod === 'online') {
-        paymentType = env.CRM_PAYMENT_TYPE_ONLINE || 'liqpay';
-    } else if (input.paymentMethod === 'cashless') {
-        paymentType = env.CRM_PAYMENT_TYPE_CASHLESS || 'bank-transfer';
-    }
-
-    const crmPayload = {
-        ...(env.CRM_SITE_CODE ? { site: env.CRM_SITE_CODE } : {}),
-        order: {
-            externalId: orderId,
-            number: shortId,
-            customerComment,
-            ...(input.customerExternalId ? { customer: { externalId: input.customerExternalId } } : {}),
-            firstName: input.customer.firstName,
-            lastName: input.customer.lastName,
-            phone: input.customer.phone,
-            email: input.customer.email,
-            items: itemsSnapshot.map((item: any, idx: number) => ({
-                externalId: `${orderId}-${idx}`,
-                offer: { externalId: item.offerId },
-                productName: item.name,
-                quantity: item.qty,
-                initialPrice: item.unitPrice,
-                ...(item.priceType ? { priceType: { code: item.priceType } } : {}),
-                properties: [
-                    {
-                        code: 'row_id',
-                        name: 'Рядок кошика',
-                        value: `${orderId}-${idx}`
-                    },
-                    ...(item.bundleId ? [{
-                        code: 'bundle_type',
-                        name: 'З набору',
-                        value: item.bundleId
-                    }] : [])
-                ]
-            })),
-            delivery: {
-                code: deliveryCode,
-                ...(Object.keys(addressData).length > 0 ? { address: addressData } : {}),
-                ...(deliveryData ? { data: deliveryData } : {}),
-            },
-            payments: [{
-                type: paymentType,
-                status: input.paymentMethod === 'online' ? 'not-paid' : undefined,
-            }],
-        },
-    };
-
-    // For COD/cashless — send to CRM immediately.
-    // For online — defer CRM push until LiqPay confirms payment.
-    if (input.paymentMethod !== 'online') {
-        try {
-            const rcResult = await createRetailCrmOrder(crmPayload);
-            retailcrmOrderId = String(rcResult.id);
-        } catch (err) {
-            logger.error('RetailCRM order creation failed', { error: (err as Error).message });
-        }
-    }
-
-    // 4. Create local order
     const order = await prisma.order.create({
         data: {
             id: orderId,
             quoteId: quote.id,
-            retailcrmOrderId,
-            customer: input.customer as any,
+            retailcrmOrderId: null, // Will be set after CRM push
+            customer: { ...input.customer, customerExternalId: input.customerExternalId } as any,
             delivery: input.delivery as any,
             itemsSnapshot: itemsSnapshot as any,
             total: totalsSnapshot.total,
@@ -173,6 +81,13 @@ export async function processCheckout(
             idempotencyKey,
         },
     });
+
+    // 4. For COD/cashless — push to CRM immediately.
+    //    For online — defer until LiqPay confirms payment.
+    //    If CRM push fails, outbox worker will retry automatically.
+    if (input.paymentMethod !== 'online') {
+        retailcrmOrderId = await pushOrderToCrm(order.id);
+    }
 
     // 5. Mark quote as used
     await prisma.quote.update({ where: { id: quote.id }, data: { status: 'USED' } });

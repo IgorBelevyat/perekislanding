@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { trackCalculatorUsed } from '../../utils/analytics';
 import SectionWrapper from '../../Common components/SectionWrapper/SectionWrapper';
 import CalculatorTabs from './CalculatorTabs';
@@ -19,26 +19,40 @@ const MODES = [
 
 function CalculatorBlock() {
     const [inputMode, setInputMode] = useState('volume'); // volume | dimensions
+    const [poolShape, setPoolShape] = useState('circular'); // circular | rectangular
     const [length, setLength] = useState('');
     const [width, setWidth] = useState('');
     const [depth, setDepth] = useState('');
+    const [diameter, setDiameter] = useState('');
     const [volume, setVolume] = useState('');
     const [cleaningMode, setCleaningMode] = useState('standard');
+    const contentRef = useRef(null);
 
     const selectedMode = MODES.find(m => m.id === cleaningMode);
 
     const calculatedVolume = useMemo(() => {
         if (inputMode === 'dimensions') {
-            const l = parseFloat(String(length).replace(',', '.'));
-            const w = parseFloat(String(width).replace(',', '.'));
-            const d = parseFloat(String(depth).replace(',', '.'));
-            if (l > 0 && w > 0 && d > 0) return l * w * d;
-            return null;
+            if (poolShape === 'circular') {
+                const d = parseFloat(String(diameter).replace(',', '.'));
+                const h = parseFloat(String(depth).replace(',', '.'));
+                if (d > 0 && h > 0) {
+                    // V = π × (D/2)² × H
+                    const radius = d / 2;
+                    return Math.PI * radius * radius * h;
+                }
+                return null;
+            } else {
+                const l = parseFloat(String(length).replace(',', '.'));
+                const w = parseFloat(String(width).replace(',', '.'));
+                const d = parseFloat(String(depth).replace(',', '.'));
+                if (l > 0 && w > 0 && d > 0) return l * w * d;
+                return null;
+            }
         } else {
             const v = parseFloat(String(volume).replace(',', '.'));
             return v > 0 ? v : null;
         }
-    }, [inputMode, length, width, depth, volume]);
+    }, [inputMode, poolShape, length, width, depth, diameter, volume]);
 
     const result = useMemo(() => {
         if (!calculatedVolume || !selectedMode) return null;
@@ -56,6 +70,25 @@ function CalculatorBlock() {
         return () => clearTimeout(handler);
     }, [result]);
 
+    // Smooth height animation when switching modes
+    useEffect(() => {
+        const el = contentRef.current;
+        if (!el) return;
+        // Capture current height
+        const prevHeight = el.offsetHeight;
+        // Trigger reflow to measure new height
+        el.style.height = 'auto';
+        const newHeight = el.offsetHeight;
+        // Animate from old to new
+        el.style.height = prevHeight + 'px';
+        // Force reflow
+        el.getBoundingClientRect();
+        el.style.height = newHeight + 'px';
+        const onEnd = () => { el.style.height = 'auto'; };
+        el.addEventListener('transitionend', onEnd, { once: true });
+        return () => el.removeEventListener('transitionend', onEnd);
+    }, [inputMode, poolShape]);
+
     return (
         <SectionWrapper bg="light" id="calculator">
             <div className="calculator">
@@ -67,25 +100,52 @@ function CalculatorBlock() {
                 <div className="calculator__card">
                     <CalculatorTabs activeTab={inputMode} onTabChange={setInputMode} />
 
-                    <CalculatorInputs
-                        mode={inputMode}
-                        length={length}
-                        width={width}
-                        depth={depth}
-                        volume={volume}
-                        onLengthChange={setLength}
-                        onWidthChange={setWidth}
-                        onDepthChange={setDepth}
-                        onVolumeChange={setVolume}
-                    />
+                    <div className="calculator__content" ref={contentRef}>
+                        {inputMode === 'dimensions' && (
+                            <div className="calc-shape-section">
+                                <p className="calc-shape-section__label">Оберіть форму вашого басейну</p>
+                                <div className="calc-shape-toggle">
+                                    <div
+                                        className="calc-shape-toggle__indicator"
+                                        style={{ transform: poolShape === 'circular' ? 'translateX(0)' : 'translateX(100%)' }}
+                                    />
+                                    <button
+                                        className={`calc-shape-toggle__btn ${poolShape === 'circular' ? 'calc-shape-toggle__btn--active' : ''}`}
+                                        onClick={() => setPoolShape('circular')}
+                                    >
+                                        Круглий
+                                    </button>
+                                    <button
+                                        className={`calc-shape-toggle__btn ${poolShape === 'rectangular' ? 'calc-shape-toggle__btn--active' : ''}`}
+                                        onClick={() => setPoolShape('rectangular')}
+                                    >
+                                        Прямокутний
+                                    </button>
+                                </div>
+                            </div>
+                        )}
 
-                    <ModeSelector
-                        modes={MODES}
-                        selected={cleaningMode}
-                        onSelect={setCleaningMode}
-                    />
+                        <CalculatorInputs
+                            mode={inputMode}
+                            poolShape={poolShape}
+                            length={length}
+                            width={width}
+                            depth={depth}
+                            diameter={diameter}
+                            volume={volume}
+                            onLengthChange={setLength}
+                            onWidthChange={setWidth}
+                            onDepthChange={setDepth}
+                            onDiameterChange={setDiameter}
+                            onVolumeChange={setVolume}
+                        />
 
-
+                        <ModeSelector
+                            modes={MODES}
+                            selected={cleaningMode}
+                            onSelect={setCleaningMode}
+                        />
+                    </div>
 
                     {result && (
                         <CalculatorResult

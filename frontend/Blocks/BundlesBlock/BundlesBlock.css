@@ -196,4 +196,5 @@
     font-size: 1.5rem;
     font-weight: 800;
     color: #003B5C;
+    white-space: nowrap;
 }

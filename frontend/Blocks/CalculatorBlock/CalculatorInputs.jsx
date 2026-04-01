@@ -1,4 +1,4 @@
-function CalculatorInputs({ mode, length, width, depth, volume, onLengthChange, onWidthChange, onDepthChange, onVolumeChange }) {
+function CalculatorInputs({ mode, poolShape, length, width, depth, diameter, volume, onLengthChange, onWidthChange, onDepthChange, onDiameterChange, onVolumeChange }) {
     const handleNumberInput = (setter) => (e) => {
         const val = e.target.value;
         // Allow empty, digits, and one decimal point or comma
@@ -8,6 +8,35 @@ function CalculatorInputs({ mode, length, width, depth, volume, onLengthChange, 
     };
 
     if (mode === 'dimensions') {
+        if (poolShape === 'circular') {
+            return (
+                <div className="calc-inputs calc-inputs--circular">
+                    <div className="calc-input-group">
+                        <label className="calc-input-group__label">Діаметр (м)</label>
+                        <input
+                            type="text"
+                            inputMode="decimal"
+                            className="calc-input-group__input"
+                            placeholder="Напр. 3.6"
+                            value={diameter}
+                            onChange={handleNumberInput(onDiameterChange)}
+                        />
+                    </div>
+                    <div className="calc-input-group">
+                        <label className="calc-input-group__label">Глибина (м)</label>
+                        <input
+                            type="text"
+                            inputMode="decimal"
+                            className="calc-input-group__input"
+                            placeholder="Напр. 1.2"
+                            value={depth}
+                            onChange={handleNumberInput(onDepthChange)}
+                        />
+                    </div>
+                </div>
+            );
+        }
+
         return (
             <div className="calc-inputs calc-inputs--dimensions">
                 <div className="calc-input-group">
