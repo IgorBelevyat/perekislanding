@@ -2,12 +2,23 @@ import { Router } from 'express';
 import { asyncHandler } from '../middleware/errorHandler';
 import { prisma } from '../lib/db/prisma';
 import { z } from 'zod';
+import crypto from 'crypto';
 
 const router = Router();
 
 const historyQuerySchema = z.object({
     customerId: z.string().uuid(),
 });
+
+/**
+ * Compute the same 8-digit order number from UUID as createCheckout.ts does.
+ * This is deterministic — same UUID always produces the same number.
+ */
+function computeOrderNumber(orderId: string): string {
+    const hash = crypto.createHash('sha256').update(orderId).digest('hex');
+    const num = parseInt(hash.substring(0, 10), 16);
+    return (num % 100000000).toString().padStart(8, '0');
+}
 
 /**
  * GET /api/orders/history?customerId=<uuid>
@@ -25,8 +36,6 @@ router.get(
 
         const { customerId } = parsed.data;
 
-        // Query orders where the customer JSON contains the matching customerExternalId
-        // Prisma supports JSON filtering with `path` syntax for PostgreSQL
         const orders = await prisma.order.findMany({
             where: {
                 customer: {
@@ -53,6 +62,7 @@ router.get(
         res.json({
             orders: orders.map(o => ({
                 id: o.id,
+                orderNumber: computeOrderNumber(o.id),
                 date: o.createdAt.toISOString(),
                 total: Number(o.total),
                 status: o.status,
@@ -65,3 +75,4 @@ router.get(
 );
 
 export default router;
+

@@ -23,13 +23,6 @@ function CartHistory() {
         }, 0);
     };
 
-    // Generate a short display order number from UUID
-    const shortOrderNumber = (orderId) => {
-        if (!orderId) return '—';
-        // Take first 8 characters of the UUID as a display number
-        return orderId.replace(/-/g, '').slice(0, 8).toUpperCase();
-    };
-
     return (
         <div className="cart-history">
             {orderHistory.map(order => {
@@ -37,7 +30,7 @@ function CartHistory() {
                 return (
                     <div key={order.id} className="cart-history__order">
                         <p className="cart-history__date">
-                            Замовлення №{shortOrderNumber(order.id)} від {formatDate(order.date)}
+                            Замовлення №{order.orderNumber || '—'} від {formatDate(order.date)}
                         </p>
                         {(order.items || []).map((item, i) => {
                             const qty = item.qty ?? item.quantity ?? 1;

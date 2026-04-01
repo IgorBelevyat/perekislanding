@@ -79,7 +79,6 @@ export function buildCrmPayload(order: {
             externalId: order.id,
             number: shortId,
             customerComment,
-            ...(customer.customerExternalId ? { customer: { externalId: customer.customerExternalId } } : {}),
             firstName: customer.firstName,
             lastName: customer.lastName,
             phone: customer.phone,
