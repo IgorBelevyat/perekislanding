@@ -125,6 +125,8 @@
     flex: 1;
     border-top: 1px solid #F3F4F6;
     padding-top: 16px;
+    position: relative;
+    z-index: 1;
 }
 
 .bundle-card__product {
@@ -160,11 +162,35 @@
     white-space: nowrap;
 }
 
+/* ── Silhouettes Background ──── */
+.bundle-card__silhouettes {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    height: 190px;
+    z-index: 0;
+    pointer-events: none;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    overflow: hidden;
+}
+
+.bundle-card__silhouettes svg {
+    display: block;
+    height: 100%;
+}
+
 /* ── Footer ──── */
 .bundle-card__footer {
     border-top: 1px solid #F3F4F6;
     padding-top: 20px;
     margin-top: auto;
+    position: relative;
+    z-index: 1;
 }
 
 .bundle-card__total {

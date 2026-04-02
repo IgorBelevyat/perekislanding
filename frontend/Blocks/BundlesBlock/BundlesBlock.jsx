@@ -2,6 +2,7 @@ import SectionWrapper from '../../Common components/SectionWrapper/SectionWrappe
 import Button from '../../Common components/Button/Button';
 import { useCart } from '../../Stores/CartContext';
 import { useBundles } from '../../Hooks/useBundles';
+import BundleSilhouettes from './BundleSilhouettes';
 import './BundlesBlock.css';
 
 function BundlesBlock() {
@@ -34,6 +35,8 @@ function BundlesBlock() {
             <div className="bundles__grid">
                 {bundles.map((bundle, i) => (
                     <div key={i} className={`bundle-card bundle-card--${bundle.type}`}>
+                        <BundleSilhouettes type={bundle.type} />
+
                         {bundle.isPopular && (
                             <span className="bundle-card__tag">Найпопулярніший</span>
                         )}
