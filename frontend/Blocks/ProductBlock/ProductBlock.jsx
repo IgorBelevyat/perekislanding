@@ -17,6 +17,7 @@ const DEFAULT_PRODUCT = {
     id: 'peroxide-5l',
     name: 'Перекис водню 50%, 5 л',
     price: 420, // Fallback price
+    inStock: true,
 };
 
 function ProductBlock() {
@@ -39,6 +40,7 @@ function ProductBlock() {
                             name: p5l.name,
                             price: p5l.price,
                             imageUrl: p5l.imageUrl,
+                            inStock: p5l.inStock ?? true,
                         }));
                     }
                 }
@@ -77,6 +79,11 @@ function ProductBlock() {
                         ) : (
                             <>
                                 <span className="product__price">{product.price} грн</span>
+                                {product.inStock ? (
+                                    <span className="product__stock-badge product__stock-badge--in">В наявності</span>
+                                ) : (
+                                    <span className="product__stock-badge product__stock-badge--out">Товар закінчився</span>
+                                )}
                             </>
                         )}
                     </div>

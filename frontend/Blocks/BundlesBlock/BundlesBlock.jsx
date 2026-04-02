@@ -2,14 +2,29 @@ import SectionWrapper from '../../Common components/SectionWrapper/SectionWrappe
 import Button from '../../Common components/Button/Button';
 import { useCart } from '../../Stores/CartContext';
 import { useBundles } from '../../Hooks/useBundles';
-import BundleSilhouettes from './BundleSilhouettes';
 import './BundlesBlock.css';
+import nasezonImg from '../../Src/assets/images/nasezon.png';
+import optimalImg from '../../Src/assets/images/optimal.png';
+import prozapasImg from '../../Src/assets/images/prozapas.png';
+
+const BUNDLE_IMAGES = {
+    'minimal': nasezonImg, // На сезон
+    'optimal': optimalImg, // Оптимальний вибір
+    'maximum': prozapasImg, // PRO запас
+};
 
 function BundlesBlock() {
-    const { bundles, isLoading } = useBundles();
+    const {
+        bundles,
+        peroxideInStock,
+        pricesConsistent,
+        isLoading,
+    } = useBundles();
     const { addToCart } = useCart();
 
     const handleOrderBundle = (bundle) => {
+        if (!pricesConsistent) return; // Block if prices inconsistent
+
         bundle.customItems.forEach((cItem) => {
             addToCart(
                 {
@@ -32,10 +47,20 @@ function BundlesBlock() {
             <h2 className="bundles__title">Набори</h2>
             <p className="bundles__subtitle">Готові комплекти для обробки басейну — все необхідне в одному замовленні</p>
 
+            {/* Price sync maintenance banner */}
+            {!pricesConsistent && (
+                <div className="bundles__maintenance-banner">
+                    <span className="bundles__maintenance-icon">⚙️</span>
+                    <span>Відбуваються технічні роботи. Можливість оформлювати замовлення скоро повернеться!</span>
+                </div>
+            )}
+
             <div className="bundles__grid">
                 {bundles.map((bundle, i) => (
                     <div key={i} className={`bundle-card bundle-card--${bundle.type}`}>
-                        <BundleSilhouettes type={bundle.type} />
+                        <div className="bundle-card__silhouettes">
+                            <img src={BUNDLE_IMAGES[bundle.type]} alt="" className="bundle-card__bg-img" />
+                        </div>
 
                         {bundle.isPopular && (
                             <span className="bundle-card__tag">Найпопулярніший</span>
@@ -53,7 +78,7 @@ function BundlesBlock() {
                                         </span>
                                     </div>
                                     <span className="bundle-card__product-price">
-                                        {item.price === 0 ? 'У подарунок' : `${item.price * item.qty} ₴`}
+                                        {item.isGift ? `У подарунок (${item.price}₴)` : `${item.price * item.qty} ₴`}
                                     </span>
                                 </li>
                             ))}
@@ -75,10 +100,10 @@ function BundlesBlock() {
                                 variant={bundle.isPopular ? 'cta' : 'primary'}
                                 size="md"
                                 fullWidth
-                                disabled={isLoading}
+                                disabled={isLoading || !pricesConsistent}
                                 onClick={() => handleOrderBundle(bundle)}
                             >
-                                Замовити набір
+                                {pricesConsistent ? 'Замовити набір' : 'Тимчасово недоступно'}
                             </Button>
                         </div>
                     </div>

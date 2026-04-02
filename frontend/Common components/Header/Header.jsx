@@ -48,7 +48,7 @@ function Header() {
             style={{ '--fade-progress': menuOpen ? 1 : fadeProgress }}
         >
             <div className="header__inner">
-                <a href="https://hlorka.ua" className="header__logo" target="_blank" rel="noopener noreferrer">
+                <a href="#" className="header__logo" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                     <img src={logoImg} alt="Hlorka Logo" className="header__logo-img" />
                 </a>
 

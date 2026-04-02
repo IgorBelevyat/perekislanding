@@ -88,8 +88,8 @@
     transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
     /* Prevent focus box-shadow from being clipped */
-    padding: 2px;
-    margin: -2px;
+    padding: 4px;
+    margin: -4px;
 }
 
 /* ── Shape Toggle ──── */

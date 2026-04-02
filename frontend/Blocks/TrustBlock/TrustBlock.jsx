@@ -54,7 +54,7 @@ function TrustBlock() {
         <>
             {/* ── "Чому саме ми?" block ──── */}
             <SectionWrapper bg="light" id="trust">
-                <h2 className="why-us__title">Чому саме ми?</h2>
+                <h2 className="why-us__title">Нас обирають тому що:</h2>
                 <div className="why-us__grid">
                     {whyUsItems.map((item, i) => (
                         <div key={i} className="why-us__card">
@@ -71,7 +71,7 @@ function TrustBlock() {
                 <div className="footer__inner">
                     {/* Left: Contacts & Legal */}
                     <div className="footer__info">
-                        <a href="https://hlorka.ua" className="footer__logo" target="_blank" rel="noopener noreferrer">
+                        <a href="#" className="footer__logo" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                             <img src={logoImg} alt="Hlorka Logo" className="footer__logo-img" />
                         </a>
 
@@ -108,7 +108,7 @@ function TrustBlock() {
                             </div>
                         </div>
 
-                        <p className="footer__copy">© 2026 Hlorka.ua — Професійна хімія для басейнів</p>
+                        <p className="footer__copy">© 2026 Hlorka.ua — не тільки дезінфекція</p>
                     </div>
 
                     {/* Right: CTA */}

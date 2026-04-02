@@ -87,6 +87,25 @@
     color: #003B5C;
 }
 
+.product__stock-badge {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 10px;
+    white-space: nowrap;
+    align-self: center;
+}
+
+.product__stock-badge--in {
+    color: #059669;
+    background: #DCFCE7;
+}
+
+.product__stock-badge--out {
+    color: #DC2626;
+    background: #FEE2E2;
+}
+
 .product__old-price {
     font-size: 1.125rem;
     color: #9CA3AF;

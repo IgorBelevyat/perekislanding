@@ -15,6 +15,7 @@ import healthRouter from './routes/health';
 import productsRouter from './routes/products';
 import bundlesRoutes from './routes/bundles';
 import ordersRouter from './routes/orders';
+import moyskladRouter from './routes/moysklad';
 
 const app = express();
 
@@ -54,6 +55,7 @@ app.use('/api/products', productsRouter);
 app.use('/api/health', healthRouter);
 app.use('/api/bundles', bundlesRoutes);
 app.use('/api/orders', ordersRouter);
+app.use('/api/moysklad', moyskladRouter);
 
 // ─── 404 for unknown API routes ────────────────────────────
 app.use('/api/*', (_req, res) => {

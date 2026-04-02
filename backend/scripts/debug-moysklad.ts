@@ -188,8 +188,9 @@ async function main() {
                 try {
                     const imagesData: any = await msApiFetch(`/entity/product/${productId}/images`);
                     for (const img of (imagesData.rows ?? [])) {
-                        const imgUrl = img.miniature?.href ?? img.meta?.downloadHref ?? '(no URL)';
-                        console.log(`      - ${img.filename}: ${imgUrl}`);
+                        console.log(`      - ${img.filename}:`);
+                        console.log(`        Miniature: ${img.miniature?.href ?? '(none)'}`);
+                        console.log(`        Full-size: ${img.meta?.downloadHref ?? '(none)'}`);
                     }
                 } catch (imgErr) {
                     console.log(`      ❌ Failed to fetch images: ${(imgErr as Error).message}`);
@@ -212,6 +213,72 @@ async function main() {
             } else {
                 console.log('   💰 Prices: (none)');
             }
+
+            // ── Availability check (same logic as production code) ──
+            console.log('   🟢 Availability check:');
+
+            // 1) Search for known availability attributes
+            let availabilityValue = '';
+            let foundAttr = false;
+            if (product.attributes && product.attributes.length > 0) {
+                for (const attr of product.attributes) {
+                    const attrName = attr.name ?? '';
+                    const attrVal = attr.value?.name ?? attr.value ?? '';
+                    // Check for known availability field names
+                    const isAvailField = 
+                        attrName === 'Наличие' || 
+                        attrName === 'Наявність' ||
+                        attrName.toLowerCase().includes('наличи') ||
+                        attrName.toLowerCase().includes('наявн') ||
+                        attrName.toLowerCase().includes('availability') ||
+                        attrName.toLowerCase().includes('залишок') ||
+                        attrName.toLowerCase().includes('stock');
+                    
+                    if (isAvailField) {
+                        foundAttr = true;
+                        availabilityValue = String(attrVal).trim();
+                        console.log(`      ✅ Found attribute [${attrName}] = "${attrVal}" (type: ${attr.type})`);
+                    }
+                }
+            }
+
+            if (!foundAttr) {
+                console.log('      ⚠️ No availability attribute found in product attributes');
+                console.log('      📋 All attribute names for reference:');
+                if (product.attributes && product.attributes.length > 0) {
+                    for (const attr of product.attributes) {
+                        const val = attr.value?.name ?? attr.value ?? '';
+                        console.log(`         - [${attr.name}] = "${String(val).slice(0, 50)}" (type: ${attr.type})`);
+                    }
+                } else {
+                    console.log('         (no attributes)');
+                }
+            }
+
+            // 2) Check top-level product fields that might indicate availability
+            console.log('      📦 Top-level fields:');
+            console.log(`         product.quantity:       ${product.quantity ?? '(undefined)'}`);
+            console.log(`         product.stock:          ${product.stock ?? '(undefined)'}`);
+            console.log(`         product.reserve:        ${product.reserve ?? '(undefined)'}`);
+            console.log(`         product.inTransit:      ${product.inTransit ?? '(undefined)'}`);
+            console.log(`         product.trackStock:     ${product.trackStock ?? '(undefined)'}`);
+            console.log(`         product.effectiveVat:   ${product.effectiveVat ?? '(undefined)'}`);
+
+            // 3) Stock from stock report
+            console.log(`      📊 Stock report:          ${stock !== undefined ? stock : '(not found)'}`);
+
+            // 4) Derive inStock using production logic
+            let derivedInStock = true;
+            if (availabilityValue === '+') derivedInStock = true;
+            else if (availabilityValue === '-') derivedInStock = false;
+            else if (availabilityValue === '&') derivedInStock = true;
+            else if (/^\d+$/.test(availabilityValue)) derivedInStock = true;
+            else if (availabilityValue === '' && stock !== undefined) {
+                derivedInStock = stock > 0;
+                console.log(`      ℹ️ No availability attr → falling back to stock qty: ${stock} → inStock=${derivedInStock}`);
+            }
+
+            console.log(`      🏷️ Final: availability="${availabilityValue}", inStock=${derivedInStock}`);
 
             console.log('');
         } catch (err) {

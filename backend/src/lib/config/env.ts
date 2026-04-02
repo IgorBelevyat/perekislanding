@@ -53,6 +53,16 @@ const envSchema = z.object({
     // GA4
     GA4_MEASUREMENT_ID: z.string().optional(),
     GA4_API_SECRET: z.string().optional(),
+
+    // MoySklad
+    MOYSKLAD_TOKEN: z.string().optional(),
+    MOYSKLAD_ID_PEROXIDE: z.string().optional(),
+    MOYSKLAD_ID_TEST_STRIPS: z.string().optional(),
+    MOYSKLAD_ID_MEASURING_CUP: z.string().optional(),
+    MOYSKLAD_PRICE_ROZNICA: z.string().optional(),
+    MOYSKLAD_PRICE_TEST_LIFE: z.string().optional(),
+    MOYSKLAD_PRICE_AKCIA: z.string().optional(),
+    MOYSKLAD_PRICE_OPT: z.string().optional(),
 });
 
 // Parse and validate — crash early if invalid

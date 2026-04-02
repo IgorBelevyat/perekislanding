@@ -20,7 +20,7 @@ router.get('/', asyncHandler(async (req, res) => {
                 env.OFFER_ID_MEASURING_CUP,
             ].filter(Boolean) as string[];
 
-            logger.info('Fetching products from RetailCRM for /api/products', { offerIds: requiredOfferIds });
+            logger.info('Fetching products for /api/products', { offerIds: requiredOfferIds });
             const priceMap = await getOfferPrices(requiredOfferIds);
 
             const offers = Array.from(priceMap.entries()).map(([id, offer]) => ({
@@ -29,6 +29,10 @@ router.get('/', asyncHandler(async (req, res) => {
                 isMainProduct: id === env.OFFER_ID_PEROXIDE,
                 price: offer.prices[env.PRICE_TYPE_BASE] ?? Object.values(offer.prices)[0] ?? 0,
                 currency: offer.currency || 'UAH',
+                // Use proxy URL — MoySklad images require auth
+                imageUrl: offer.imageUrl ? `/api/moysklad/product-image/${id}` : null,
+                inStock: offer.inStock ?? true,
+                availability: offer.availability ?? '',
             }));
 
             return offers;

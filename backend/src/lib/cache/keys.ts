@@ -5,6 +5,9 @@ export const CacheKeys = {
     // RetailCRM offer prices
     rcOffer: (offerId: string) => `rc:offer:${offerId}`,
 
+    // MoySklad product data
+    msProduct: (msId: string) => `ms:product:${msId}`,
+
     // Nova Poshta
     npCities: (query: string) => `np:cities:q:${query.toLowerCase().trim()}`,
     npWarehouses: (cityRef: string) => `np:warehouses:city:${cityRef}`,

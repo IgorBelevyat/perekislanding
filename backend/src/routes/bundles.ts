@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { asyncHandler } from '../middleware/errorHandler';
-import { getOfferPrices } from '../lib/integrations/retailcrm/prices';
+import { getOfferPrices, checkPriceConsistency } from '../lib/integrations/retailcrm/prices';
 import { env } from '../lib/config/env';
 
 const router = Router();
@@ -15,7 +15,7 @@ router.get(
             env.OFFER_ID_MEASURING_CUP,
         ].filter(Boolean) as string[];
 
-        // Fetch prices from Redis/RetailCRM
+        // Fetch prices from MoySklad (primary) / RetailCRM (fallback)
         const priceMap = await getOfferPrices(requiredOfferIds);
 
         const peroxide = priceMap.get(env.OFFER_ID_PEROXIDE || '');
@@ -56,12 +56,13 @@ router.get(
 
             if (includesStrips) {
                 baseTotal += stripsBasePrice;
+                actualTotal += 1; // Gift at 1₴
                 descriptionItems.push('тест-смужки');
                 customItems.push({
                     offerId: strips?.offerId || 'str',
                     qty: 1,
                     name: strips?.name || 'Тест-смужки для перекису',
-                    price: 0,
+                    price: 1,
                     basePrice: stripsBasePrice,
                     isGift: true
                 });
@@ -69,12 +70,13 @@ router.get(
 
             if (includesCup) {
                 baseTotal += cupBasePrice;
+                actualTotal += 1; // Gift at 1₴
                 descriptionItems.push('мірна тара');
                 customItems.push({
                     offerId: cup?.offerId || 'cup',
                     qty: 1,
                     name: cup?.name || 'Мірна тара',
-                    price: 0,
+                    price: 1,
                     basePrice: cupBasePrice,
                     isGift: true
                 });
@@ -132,7 +134,25 @@ router.get(
             )
         ];
 
-        res.json({ bundles });
+        // Price consistency check (MoySklad vs CRM)
+        let pricesConsistent = true;
+        try {
+            const check = await checkPriceConsistency();
+            pricesConsistent = check.consistent;
+        } catch {
+            // If check fails, allow ordering (be lenient)
+            pricesConsistent = true;
+        }
+
+        res.json({
+            bundles,
+            // Peroxide-specific data from MoySklad
+            peroxideImageUrl: peroxide?.imageUrl ?? null,
+            peroxideInStock: peroxide?.inStock ?? true,
+            peroxideAvailability: peroxide?.availability ?? '',
+            // Price consistency gate
+            pricesConsistent,
+        });
     }),
 );
 

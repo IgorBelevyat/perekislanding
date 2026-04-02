@@ -165,7 +165,7 @@
 /* ── Silhouettes Background ──── */
 .bundle-card__silhouettes {
     position: absolute;
-    bottom: 0;
+    bottom: 40px;
     right: 0;
     left: 0;
     height: 190px;
@@ -179,14 +179,31 @@
     overflow: hidden;
 }
 
-.bundle-card__silhouettes svg {
+.bundle-card__bg-img {
     display: block;
     height: 100%;
+    width: 100%;
+    object-fit: contain;
+    object-position: right bottom;
+    opacity: 0.25; /* Reduced opacity as requested to blend well in background */
+    transform-origin: bottom right;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.bundle-card:hover .bundle-card__bg-img {
+    opacity: 0.4;
+    transform: scale(1.03);
+}
+
+@media (max-width: 768px) {
+    .bundle-card__bg-img {
+        opacity: 0.2; /* Even more transparent on mobile to ensure readability */
+        object-position: center bottom; /* center it more on narrow screens if needed */
+    }
 }
 
 /* ── Footer ──── */
 .bundle-card__footer {
-    border-top: 1px solid #F3F4F6;
     padding-top: 20px;
     margin-top: auto;
     position: relative;
@@ -224,3 +241,43 @@
     color: #003B5C;
     white-space: nowrap;
 }
+
+/* ── Maintenance Banner ──── */
+.bundles__maintenance-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #FFF7ED;
+    border: 1px solid #FDBA74;
+    border-radius: 12px;
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #9A3412;
+    line-height: 1.5;
+}
+
+.bundles__maintenance-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+/* ── Stock Badge ──── */
+.bundle-card__stock-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+}
+
+.bundle-card__stock-badge--in {
+    background: #DCFCE7;
+    color: #059669;
+}
+
+.bundle-card__stock-badge--out {
+    background: #FEE2E2;
+    color: #DC2626;
+}

@@ -2,22 +2,34 @@ import { useState, useEffect } from 'react';
 import { api } from '../Api/api';
 
 // Module-level cache so multiple components share the same data
-let cachedBundles = null;
+let cachedData = null;
 let fetchPromise = null;
 
 function fetchBundlesOnce() {
-    if (cachedBundles) return Promise.resolve(cachedBundles);
+    if (cachedData) return Promise.resolve(cachedData);
     if (fetchPromise) return fetchPromise;
 
     fetchPromise = api.getBundles()
         .then(data => {
-            cachedBundles = data.bundles || [];
-            return cachedBundles;
+            cachedData = {
+                bundles: data.bundles || [],
+                peroxideImageUrl: data.peroxideImageUrl || null,
+                peroxideInStock: data.peroxideInStock ?? true,
+                peroxideAvailability: data.peroxideAvailability || '',
+                pricesConsistent: data.pricesConsistent ?? true,
+            };
+            return cachedData;
         })
         .catch(err => {
             console.error('Failed to fetch bundles:', err);
             fetchPromise = null; // Allow retry on failure
-            return [];
+            return {
+                bundles: [],
+                peroxideImageUrl: null,
+                peroxideInStock: true,
+                peroxideAvailability: '',
+                pricesConsistent: true,
+            };
         });
 
     return fetchPromise;
@@ -29,21 +41,34 @@ function fetchBundlesOnce() {
  * to avoid duplicate API calls.
  */
 export function useBundles() {
-    const [bundles, setBundles] = useState(cachedBundles || []);
-    const [isLoading, setIsLoading] = useState(!cachedBundles);
+    const [data, setData] = useState(cachedData || {
+        bundles: [],
+        peroxideImageUrl: null,
+        peroxideInStock: true,
+        peroxideAvailability: '',
+        pricesConsistent: true,
+    });
+    const [isLoading, setIsLoading] = useState(!cachedData);
 
     useEffect(() => {
         let isMounted = true;
-        fetchBundlesOnce().then(data => {
+        fetchBundlesOnce().then(result => {
             if (isMounted) {
-                setBundles(data);
+                setData(result);
                 setIsLoading(false);
             }
         });
         return () => { isMounted = false; };
     }, []);
 
-    return { bundles, isLoading };
+    return {
+        bundles: data.bundles,
+        peroxideImageUrl: data.peroxideImageUrl,
+        peroxideInStock: data.peroxideInStock,
+        peroxideAvailability: data.peroxideAvailability,
+        pricesConsistent: data.pricesConsistent,
+        isLoading,
+    };
 }
 
 /**
