@@ -108,7 +108,7 @@ export function CartProvider({ children }) {
                         offerId: i.id,
                         qty: i.quantity,
                         isBundleItem: i.isBundleItem,
-                        isGift: i.price === 0 && i.isBundleItem
+                        isGift: !!i.isGift
                     };
                     if (i.bundleId) payloadItem.bundleId = i.bundleId;
                     return payloadItem;
@@ -183,7 +183,18 @@ export function CartProvider({ children }) {
                     return i;
                 });
             }
-            return [...prev, { ...product, quantity, cartItemId, isBundleItem: !!bundleId, bundleId, minQty }];
+            return [...prev, {
+                ...product,
+                quantity,
+                cartItemId,
+                isBundleItem: !!bundleId,
+                bundleId,
+                bundleTitle: options.bundleTitle || null,
+                bundleType: options.bundleType || null,
+                isPopular: options.isPopular || false,
+                isGift: options.isGift || false,
+                minQty,
+            }];
         });
         trackAddToCart(product, quantity);
         setIsCartOpen(true); // Automatically open cart when adding items
@@ -215,6 +226,15 @@ export function CartProvider({ children }) {
         });
     };
 
+    // Remove entire bundle (all items with same bundleId)
+    const removeBundle = (bundleId) => {
+        setItems(prev => {
+            const bundleItems = prev.filter(i => i.bundleId === bundleId);
+            bundleItems.forEach(item => trackRemoveFromCart(item));
+            return prev.filter(i => i.bundleId !== bundleId);
+        });
+    };
+
     const clearCart = () => setItems([]);
 
     const getTotal = () => {
@@ -223,8 +243,8 @@ export function CartProvider({ children }) {
 
     const getBenefit = () => {
         return items.reduce((sum, item) => {
-            // Skip gift items (price=0) — they're bonuses, not savings
-            if (item.price === 0) return sum;
+            // Skip gift items — they're bonuses, not savings
+            if (item.isGift) return sum;
             const base = item.basePrice || item.price;
             return sum + ((base - item.price) * item.quantity);
         }, 0);
@@ -240,7 +260,7 @@ export function CartProvider({ children }) {
                     offerId: i.id,
                     qty: i.quantity,
                     isBundleItem: i.isBundleItem,
-                    isGift: i.price === 0 && i.isBundleItem
+                    isGift: !!i.isGift
                 };
                 if (i.bundleId) payloadItem.bundleId = i.bundleId;
                 return payloadItem;
@@ -313,7 +333,7 @@ export function CartProvider({ children }) {
                     offerId: i.offerId || i.id,
                     qty: i.qty || i.quantity,
                     isBundleItem: !!i.isBundleItem,
-                    isGift: (i.unitPrice === 0 || i.price === 0) && !!i.isBundleItem
+                    isGift: !!i.isGift
                 };
                 if (i.bundleId) payloadItem.bundleId = i.bundleId;
                 return payloadItem;
@@ -342,6 +362,10 @@ export function CartProvider({ children }) {
                     quantity: oldQty,
                     isBundleItem: !!oldItem.isBundleItem,
                     bundleId: oldItem.bundleId || null,
+                    bundleTitle: oldItem.bundleTitle || null,
+                    bundleType: oldItem.bundleType || null,
+                    isPopular: oldItem.isPopular || false,
+                    isGift: !!oldItem.isGift || oldPrice === 1,
                 };
 
                 if (serverItem && serverItem.unitPrice !== oldPrice) {
@@ -351,7 +375,31 @@ export function CartProvider({ children }) {
                 return cartItem;
             });
 
-            cartItems.forEach(item => addToCart(item, item.quantity, { bundleId: item.bundleId }));
+            const fallbackTitles = {
+                'optimal': 'Оптимальний вибір',
+                'pro': 'PRO запас',
+                'nasezon': 'На сезон',
+                'minimal': 'Мінімальний пакет'
+            };
+
+            cartItems.forEach(item => {
+                let minQty = 1;
+                if (item.name?.includes('Перекис')) {
+                    if (item.bundleId === 'optimal') minQty = 2;
+                    else if (item.bundleId === 'nasezon') minQty = 3;
+                    else if (item.bundleId === 'pro') minQty = 6;
+                }
+                const resolvedTitle = item.bundleTitle || fallbackTitles[item.bundleId] || item.bundleId;
+
+                addToCart(item, item.quantity, {
+                    bundleId: item.bundleId,
+                    bundleTitle: resolvedTitle,
+                    bundleType: item.bundleType || item.bundleId,
+                    isPopular: item.isPopular,
+                    isGift: item.isGift,
+                    minQty: minQty
+                });
+            });
 
             if (pricesDrifted) {
                 setPriceAlertMessage('Ціни на деякі товари відрізняються від вашого попереднього замовлення. Вони були додані до кошика з актуальними цінами.');
@@ -368,8 +416,34 @@ export function CartProvider({ children }) {
                     quantity: item.qty ?? item.quantity,
                     isBundleItem: !!item.isBundleItem,
                     bundleId: item.bundleId || null,
+                    bundleTitle: item.bundleTitle || null,
+                    bundleType: item.bundleType || null,
+                    isPopular: item.isPopular || false,
+                    isGift: !!item.isGift || (item.unitPrice ?? item.price) === 1,
                 };
-                addToCart(cartItem, cartItem.quantity, { bundleId: cartItem.bundleId });
+                const fallbackTitles = {
+                    'optimal': 'Оптимальний вибір',
+                    'pro': 'PRO запас',
+                    'nasezon': 'На сезон',
+                    'minimal': 'Мінімальний пакет'
+                };
+                
+                let minQty = 1;
+                if (cartItem.name?.includes('Перекис')) {
+                    if (cartItem.bundleId === 'optimal') minQty = 2;
+                    else if (cartItem.bundleId === 'nasezon') minQty = 3;
+                    else if (cartItem.bundleId === 'pro') minQty = 6;
+                }
+                const resolvedTitle = cartItem.bundleTitle || fallbackTitles[cartItem.bundleId] || cartItem.bundleId;
+
+                addToCart(cartItem, cartItem.quantity, {
+                    bundleId: cartItem.bundleId,
+                    bundleTitle: resolvedTitle,
+                    bundleType: cartItem.bundleType || cartItem.bundleId,
+                    isPopular: cartItem.isPopular,
+                    isGift: cartItem.isGift,
+                    minQty: minQty
+                });
             });
         }
         setIsCartOpen(true);
@@ -384,6 +458,7 @@ export function CartProvider({ children }) {
             addToCart,
             updateQuantity,
             removeFromCart,
+            removeBundle,
             clearCart,
             getTotal,
             getBenefit,

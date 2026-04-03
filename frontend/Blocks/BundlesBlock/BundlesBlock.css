@@ -185,7 +185,8 @@
     width: 100%;
     object-fit: contain;
     object-position: right bottom;
-    opacity: 0.25; /* Reduced opacity as requested to blend well in background */
+    opacity: 0.25;
+    /* Reduced opacity as requested to blend well in background */
     transform-origin: bottom right;
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
@@ -197,8 +198,10 @@
 
 @media (max-width: 768px) {
     .bundle-card__bg-img {
-        opacity: 0.2; /* Even more transparent on mobile to ensure readability */
-        object-position: center bottom; /* center it more on narrow screens if needed */
+        opacity: 0.2;
+        /* Even more transparent on mobile to ensure readability */
+        object-position: center bottom;
+        /* center it more on narrow screens if needed */
     }
 }
 
@@ -229,7 +232,7 @@
     font-size: 11px;
     font-weight: 700;
     padding: 4px 8px;
-    border-radius: 12px;
+    border-radius: 20px;
     white-space: nowrap;
     text-transform: uppercase;
     margin-right: auto;
@@ -290,4 +293,4 @@
 .bundle-card__stock-badge--order {
     background: #DBEAFE;
     color: #2563EB;
-}
+}

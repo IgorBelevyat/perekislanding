@@ -58,10 +58,10 @@ export const checkoutRequestSchema = z.object({
     delivery: deliverySchema,
     paymentMethod: paymentMethodSchema,
 }).superRefine((data, ctx) => {
-    if (data.delivery.type === 'pickup' && data.paymentMethod !== 'online') {
+    if (data.delivery.type === 'pickup' && data.paymentMethod === 'cod') {
         ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: "Самовивіз можливий лише за умови онлайн оплати",
+            message: "При самовивозі оплата при отриманні недоступна",
             path: ['paymentMethod'],
         });
     }

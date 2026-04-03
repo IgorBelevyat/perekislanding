@@ -279,7 +279,7 @@ function CheckoutModal() {
                             <div key={item.id} className="checkout-modal__summary-item">
                                 <span>{item.quantity} × {item.name}</span>
                                 <span style={{ whiteSpace: 'nowrap' }}>
-                                    {item.price === 0 ? 'У подарунок' : `${item.price * item.quantity} ₴`}
+                                    {item.isGift ? `${item.price * item.quantity} ₴ (у подарунок)` : `${item.price * item.quantity} ₴`}
                                 </span>
                             </div>
                         ))}

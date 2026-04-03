@@ -48,7 +48,14 @@ function CalculatorResult({ volume, liters, canisters, kValue }) {
             addToCart(
                 { id: cItem.offerId, name: cItem.name, price: cItem.price, basePrice: cItem.basePrice },
                 cItem.qty,
-                { bundleId: bundle.id, minQty: cItem.name.includes('Перекис') ? cItem.qty : undefined }
+                { 
+                    bundleId: bundle.id, 
+                    bundleTitle: bundle.title,
+                    bundleType: bundle.type,
+                    isPopular: bundle.isPopular,
+                    isGift: cItem.isGift || cItem.price === 1,
+                    minQty: cItem.name.includes('Перекис') ? cItem.qty : undefined 
+                }
             );
         });
     };
@@ -64,17 +71,15 @@ function CalculatorResult({ volume, liters, canisters, kValue }) {
 
         return (
             <div className={`calc-upsell${highlight ? ' calc-upsell--highlight' : ''}`}>
-                <div className="calc-upsell__body">
-                    <div className="calc-upsell__info">
-                        <span className="calc-upsell__title">{bundle.title}</span>
-                        <span className="calc-upsell__contents">{contentsText}</span>
-                    </div>
-                    <div className="calc-upsell__pricing">
-                        <span className="calc-upsell__price">{bundle.price} ₴</span>
-                        {bundle.benefit > 0 && (
-                            <span className="calc-upsell__benefit">Вигода {bundle.benefit} ₴</span>
-                        )}
-                    </div>
+                <div className="calc-upsell__info">
+                    <span className="calc-upsell__title">{bundle.title}</span>
+                    <span className="calc-upsell__contents">{contentsText}</span>
+                </div>
+                <div className="calc-upsell__pricing">
+                    <span className="calc-upsell__price">{bundle.price} ₴</span>
+                    {bundle.benefit > 0 && (
+                        <span className="calc-upsell__benefit">Вигода {bundle.benefit} ₴</span>
+                    )}
                 </div>
                 <Button
                     variant={highlight ? 'cta' : 'primary'}

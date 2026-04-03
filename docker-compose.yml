@@ -78,6 +78,8 @@ services:
       POSTGRES_INITDB_ARGS: "--auth-host=md5"
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5433:5432"
     restart: unless-stopped
 
   # ── Redis ─────────────────────────────────────────────────
@@ -85,5 +87,7 @@ services:
     image: redis:7-alpine
     volumes:
       - ./data/redis:/data
+    ports:
+      - "127.0.0.1:6379:6379"
     command: redis-server --appendonly yes --maxmemory 128mb --maxmemory-policy allkeys-lru
     restart: unless-stopped

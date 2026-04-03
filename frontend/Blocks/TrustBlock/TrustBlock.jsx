@@ -1,5 +1,8 @@
+import { useState } from 'react';
 import SectionWrapper from '../../Common components/SectionWrapper/SectionWrapper';
 import Button from '../../Common components/Button/Button';
+import LegalModal from '../../Common components/LegalModal/LegalModal';
+import { publicOfferText, privacyPolicyText } from '../../Common components/LegalModal/LegalTexts';
 import { trackContactClick } from '../../utils/analytics';
 import logoImg from '../../Src/assets/images/logo.png';
 import './TrustBlock.css';
@@ -50,6 +53,21 @@ const whyUsItems = [
 ];
 
 function TrustBlock() {
+    const [legalModalConfig, setLegalModalConfig] = useState({ isOpen: false, title: '', content: '' });
+
+    const openLegalModal = (title, content, e) => {
+        e.preventDefault();
+        setLegalModalConfig({ isOpen: true, title, content });
+        // Prevent body scrolling
+        document.body.style.overflow = 'hidden';
+    };
+
+    const closeLegalModal = () => {
+        setLegalModalConfig(prev => ({ ...prev, isOpen: false }));
+        // Restore body scrolling
+        document.body.style.overflow = 'unset';
+    };
+
     return (
         <>
             {/* ── "Чому саме ми?" block ──── */}
@@ -101,9 +119,9 @@ function TrustBlock() {
                             <div className="footer__col">
                                 <h4 className="footer__col-title">Важливі посилання</h4>
                                 <ul className="footer__list">
-                                    <li><a href="https://hlorka.ua" className="footer__link footer__link--ups" target="_blank" rel="noopener noreferrer">Посилання на сайт</a></li>
-                                    <li><a href="https://hlorka.ua/policy/" className="footer__link footer__link--ups" target="_blank" rel="noopener noreferrer">Публічна оферта</a></li>
-                                    <li><a href="https://hlorka.ua/gdpr/" className="footer__link footer__link--ups" target="_blank" rel="noopener noreferrer">Політика конфіденційності</a></li>
+                                <li><a href="https://hlorka.ua" className="footer__link footer__link--ups" target="_blank" rel="noopener noreferrer">Посилання на сайт</a></li>
+                                    <li><a href="#" onClick={(e) => openLegalModal("Публічна оферта", publicOfferText, e)} className="footer__link footer__link--ups">Публічна оферта</a></li>
+                                    <li><a href="#" onClick={(e) => openLegalModal("Політика конфіденційності", privacyPolicyText, e)} className="footer__link footer__link--ups">Політика конфіденційності</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -128,6 +146,13 @@ function TrustBlock() {
                     </div>
                 </div>
             </footer>
+            
+            <LegalModal 
+                isOpen={legalModalConfig.isOpen}
+                title={legalModalConfig.title}
+                content={legalModalConfig.content}
+                onClose={closeLegalModal}
+            />
         </>
     );
 }

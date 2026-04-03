@@ -36,6 +36,10 @@ function BundlesBlock() {
                 cItem.qty,
                 {
                     bundleId: bundle.id,
+                    bundleTitle: bundle.title,
+                    bundleType: bundle.type,
+                    isPopular: bundle.isPopular,
+                    isGift: cItem.isGift || false,
                     minQty: cItem.name.includes('Перекис') ? cItem.qty : undefined
                 }
             );
