@@ -3,6 +3,7 @@ import SectionWrapper from '../../Common components/SectionWrapper/SectionWrappe
 import Button from '../../Common components/Button/Button';
 import { useCart } from '../../Stores/CartContext';
 import { api } from '../../Api/api';
+import { getStockStatus } from '../../Helpers/availabilityHelper';
 import productImg from '../../Src/assets/images/product-canister.png';
 import './ProductBlock.css';
 
@@ -18,6 +19,7 @@ const DEFAULT_PRODUCT = {
     name: 'Перекис водню 50%, 5 л',
     price: 420, // Fallback price
     inStock: true,
+    availability: '',
 };
 
 function ProductBlock() {
@@ -41,6 +43,7 @@ function ProductBlock() {
                             price: p5l.price,
                             imageUrl: p5l.imageUrl,
                             inStock: p5l.inStock ?? true,
+                            availability: p5l.availability ?? '',
                         }));
                     }
                 }
@@ -79,11 +82,14 @@ function ProductBlock() {
                         ) : (
                             <>
                                 <span className="product__price">{product.price} грн</span>
-                                {product.inStock ? (
-                                    <span className="product__stock-badge product__stock-badge--in">В наявності</span>
-                                ) : (
-                                    <span className="product__stock-badge product__stock-badge--out">Товар закінчився</span>
-                                )}
+                                {(() => {
+                                    const status = getStockStatus(product.availability, product.inStock);
+                                    return (
+                                        <span className={`product__stock-badge product__stock-badge--${status.variant}`}>
+                                            {status.text}
+                                        </span>
+                                    );
+                                })()}
                             </>
                         )}
                     </div>

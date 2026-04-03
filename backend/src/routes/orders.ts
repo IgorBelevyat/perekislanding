@@ -42,8 +42,10 @@ router.get(
                     path: ['customerExternalId'],
                     equals: customerId,
                 },
+                // Only show confirmed orders — excludes AWAITING_PAYMENT
+                // (LiqPay orders that were never paid)
                 status: {
-                    in: ['CONFIRMED', 'AWAITING_PAYMENT', 'CREATED'],
+                    in: ['CONFIRMED', 'CREATED'],
                 },
             },
             select: {

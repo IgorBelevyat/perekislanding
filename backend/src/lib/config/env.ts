@@ -38,6 +38,7 @@ const envSchema = z.object({
     CRM_DELIVERY_TYPE_NP: z.string().optional().default('novaposhta'),
     CRM_DELIVERY_TYPE_COURIER: z.string().optional().default('courier'),
     CRM_DELIVERY_TYPE_PICKUP: z.string().optional().default('pickup'),
+    CRM_NP_INTEGRATION_CODE: z.string().optional(), // e.g. 'newpost_new_0'
     CRM_SITE_CODE: z.string().optional(),
 
     // Nova Poshta

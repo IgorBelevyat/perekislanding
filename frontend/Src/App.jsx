@@ -15,6 +15,7 @@ import CartModal from '../Common components/Cart/CartModal';
 import StickyCartBar from '../Common components/StickyCartBar/StickyCartBar';
 import CheckoutModal from '../Common components/Checkout/CheckoutModal';
 import OrderResult from '../Common components/Checkout/OrderResult';
+import CookieBanner from '../Common components/CookieBanner/CookieBanner';
 
 function App() {
     return (
@@ -37,6 +38,7 @@ function App() {
             <CheckoutModal />
             <OrderResult />
             <StickyCartBar />
+            <CookieBanner />
         </CartProvider>
     );
 }

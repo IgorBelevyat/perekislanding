@@ -8,7 +8,7 @@ function FaqItem({ question, answer, isOpen, onToggle }) {
                 </span>
             </button>
             <div className={`faq-item__answer-wrapper ${isOpen ? 'faq-item__answer-wrapper--open' : ''}`}>
-                <p className="faq-item__answer">{answer}</p>
+                <div className="faq-item__answer">{answer}</div>
             </div>
         </div>
     );

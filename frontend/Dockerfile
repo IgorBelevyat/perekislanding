@@ -4,8 +4,8 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci
 COPY . .
-ARG VITE_GA4_MEASUREMENT_ID
-ENV VITE_GA4_MEASUREMENT_ID=$VITE_GA4_MEASUREMENT_ID
+ARG VITE_GTM_ID
+ENV VITE_GTM_ID=$VITE_GTM_ID
 RUN npm run build
 
 # Stage 2: Serve with Nginx

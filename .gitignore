@@ -27,3 +27,7 @@ data/redis/
 # Logs
 *.log
 npm-debug.log*
+
+#Scripts
+/backend/scripts
+

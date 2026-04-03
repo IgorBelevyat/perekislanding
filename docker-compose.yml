@@ -7,7 +7,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        VITE_GA4_MEASUREMENT_ID: ${GA4_MEASUREMENT_ID}
+        VITE_GTM_ID: ${VITE_GTM_ID}
     ports:
       - "127.0.0.1:3000:80"
     depends_on:
@@ -48,8 +48,6 @@ services:
       NP_API_KEY: ${NP_API_KEY}
       LIQPAY_PUBLIC_KEY: ${LIQPAY_PUBLIC_KEY}
       LIQPAY_PRIVATE_KEY: ${LIQPAY_PRIVATE_KEY}
-      GA4_MEASUREMENT_ID: ${GA4_MEASUREMENT_ID}
-      GA4_API_SECRET: ${GA4_API_SECRET}
       MOYSKLAD_TOKEN: ${MOYSKLAD_TOKEN}
       MOYSKLAD_ID_PEROXIDE: ${MOYSKLAD_ID_PEROXIDE}
       MOYSKLAD_ID_TEST_STRIPS: ${MOYSKLAD_ID_TEST_STRIPS}

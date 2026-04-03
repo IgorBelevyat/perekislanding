@@ -106,6 +106,16 @@
     background: #FEE2E2;
 }
 
+.product__stock-badge--expected {
+    color: #D97706;
+    background: #FEF3C7;
+}
+
+.product__stock-badge--order {
+    color: #2563EB;
+    background: #DBEAFE;
+}
+
 .product__old-price {
     font-size: 1.125rem;
     color: #9CA3AF;

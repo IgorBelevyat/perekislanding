@@ -300,6 +300,111 @@ async function main() {
     } catch (err) {
         console.error('   ❌ Failed to fetch price types:', (err as Error).message);
     }
+
+    // 3. Assortment endpoint — the integrator says this is where "Наличие" lives
+    console.log('\n' + '═'.repeat(60));
+    console.log('🔎 ASSORTMENT ENDPOINT — searching for availability fields');
+    console.log('═'.repeat(60));
+
+    for (const [label, productId] of Object.entries(PRODUCTS)) {
+        try {
+            console.log(`\n📡 Fetching assortment for [${label}]...`);
+
+            // Filter assortment by the specific product href
+            const productHref = `${BASE_URL}/entity/product/${productId}`;
+            const assortment: any = await msApiFetch('/entity/assortment', {
+                filter: `id=${productId}`,
+                limit: '10',
+            });
+
+            const rows = assortment.rows ?? [];
+            console.log(`   Found ${rows.length} assortment row(s)`);
+
+            if (rows.length === 0) {
+                // Try alternative: filter by product href
+                console.log('   Trying alternative filter (product href)...')
+                const assortment2: any = await msApiFetch('/entity/assortment', {
+                    filter: `product=${productHref}`,
+                    limit: '10',
+                });
+                const rows2 = assortment2.rows ?? [];
+                console.log(`   Found ${rows2.length} assortment row(s) with product filter`);
+                if (rows2.length > 0) rows.push(...rows2);
+            }
+
+            for (const row of rows) {
+                console.log(`\n   📦 Assortment item: ${row.name ?? '(no name)'}`);
+                console.log(`      Type: ${row.meta?.type ?? '(unknown)'}`);
+
+                // Dump ALL top-level keys (excluding nested objects to keep it readable)
+                const allKeys = Object.keys(row);
+                console.log(`      All keys (${allKeys.length}): ${allKeys.join(', ')}`);
+
+                // Specifically check for stock/availability-related fields
+                const interestingFields = [
+                    'stock', 'quantity', 'reserve', 'inTransit',
+                    'available', 'availability', 'trackStock',
+                    'stockDays', 'minimumBalance', 'volume',
+                ];
+                console.log('      📊 Stock-related fields:');
+                for (const field of interestingFields) {
+                    if (row[field] !== undefined) {
+                        console.log(`         ✅ ${field}: ${JSON.stringify(row[field])}`);
+                    }
+                }
+
+                // Check attributes inside assortment
+                if (row.attributes && row.attributes.length > 0) {
+                    console.log(`      📋 Attributes in assortment (${row.attributes.length}):`);
+                    for (const attr of row.attributes) {
+                        const attrName = attr.name ?? attr.id ?? '?';
+                        const attrVal = attr.value?.name ?? attr.value ?? '';
+                        const isAvail = attrName.toLowerCase().includes('наличи') ||
+                                        attrName.toLowerCase().includes('наявн') ||
+                                        attrName.toLowerCase().includes('avail') ||
+                                        attrName.toLowerCase().includes('stock');
+                        const marker = isAvail ? ' ⭐ <-- AVAILABILITY?' : '';
+                        console.log(`         - [${attrName}] = "${attrVal}" (type: ${attr.type})${marker}`);
+                    }
+                } else {
+                    console.log('      📋 Attributes in assortment: (none)');
+                }
+
+                // Dump any field that contains numbers or booleans (potential stock indicators)
+                console.log('      🔢 Numeric/Boolean fields:');
+                for (const [key, val] of Object.entries(row)) {
+                    if ((typeof val === 'number' || typeof val === 'boolean') && !['version', 'weight', 'volume'].includes(key)) {
+                        console.log(`         ${key}: ${val}`);
+                    }
+                }
+            }
+        } catch (err) {
+            console.error(`   ❌ Assortment fetch failed for [${label}]: ${(err as Error).message}`);
+        }
+    }
+
+    // 4. Also try fetching assortment without filter to see what fields are available
+    console.log('\n' + '═'.repeat(60));
+    console.log('🔎 ASSORTMENT — sample row (first product) with ALL fields');
+    console.log('═'.repeat(60));
+    try {
+        const sample: any = await msApiFetch('/entity/assortment', { limit: '1' });
+        const firstRow = (sample.rows ?? [])[0];
+        if (firstRow) {
+            console.log('   Full JSON dump of first assortment item:');
+            // Print all keys and values, truncating long strings
+            for (const [key, val] of Object.entries(firstRow)) {
+                if (typeof val === 'object' && val !== null) {
+                    const summary = JSON.stringify(val).slice(0, 150);
+                    console.log(`      ${key}: ${summary}${JSON.stringify(val).length > 150 ? '...' : ''}`);
+                } else {
+                    console.log(`      ${key}: ${val}`);
+                }
+            }
+        }
+    } catch (err) {
+        console.error(`   ❌ Sample assortment fetch failed: ${(err as Error).message}`);
+    }
 }
 
 main().catch(err => {

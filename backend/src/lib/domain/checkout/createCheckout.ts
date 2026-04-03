@@ -1,7 +1,6 @@
 import { prisma } from '../../db/prisma';
 import { createPaymentFormData, getCheckoutUrl } from '../../integrations/liqpay/client';
 import { setIdempotencyResult } from '../../security/idempotency';
-import { sendGA4Event } from '../../integrations/ga4/client';
 import { pushOrderToCrm } from './crmSync';
 import { logger } from '../../security/logger';
 import { env } from '../../config/env';
@@ -120,26 +119,6 @@ export async function processCheckout(
 
     // 8. Store idempotency result
     await setIdempotencyResult(idempotencyKey, result as any);
-
-    // 9. Fire GA4 purchase event (non-blocking)
-    sendGA4Event('server', [
-        {
-            name: 'purchase',
-            params: {
-                transaction_id: order.id,
-                value: totalsSnapshot.total,
-                currency: 'UAH',
-                payment_type: input.paymentMethod,
-                shipping_tier: input.delivery.type,
-                items: itemsSnapshot.map((item: any) => ({
-                    item_id: item.offerId,
-                    item_name: item.name,
-                    price: item.unitPrice,
-                    quantity: item.qty,
-                })),
-            },
-        },
-    ]).catch(() => { }); // non-blocking
 
     logger.info('Checkout completed', {
         orderId: order.id,

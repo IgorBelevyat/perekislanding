@@ -1,69 +1,97 @@
-// Require VITE_GA4_MEASUREMENT_ID in the frontend .env file
-export const GTAG_ID = import.meta.env.VITE_GA4_MEASUREMENT_ID;
+// Require VITE_GTM_ID in the frontend .env file
+export const GTM_ID = import.meta.env.VITE_GTM_ID;
 
-// Dynamically inject the GA script if the ID is present
-if (typeof window !== 'undefined' && GTAG_ID) {
-    const script = document.createElement('script');
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${GTAG_ID}`;
-    script.async = true;
-    document.head.appendChild(script);
+// Ensure dataLayer is available
+window.dataLayer = window.dataLayer || [];
 
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = function() { window.dataLayer.push(arguments); };
-    window.gtag('js', new Date());
-    window.gtag('config', GTAG_ID, { send_page_view: true });
-}
-
-export const sendEvent = ({ action, category, label, value, ...rest }) => {
-    if (typeof window !== 'undefined' && typeof window.gtag !== 'undefined') {
-        window.gtag('event', action, {
-            event_category: category,
-            event_label: label,
-            value: value,
-            ...rest,
+export const sendEvent = (eventData) => {
+    if (typeof window !== 'undefined' && window.dataLayer) {
+        window.dataLayer.push({
+            page_location: window.location.href,
+            page_referrer: document.referrer || '',
+            page_title: document.title,
+            ...eventData
         });
     } else {
         // Fallback or dev logging
-        // console.log('[GA4 Event MOCK]', action, { category, label, value, ...rest });
+        // console.log('[GTM Event MOCK]', eventData);
     }
 };
 
 export const trackAddToCart = (item, quantity) => {
     sendEvent({
-        action: 'add_to_cart',
-        currency: 'UAH',
-        value: item.price * quantity,
-        items: [{
-            item_id: item.id,
-            item_name: item.name,
-            price: item.price,
-            quantity: quantity,
-            item_category: item.isBundleItem ? 'Bundle' : 'Product'
-        }]
+        event: 'add_to_cart',
+        ecommerce: {
+            currency: 'UAH',
+            value: item.price * quantity,
+            items: [{
+                item_id: item.id,
+                item_name: item.name,
+                price: item.price,
+                quantity: quantity,
+                item_category: item.isBundleItem ? 'Bundle' : 'Product'
+            }]
+        }
     });
 };
 
 export const trackRemoveFromCart = (item) => {
     sendEvent({
-        action: 'remove_from_cart',
-        currency: 'UAH',
-        value: item.price * item.quantity,
-        items: [{
-            item_id: item.id,
-            item_name: item.name,
-            price: item.price,
-            quantity: item.quantity,
-            item_category: item.isBundleItem ? 'Bundle' : 'Product'
-        }]
+        event: 'remove_from_cart',
+        ecommerce: {
+            currency: 'UAH',
+            value: item.price * item.quantity,
+            items: [{
+                item_id: item.id,
+                item_name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+                item_category: item.isBundleItem ? 'Bundle' : 'Product'
+            }]
+        }
+    });
+};
+
+export const trackBeginCheckout = (items, totalValue) => {
+    sendEvent({
+        event: 'begin_checkout',
+        ecommerce: {
+            currency: 'UAH',
+            value: totalValue,
+            items: items.map(item => ({
+                item_id: item.id,
+                item_name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+                item_category: item.isBundleItem ? 'Bundle' : 'Product'
+            }))
+        }
+    });
+};
+
+export const trackPurchase = (items, transaction_id, totalValue) => {
+    sendEvent({
+        event: 'purchase',
+        ecommerce: {
+            transaction_id: transaction_id,
+            value: totalValue,
+            currency: 'UAH',
+            shipping: 0,
+            tax: 0,
+            items: items.map(item => ({
+                item_id: item.id,
+                item_name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+                item_category: item.isBundleItem ? 'Bundle' : 'Product'
+            }))
+        }
     });
 };
 
 export const trackCalculatorUsed = (volume, canisters) => {
     sendEvent({
-        action: 'calculator_used',
-        category: 'engagement',
-        label: 'Calculator Result',
-        value: canisters,
+        event: 'calculator_used',
         volume_m3: volume,
         recommended_canisters: canisters
     });
@@ -71,8 +99,6 @@ export const trackCalculatorUsed = (volume, canisters) => {
 
 export const trackContactClick = (type) => { // 'telegram' or 'phone'
     sendEvent({
-        action: `click_${type}`,
-        category: 'engagement',
-        label: type
+        event: `click_${type}`
     });
 };

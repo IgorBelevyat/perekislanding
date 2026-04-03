@@ -48,17 +48,22 @@ export function buildCrmPayload(order: {
         };
     } else if (delivery.type === 'nova_poshta') {
         deliveryCode = env.CRM_DELIVERY_TYPE_NP || 'nova-poshta';
-        // Address block — needed for CRM UI to display city name
+        // Address block — countryIso + city + full text for CRM UI display
         addressData = {
+            countryIso: 'UA',
             city: delivery.cityName,
+            text: `${delivery.cityName}, ${delivery.warehouseName}`,
         };
-        // NP-specific data — refs for CRM directory integration
+        // NP integration module data — must match newpost_new_0 format
+        // (discovered from existing CRM orders created via the CRM interface)
         deliveryData = {
-            receiverCity: delivery.cityName,
-            receiverCityRef: delivery.cityRef,
-            receiverWarehouseTypeRef: delivery.warehouseRef,
             pickuppointId: delivery.warehouseRef,
-            pickuppoint: delivery.warehouseName,
+            pickuppointName: delivery.warehouseName,
+            pickuppointAddress: delivery.warehouseName,
+            payerType: 'receiver',
+            extraData: {
+                technology: 'WarehouseWarehouse',
+            },
         };
     }
 
@@ -68,14 +73,11 @@ export function buildCrmPayload(order: {
         customerComment = `Увага, замовлення за безготівковим розрахунком\nНазва організації: ${customer.companyName}\nКод ЄДРПОУ: ${customer.edrpou}`;
     }
 
-    // Payment type & status
+    // Payment type (status is NOT sent — manager sets it manually in CRM)
     let paymentType = env.CRM_PAYMENT_TYPE_COD || 'cash-on-delivery';
-    let paymentStatus: string | undefined = undefined;
 
     if (order.paymentMethod === 'ONLINE') {
         paymentType = env.CRM_PAYMENT_TYPE_ONLINE || 'liqpay';
-        // If payment is already confirmed, mark as paid; otherwise not-paid
-        paymentStatus = order.paymentStatus === 'PAID' ? 'paid' : 'not-paid';
     } else if (order.paymentMethod === 'CASHLESS') {
         paymentType = env.CRM_PAYMENT_TYPE_CASHLESS || 'bank-transfer';
     }
@@ -112,12 +114,16 @@ export function buildCrmPayload(order: {
             })),
             delivery: {
                 code: deliveryCode,
+                // For Nova Poshta — link to the integration module so CRM treats
+                // pickuppointId etc. as directory references, not plain strings
+                ...(delivery.type === 'nova_poshta' && env.CRM_NP_INTEGRATION_CODE
+                    ? { integrationCode: env.CRM_NP_INTEGRATION_CODE }
+                    : {}),
                 ...(Object.keys(addressData).length > 0 ? { address: addressData } : {}),
                 ...(deliveryData ? { data: deliveryData } : {}),
             },
             payments: [{
                 type: paymentType,
-                ...(paymentStatus ? { status: paymentStatus } : {}),
             }],
         },
     };

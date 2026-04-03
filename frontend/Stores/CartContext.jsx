@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { api } from '../Api/api';
 import PriceAlertModal from '../Common components/Cart/PriceAlertModal';
-import { trackAddToCart, trackRemoveFromCart } from '../utils/analytics';
+import { trackAddToCart, trackRemoveFromCart, trackBeginCheckout, trackPurchase } from '../utils/analytics';
 
 const CartContext = createContext();
 
@@ -274,6 +274,7 @@ export function CartProvider({ children }) {
 
             setQuoteId(res.quoteId);
             setCheckoutStep('checkout');
+            trackBeginCheckout(items, getTotal());
         } catch (error) {
             console.error('Failed to start checkout:', error);
             setCheckoutStep('cart');
@@ -285,6 +286,11 @@ export function CartProvider({ children }) {
     const completeOrder = (resultData) => {
         setOrderResult(resultData);
         setCheckoutStep(resultData.status === 'failed' ? 'failed' : 'success');
+        
+        if (resultData.status !== 'failed') {
+            trackPurchase(items, resultData.orderNumber || resultData.orderId, getTotal());
+        }
+        
         clearCart();
         // Refresh history from server (the order is now in the DB)
         fetchOrderHistory();

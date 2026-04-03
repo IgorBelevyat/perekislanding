@@ -280,4 +280,14 @@
 .bundle-card__stock-badge--out {
     background: #FEE2E2;
     color: #DC2626;
+}
+
+.bundle-card__stock-badge--expected {
+    background: #FEF3C7;
+    color: #D97706;
+}
+
+.bundle-card__stock-badge--order {
+    background: #DBEAFE;
+    color: #2563EB;
 }
