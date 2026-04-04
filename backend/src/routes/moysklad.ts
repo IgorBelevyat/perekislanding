@@ -2,7 +2,8 @@ import { Router } from 'express';
 import { asyncHandler } from '../middleware/errorHandler';
 import { fetchImageBuffer } from '../lib/integrations/moysklad/client';
 import { getMoySkladProduct, crmOfferToMsId } from '../lib/integrations/moysklad/products';
-import { getOrSet } from '../lib/cache/redis';
+import { getOrSet, delCache } from '../lib/cache/redis';
+import { CacheKeys } from '../lib/cache/keys';
 import { env } from '../lib/config/env';
 import { logger } from '../lib/security/logger';
 
@@ -28,23 +29,46 @@ router.get(
 
         const cacheKey = `ms:img:${offerId}`;
 
+        /**
+         * Fetch image from MoySklad, optionally invalidating stale product cache first.
+         */
+        const fetchFreshImage = async (invalidateProductCache: boolean) => {
+            const msId = crmOfferToMsId(offerId);
+            if (!msId) return null;
+
+            if (invalidateProductCache) {
+                // Clear stale product data so we get a fresh downloadHref
+                await delCache(CacheKeys.msProduct(msId));
+                await delCache(`${CacheKeys.msProduct(msId)}:stale`);
+            }
+
+            const product = await getMoySkladProduct(msId);
+            const imageUrl = product?.imageUrl;
+            if (!imageUrl) return null;
+
+            const { buffer, contentType } = await fetchImageBuffer(imageUrl);
+            return {
+                base64: buffer.toString('base64'),
+                contentType,
+            };
+        };
+
         try {
             const cached = await getOrSet<{ base64: string; contentType: string } | null>(
                 cacheKey,
                 3600, // 1 hour
                 async () => {
-                    const msId = crmOfferToMsId(offerId);
-                    if (!msId) return null;
-
-                    const product = await getMoySkladProduct(msId);
-                    const imageUrl = product?.imageUrl;
-                    if (!imageUrl) return null;
-
-                    const { buffer, contentType } = await fetchImageBuffer(imageUrl);
-                    return {
-                        base64: buffer.toString('base64'),
-                        contentType,
-                    };
+                    try {
+                        // First try with existing (possibly cached) product data
+                        return await fetchFreshImage(false);
+                    } catch (firstErr) {
+                        // downloadHref may have expired — invalidate product cache and retry
+                        logger.warn('Image download failed, retrying with fresh product data', {
+                            offerId,
+                            error: (firstErr as Error).message,
+                        });
+                        return await fetchFreshImage(true);
+                    }
                 },
             );
 

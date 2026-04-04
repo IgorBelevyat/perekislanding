@@ -69,6 +69,8 @@ export function CartProvider({ children }) {
                 const data = await api.getOrderStatus(orderId);
 
                 if (data.paymentStatus === 'PAID') {
+                    // Track purchase BEFORE clearing cart (items & getTotal need cart data)
+                    trackPurchase(items, orderNumber || orderId, getTotal());
                     setOrderResult({ orderId, orderNumber: orderNumber || orderId, status: 'success' });
                     setCheckoutStep('success');
                     setItems([]); // Clear cart after successful payment
@@ -87,6 +89,7 @@ export function CartProvider({ children }) {
             } catch (err) {
                 console.error('Failed to check payment status:', err);
                 // Fallback: show success (order was created, callback will process later)
+                trackPurchase(items, orderNumber || orderId, getTotal());
                 setOrderResult({ orderId, orderNumber: orderNumber || orderId, status: 'success' });
                 setCheckoutStep('success');
                 setItems([]);
