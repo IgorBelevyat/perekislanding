@@ -76,10 +76,13 @@
 .legal-modal__body {
     padding: 24px;
     overflow-y: auto;
+    overflow-x: hidden;
     flex: 1;
     font-size: 14px;
     line-height: 1.6;
     color: #4B5563;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 /* Section titles - bold and visually separated */

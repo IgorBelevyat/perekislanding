@@ -179,25 +179,22 @@ function CalculatorResult({ volume, liters, canisters, kValue }) {
             </p>
 
             <div style={{ marginTop: '1rem', width: '100%', textAlign: 'center' }}>
-                <span style={{ color: '#E53E3E', fontSize: '15px', marginRight: '4px' }}>*</span>
                 <a 
                     href="#safety-rules" 
                     onClick={(e) => {
-                        // e.preventDefault(); // allow hash change for scrolling
                         window.dispatchEvent(new Event('open-safety-rules'));
                     }}
                     style={{ 
                         color: '#4B5563', 
                         fontSize: '13px', 
-                        textDecoration: 'underline', 
-                        textUnderlineOffset: '3px',
+                        textDecoration: 'none', 
                         transition: 'color 0.2s ease',
-                        display: 'inline-block'
                     }}
                     onMouseEnter={(e) => e.target.style.color = '#0096B8'}
                     onMouseLeave={(e) => e.target.style.color = '#4B5563'}
                 >
-                    розрахунок на калькуляторі є орієнтовним
+                    <span style={{ color: '#E53E3E', fontSize: '15px' }}>*</span>{' '}
+                    <span style={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}>розрахунок на калькуляторі є орієнтовним</span>
                 </a>
             </div>
         </div>
