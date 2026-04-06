@@ -1,9 +1,8 @@
 import { Router } from 'express';
 import { asyncHandler } from '../middleware/errorHandler';
-import { fetchImageBuffer } from '../lib/integrations/moysklad/client';
-import { getMoySkladProduct, crmOfferToMsId } from '../lib/integrations/moysklad/products';
-import { getOrSet, delCache } from '../lib/cache/redis';
-import { CacheKeys } from '../lib/cache/keys';
+import { fetchProductImages, fetchImageBuffer } from '../lib/integrations/moysklad/client';
+import { crmOfferToMsId } from '../lib/integrations/moysklad/products';
+import { getRedis } from '../lib/cache/redis';
 import { env } from '../lib/config/env';
 import { logger } from '../lib/security/logger';
 
@@ -13,8 +12,12 @@ const router = Router();
  * GET /api/moysklad/product-image/:offerId
  *
  * Proxies the product image from MoySklad (which requires Bearer auth).
- * The image is cached in Redis as base64 for 1 hour to minimize API calls.
- * Only the peroxide product has an image from MoySklad.
+ * 
+ * Strategy:
+ *  - Cache the downloaded image bytes in Redis for 6 hours.
+ *  - When cache misses, fetch a FRESH downloadHref from MoySklad images API
+ *    (not from the product cache — downloadHref URLs expire!).
+ *  - Never cache null/failure results.
  */
 router.get(
     '/product-image/:offerId',
@@ -27,65 +30,88 @@ router.get(
             return;
         }
 
+        const msId = crmOfferToMsId(offerId);
+        if (!msId) {
+            logger.warn('No MoySklad mapping for image request', { offerId });
+            res.status(404).json({ error: 'Product mapping not found' });
+            return;
+        }
+
         const cacheKey = `ms:img:${offerId}`;
 
-        /**
-         * Fetch image from MoySklad, optionally invalidating stale product cache first.
-         */
-        const fetchFreshImage = async (invalidateProductCache: boolean) => {
-            const msId = crmOfferToMsId(offerId);
-            if (!msId) return null;
-
-            if (invalidateProductCache) {
-                // Clear stale product data so we get a fresh downloadHref
-                await delCache(CacheKeys.msProduct(msId));
-                await delCache(`${CacheKeys.msProduct(msId)}:stale`);
+        try {
+            // 1) Check Redis cache for previously downloaded image bytes
+            const r = getRedis();
+            const cached = await r.get(cacheKey);
+            if (cached) {
+                try {
+                    const parsed = JSON.parse(cached) as { base64: string; contentType: string };
+                    if (parsed?.base64) {
+                        const buf = Buffer.from(parsed.base64, 'base64');
+                        res.set({
+                            'Content-Type': parsed.contentType || 'image/jpeg',
+                            'Content-Length': buf.length.toString(),
+                            'Cache-Control': 'public, max-age=21600', // 6 hours browser cache
+                        });
+                        res.send(buf);
+                        return;
+                    }
+                } catch {
+                    // Corrupted cache — delete and refetch
+                    await r.del(cacheKey);
+                }
             }
 
-            const product = await getMoySkladProduct(msId);
-            const imageUrl = product?.imageUrl;
-            if (!imageUrl) return null;
+            // 2) Cache miss — fetch fresh image directly from MoySklad API
+            //    Always get a fresh downloadHref (they can expire!)
+            logger.info('Fetching fresh product image from MoySklad', { offerId, msId });
 
-            const { buffer, contentType } = await fetchImageBuffer(imageUrl);
-            return {
-                base64: buffer.toString('base64'),
-                contentType,
-            };
-        };
-
-        try {
-            const cached = await getOrSet<{ base64: string; contentType: string } | null>(
-                cacheKey,
-                3600, // 1 hour
-                async () => {
-                    try {
-                        // First try with existing (possibly cached) product data
-                        return await fetchFreshImage(false);
-                    } catch (firstErr) {
-                        // downloadHref may have expired — invalidate product cache and retry
-                        logger.warn('Image download failed, retrying with fresh product data', {
-                            offerId,
-                            error: (firstErr as Error).message,
-                        });
-                        return await fetchFreshImage(true);
-                    }
-                },
-            );
-
-            if (!cached) {
-                res.status(404).json({ error: 'Image not available' });
+            const images = await fetchProductImages(msId);
+            if (!images || images.length === 0) {
+                logger.warn('No images found for product in MoySklad', { offerId, msId });
+                // DON'T cache this — images might appear later
+                res.status(404).json({ error: 'No images available' });
                 return;
             }
 
-            const buf = Buffer.from(cached.base64, 'base64');
+            // Get download URL — prefer downloadHref (full res), fallback to miniature
+            const downloadUrl = images[0].meta?.downloadHref
+                ?? images[0].miniature?.href;
+
+            if (!downloadUrl) {
+                logger.warn('Image entry has no downloadHref or miniature', {
+                    offerId, msId,
+                    imageKeys: Object.keys(images[0]),
+                    metaKeys: images[0].meta ? Object.keys(images[0].meta) : [],
+                });
+                res.status(404).json({ error: 'Image URL not available' });
+                return;
+            }
+
+            // 3) Download actual image bytes
+            const { buffer, contentType } = await fetchImageBuffer(downloadUrl);
+
+            // 4) Cache in Redis for 6 hours (image bytes, not the URL)
+            await r.setex(cacheKey, 21600, JSON.stringify({
+                base64: buffer.toString('base64'),
+                contentType,
+            }));
+
+            // 5) Serve
             res.set({
-                'Content-Type': cached.contentType,
-                'Content-Length': buf.length.toString(),
-                'Cache-Control': 'public, max-age=3600',
+                'Content-Type': contentType,
+                'Content-Length': buffer.length.toString(),
+                'Cache-Control': 'public, max-age=21600',
             });
-            res.send(buf);
+            res.send(buffer);
+
         } catch (err) {
-            logger.error('Failed to proxy MoySklad image', { offerId, error: (err as Error).message });
+            logger.error('Failed to proxy MoySklad image', {
+                offerId,
+                msId,
+                error: (err as Error).message,
+                stack: (err as Error).stack,
+            });
             res.status(502).json({ error: 'Failed to fetch image' });
         }
     }),
