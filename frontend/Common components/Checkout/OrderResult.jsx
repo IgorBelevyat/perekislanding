@@ -8,6 +8,7 @@ function OrderResult() {
     if (checkoutStep !== 'success' && checkoutStep !== 'failed' && checkoutStep !== 'processing') return null;
 
     if (checkoutStep === 'processing') {
+        const isPaymentCheck = new URLSearchParams(window.location.search).has('orderId');
         return (
             <div
                 className="checkout-overlay"
@@ -26,7 +27,9 @@ function OrderResult() {
                 >
                     <div className="checkout-modal__content" style={{ textAlign: 'center', padding: '2.5rem' }}>
                         <div style={{ width: '48px', height: '48px', margin: '0 auto 1.5rem', border: '4px solid #e0e0e0', borderTopColor: '#FF8C00', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-                        <h2 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: 'var(--color-text)', fontWeight: '700' }}>Перевіряємо оплату...</h2>
+                        <h2 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: 'var(--color-text)', fontWeight: '700' }}>
+                            {isPaymentCheck ? 'Перевіряємо оплату...' : 'Формуємо замовлення...'}
+                        </h2>
                         <p style={{ color: 'var(--color-text-light)', lineHeight: '1.6' }}>Зачекайте, будь ласка</p>
                     </div>
                 </div>

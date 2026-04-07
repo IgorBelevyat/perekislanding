@@ -101,7 +101,7 @@ export async function buildQuote(input: QuoteRequest): Promise<QuoteResult> {
                 // Send this back so the frontend can match it in `CartContext`
                 isBundleItem: customItem.isBundleItem,
                 bundleId: customItem.bundleId,
-                priceType: activePriceType !== 'base' ? activePriceType : undefined
+                priceType: activePriceType
             });
         }
     } else {
@@ -150,6 +150,7 @@ export async function buildQuote(input: QuoteRequest): Promise<QuoteResult> {
                 unitPrice: basePrice,
                 baseTotal: basePrice * qty,
                 total: basePrice * qty,
+                priceType: env.PRICE_TYPE_BASE || 'base',
             });
         }
     }

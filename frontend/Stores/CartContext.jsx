@@ -238,6 +238,26 @@ export function CartProvider({ children }) {
         });
     };
 
+    const getBundleMultiplier = (bundleId) => {
+        const bundleItem = items.find(i => i.bundleId === bundleId);
+        if (!bundleItem || !bundleItem.minQty) return 1;
+        return Math.floor(bundleItem.quantity / bundleItem.minQty);
+    };
+
+    const updateBundleMultiplier = (bundleId, multiplier) => {
+        if (multiplier <= 0) {
+            removeBundle(bundleId);
+            return;
+        }
+
+        setItems(prev => prev.map(item => {
+            if (item.bundleId === bundleId) {
+                return { ...item, quantity: item.minQty * multiplier };
+            }
+            return item;
+        }));
+    };
+
     const clearCart = () => setItems([]);
 
     const getTotal = () => {
@@ -465,6 +485,8 @@ export function CartProvider({ children }) {
             clearCart,
             getTotal,
             getBenefit,
+            getBundleMultiplier,
+            updateBundleMultiplier,
             reorder,
             activeBundleId,
             setActiveBundleId,

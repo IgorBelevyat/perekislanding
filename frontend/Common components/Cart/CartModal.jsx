@@ -41,7 +41,7 @@ const BUNDLE_COLORS = {
 };
 
 function CartModal() {
-    const { items, isCartOpen, setIsCartOpen, getTotal, getBenefit, startCheckout, checkoutStep, orderHistory, removeBundle } = useCart();
+    const { items, isCartOpen, setIsCartOpen, getTotal, getBenefit, startCheckout, checkoutStep, orderHistory, removeBundle, getBundleMultiplier, updateBundleMultiplier } = useCart();
     const [showHistory, setShowHistory] = useState(false);
 
     // Body scroll lock
@@ -112,13 +112,33 @@ function CartModal() {
                                                     </span>
                                                 )}
                                             </div>
-                                            <button
-                                                className="cart-bundle__remove"
-                                                onClick={() => removeBundle(bundleId)}
-                                                aria-label="Видалити набір"
-                                            >
-                                                ✕
-                                            </button>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <div className="cart-item__controls" style={{ transform: 'scale(0.85)', transformOrigin: 'right center' }}>
+                                                    <button 
+                                                        className="cart-item__btn"
+                                                        onClick={() => updateBundleMultiplier(bundle.bundleId, getBundleMultiplier(bundle.bundleId) - 1)}
+                                                        aria-label="Зменшити кількість наборів"
+                                                    >
+                                                        -
+                                                    </button>
+                                                    <span className="cart-item__qty">{getBundleMultiplier(bundle.bundleId)}</span>
+                                                    <button 
+                                                        className="cart-item__btn"
+                                                        onClick={() => updateBundleMultiplier(bundle.bundleId, getBundleMultiplier(bundle.bundleId) + 1)}
+                                                        aria-label="Збільшити кількість наборів"
+                                                    >
+                                                        +
+                                                    </button>
+                                                </div>
+                                                <button
+                                                    className="cart-bundle__remove"
+                                                    onClick={() => removeBundle(bundleId)}
+                                                    aria-label="Видалити набір"
+                                                    style={{ marginLeft: '4px' }}
+                                                >
+                                                    ✕
+                                                </button>
+                                            </div>
                                         </div>
                                         <div className="cart-bundle__items">
                                             {bundle.items.map(item => {

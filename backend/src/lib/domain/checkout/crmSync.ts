@@ -20,6 +20,7 @@ export function buildCrmPayload(order: {
     itemsSnapshot: any[];
     paymentMethod: string;
     paymentStatus: string;
+    bundleTitle?: string | null;
 }) {
     const customer = order.customer;
     const delivery = order.delivery;
@@ -63,15 +64,34 @@ export function buildCrmPayload(order: {
             payerType: 'receiver',
             extraData: {
                 technology: 'WarehouseWarehouse',
+                contrahent_sender: '',
+                paymentMethod: 'Cash',
+                cargo: 'Cargo',
+                saturdayDelivery: false,
+                afterpayPayer: 'receiver',
+                seatsAmount: 1,
+                ...(delivery.cityRef ? {
+                    cityRef: delivery.cityRef,
+                    cityRefLabel: delivery.cityName,
+                } : {}),
             },
+            itemDeclaredValues: [],
+            packages: [],
         };
     }
 
-    // Customer comment for cashless
-    let customerComment: string | undefined = undefined;
-    if (order.paymentMethod === 'CASHLESS' && customer.companyName && customer.edrpou) {
-        customerComment = `Увага, замовлення за безготівковим розрахунком\nНазва організації: ${customer.companyName}\nКод ЄДРПОУ: ${customer.edrpou}`;
+    // Customer comments assembly
+    const comments: string[] = [];
+
+    if (order.bundleTitle) {
+        comments.push(`Набір: ${order.bundleTitle}`);
     }
+
+    if (order.paymentMethod === 'CASHLESS' && customer.companyName && customer.edrpou) {
+        comments.push(`Увага, замовлення за безготівковим розрахунком\nНазва організації: ${customer.companyName}\nКод ЄДРПОУ: ${customer.edrpou}`);
+    }
+
+    const customerComment = comments.length > 0 ? comments.join('\n\n') : undefined;
 
     // Payment type (status is NOT sent — manager sets it manually in CRM)
     let paymentType = env.CRM_PAYMENT_TYPE_COD || 'cash-on-delivery';
@@ -136,6 +156,7 @@ export function buildCrmPayload(order: {
 export async function pushOrderToCrm(orderId: string): Promise<string | null> {
     const order = await prisma.order.findUnique({
         where: { id: orderId },
+        include: { quote: { include: { bundle: true } } },
     });
 
     if (!order) {
@@ -155,9 +176,11 @@ export async function pushOrderToCrm(orderId: string): Promise<string | null> {
         itemsSnapshot: order.itemsSnapshot as any[],
         paymentMethod: order.paymentMethod,
         paymentStatus: order.paymentStatus,
+        bundleTitle: order.quote?.bundle?.name,
     });
 
     try {
+        logger.info('CRM payload', { payload: JSON.stringify(payload, null, 2) });
         const rcResult = await createRetailCrmOrder(payload);
         const crmId = String(rcResult.id);
 
