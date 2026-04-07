@@ -115,16 +115,16 @@ function CartModal() {
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                 <div className="cart-item__controls" style={{ transform: 'scale(0.85)', transformOrigin: 'right center' }}>
                                                     <button 
-                                                        className="cart-item__btn"
-                                                        onClick={() => updateBundleMultiplier(bundle.bundleId, getBundleMultiplier(bundle.bundleId) - 1)}
+                                                        className="cart-item__qty-btn"
+                                                        onClick={() => updateBundleMultiplier(bundleId, getBundleMultiplier(bundleId) - 1)}
                                                         aria-label="Зменшити кількість наборів"
                                                     >
                                                         -
                                                     </button>
-                                                    <span className="cart-item__qty">{getBundleMultiplier(bundle.bundleId)}</span>
+                                                    <span className="cart-item__qty">{getBundleMultiplier(bundleId)}</span>
                                                     <button 
-                                                        className="cart-item__btn"
-                                                        onClick={() => updateBundleMultiplier(bundle.bundleId, getBundleMultiplier(bundle.bundleId) + 1)}
+                                                        className="cart-item__qty-btn"
+                                                        onClick={() => updateBundleMultiplier(bundleId, getBundleMultiplier(bundleId) + 1)}
                                                         aria-label="Збільшити кількість наборів"
                                                     >
                                                         +
