@@ -17,6 +17,7 @@ export interface QuoteItem {
     baseTotal: number;    // basePrice * qty
     isBundleItem?: boolean; // identifies bundle context match
     bundleId?: string;    // exact package ID this item belongs to
+    bundleTitle?: string; // human readable name of bundle for backend processing
     priceType?: string;   // specific CRM price type
 }
 
@@ -101,6 +102,7 @@ export async function buildQuote(input: QuoteRequest): Promise<QuoteResult> {
                 // Send this back so the frontend can match it in `CartContext`
                 isBundleItem: customItem.isBundleItem,
                 bundleId: customItem.bundleId,
+                bundleTitle: (customItem as any).bundleTitle,
                 priceType: activePriceType
             });
         }

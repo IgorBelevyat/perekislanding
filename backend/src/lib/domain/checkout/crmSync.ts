@@ -83,8 +83,24 @@ export function buildCrmPayload(order: {
     // Customer comments assembly
     const comments: string[] = [];
 
+    const bundlesInOrder = new Set<string>();
+
     if (order.bundleTitle) {
-        comments.push(`Набір: ${order.bundleTitle}`);
+        bundlesInOrder.add(order.bundleTitle); // Calculator flow
+    }
+
+    // Custom flow
+    if (order.itemsSnapshot && Array.isArray(order.itemsSnapshot)) {
+        for (const item of order.itemsSnapshot) {
+            if (item.bundleTitle) {
+                bundlesInOrder.add(item.bundleTitle);
+            }
+        }
+    }
+
+    if (bundlesInOrder.size > 0) {
+        const joinedBundles = Array.from(bundlesInOrder).join(', ');
+        comments.push(`Набір: ${joinedBundles}`);
     }
 
     if (order.paymentMethod === 'CASHLESS' && customer.companyName && customer.edrpou) {
