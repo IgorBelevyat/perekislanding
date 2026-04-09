@@ -102,7 +102,7 @@ export async function buildQuote(input: QuoteRequest): Promise<QuoteResult> {
                 // Send this back so the frontend can match it in `CartContext`
                 isBundleItem: customItem.isBundleItem,
                 bundleId: customItem.bundleId,
-                bundleTitle: (customItem as any).bundleTitle,
+                bundleTitle: customItem.bundleTitle,
                 priceType: activePriceType
             });
         }

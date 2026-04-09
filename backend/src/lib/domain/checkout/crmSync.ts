@@ -1,4 +1,5 @@
 import { createOrder as createRetailCrmOrder } from '../../integrations/retailcrm/client';
+import { getCrmGeoIds } from '../../integrations/novaposhta/crmGeo';
 import { prisma } from '../../db/prisma';
 import { logger } from '../../security/logger';
 import { env } from '../../config/env';
@@ -13,7 +14,7 @@ import crypto from 'crypto';
  *
  * Eliminates the duplication that previously existed in 2 places.
  */
-export function buildCrmPayload(order: {
+export async function buildCrmPayload(order: {
     id: string;
     customer: any;
     delivery: any;
@@ -49,34 +50,34 @@ export function buildCrmPayload(order: {
         };
     } else if (delivery.type === 'nova_poshta') {
         deliveryCode = env.CRM_DELIVERY_TYPE_NP || 'nova-poshta';
-        // Address block — countryIso + city + full text for CRM UI display
+
+        // Fetch CRM-specific cityId & regionId from state13 API
+        // (RetailCRM uses its own internal geo IDs, not NP refs)
+        let crmCityId: number | undefined;
+        let crmRegionId: number | undefined;
+
+        if (delivery.cityRef) {
+            const geoIds = await getCrmGeoIds(delivery.cityRef);
+            if (geoIds) {
+                crmCityId = geoIds.cityId;
+                crmRegionId = geoIds.regionId;
+            }
+        }
+
+        // Address block — city name + CRM geo IDs for directory matching
         addressData = {
-            countryIso: 'UA',
             city: delivery.cityName,
-            text: `${delivery.cityName}, ${delivery.warehouseName}`,
+            ...(crmCityId ? { cityId: crmCityId } : {}),
+            ...(crmRegionId ? { regionId: crmRegionId } : {}),
         };
-        // NP integration module data — must match newpost_new_0 format
-        // (discovered from existing CRM orders created via the CRM interface)
+
+        // NP delivery data — structure required by CRM integration
         deliveryData = {
+            tariff: '841339c7-591a-42e2-8233-7a0a00f0ed6f', // "Поштове відділення"
             pickuppointId: delivery.warehouseRef,
-            pickuppointName: delivery.warehouseName,
-            pickuppointAddress: delivery.warehouseName,
-            payerType: 'receiver',
-            extraData: {
-                technology: 'WarehouseWarehouse',
-                contrahent_sender: '',
-                paymentMethod: 'Cash',
-                cargo: 'Cargo',
-                saturdayDelivery: false,
-                afterpayPayer: 'receiver',
-                seatsAmount: 1,
-                ...(delivery.cityRef ? {
-                    cityRef: delivery.cityRef,
-                    cityRefLabel: delivery.cityName,
-                } : {}),
-            },
-            itemDeclaredValues: [],
-            packages: [],
+            serviceType: 'WarehouseWarehouse',
+            receiverCity: delivery.cityName,
+            receiverCityRef: delivery.cityRef,
         };
     }
 
@@ -185,7 +186,7 @@ export async function pushOrderToCrm(orderId: string): Promise<string | null> {
         return order.retailcrmOrderId;
     }
 
-    const payload = buildCrmPayload({
+    const payload = await buildCrmPayload({
         id: order.id,
         customer: order.customer,
         delivery: order.delivery,

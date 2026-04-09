@@ -286,6 +286,7 @@ export function CartProvider({ children }) {
                     isGift: !!i.isGift
                 };
                 if (i.bundleId) payloadItem.bundleId = i.bundleId;
+                if (i.bundleTitle) payloadItem.bundleTitle = i.bundleTitle;
                 return payloadItem;
             });
             const payload = { customItems };
