@@ -78,6 +78,15 @@ export async function buildCrmPayload(order: {
             serviceType: 'WarehouseWarehouse',
             receiverCity: delivery.cityName,
             receiverCityRef: delivery.cityRef,
+            extraData: {
+                technology: 'WarehouseWarehouse',
+                paymentMethod: 'Cash',
+                description: 'Товар',
+                seatsAmount: 1,
+                afterpayPayer: 'receiver',
+                cityRef: delivery.cityRef,
+                cityRefLabel: delivery.cityName,
+            },
         };
     }
 
