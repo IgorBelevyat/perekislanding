@@ -75,6 +75,8 @@ export async function buildCrmPayload(order: {
         deliveryData = {
             tariff: '841339c7-591a-42e2-8233-7a0a00f0ed6f', // "Поштове відділення"
             pickuppointId: delivery.warehouseRef,
+            pickuppointName: delivery.warehouseName,
+            pickuppointAddress: delivery.warehouseName,
             serviceType: 'WarehouseWarehouse',
             receiverCity: delivery.cityName,
             receiverCityRef: delivery.cityRef,
