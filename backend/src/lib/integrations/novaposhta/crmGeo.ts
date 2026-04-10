@@ -28,20 +28,29 @@ export async function getCrmGeoIds(cityRef: string): Promise<CrmGeoIds | null> {
             return null;
         }
 
-        const data = (await response.json()) as Record<string, unknown>;
+        const raw = await response.json();
 
-        if (data.cityId && data.regionId) {
-            logger.info('CRM geo IDs fetched', { cityRef, cityId: data.cityId, regionId: data.regionId });
-            return { cityId: Number(data.cityId), regionId: Number(data.regionId) };
+        // API returns nested array: [[{cityId, regionId, cityName, ...}, ...]]
+        // First entry is usually the Ukrainian locale — that's what we need.
+        let entry: Record<string, unknown> | null = null;
+
+        if (Array.isArray(raw) && Array.isArray(raw[0]) && raw[0].length > 0) {
+            // Nested array shape: [[{...}, {...}]]
+            entry = raw[0][0] as Record<string, unknown>;
+        } else if (Array.isArray(raw) && raw.length > 0 && !Array.isArray(raw[0])) {
+            // Flat array shape: [{...}, {...}]
+            entry = raw[0] as Record<string, unknown>;
+        } else if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+            // Flat object shape: {cityId, regionId}
+            entry = raw as Record<string, unknown>;
         }
 
-        // Try alternative response shapes
-        if (data.city_id && data.region_id) {
-            logger.info('CRM geo IDs fetched (alt)', { cityRef, cityId: data.city_id, regionId: data.region_id });
-            return { cityId: Number(data.city_id), regionId: Number(data.region_id) };
+        if (entry && entry.cityId && entry.regionId) {
+            logger.info('CRM geo IDs fetched', { cityRef, cityId: entry.cityId, regionId: entry.regionId });
+            return { cityId: Number(entry.cityId), regionId: Number(entry.regionId) };
         }
 
-        logger.warn('state13 geo API returned unexpected shape', { cityRef, data });
+        logger.warn('state13 geo API: could not extract cityId/regionId', { cityRef, raw });
         return null;
     } catch (err) {
         logger.error('state13 geo API call failed', { cityRef, error: (err as Error).message });
