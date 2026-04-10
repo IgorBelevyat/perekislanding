@@ -46,6 +46,7 @@ services:
       CRM_SITE_CODE: ${CRM_SITE_CODE:-landing-hlorka-ua}
       SITE_URL: ${SITE_URL:-http://localhost:3000}
       NP_API_KEY: ${NP_API_KEY}
+      CRM_NP_INTEGRATION_CODE: ${CRM_NP_INTEGRATION_CODE:-newpost_new_0}
       LIQPAY_PUBLIC_KEY: ${LIQPAY_PUBLIC_KEY}
       LIQPAY_PRIVATE_KEY: ${LIQPAY_PRIVATE_KEY}
       MOYSKLAD_TOKEN: ${MOYSKLAD_TOKEN}
