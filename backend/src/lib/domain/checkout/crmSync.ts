@@ -50,17 +50,11 @@ export async function buildCrmPayload(order: {
         };
     } else if (delivery.type === 'nova_poshta') {
         deliveryCode = env.CRM_DELIVERY_TYPE_NP || 'nova-poshta';
-
-        // TEMP: plain-text fallback while waiting for integrator instructions
-        // Managers will handle address manually in CRM
         addressData = {
             city: delivery.cityName,
-            text: `${delivery.cityName}, ${delivery.warehouseName}`,
+            // Passing warehouse as street allows the CRM to parse them cleanly into two separate inputs
+            street: delivery.warehouseName,
         };
-
-        // TODO: restore full NP integration after integrators confirm the format
-        // (geo IDs, tariff, extraData, pickuppointId etc.)
-        deliveryData = null;
     }
 
     // Customer comments assembly
