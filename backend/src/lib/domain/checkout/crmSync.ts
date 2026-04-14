@@ -51,45 +51,16 @@ export async function buildCrmPayload(order: {
     } else if (delivery.type === 'nova_poshta') {
         deliveryCode = env.CRM_DELIVERY_TYPE_NP || 'nova-poshta';
 
-        // Fetch CRM-specific cityId & regionId from state13 API
-        // (RetailCRM uses its own internal geo IDs, not NP refs)
-        let crmCityId: number | undefined;
-        let crmRegionId: number | undefined;
-
-        if (delivery.cityRef) {
-            const geoIds = await getCrmGeoIds(delivery.cityRef);
-            if (geoIds) {
-                crmCityId = geoIds.cityId;
-                crmRegionId = geoIds.regionId;
-            }
-        }
-
-        // Address block — city name + CRM geo IDs for directory matching
+        // TEMP: plain-text fallback while waiting for integrator instructions
+        // Managers will handle address manually in CRM
         addressData = {
             city: delivery.cityName,
-            ...(crmCityId ? { cityId: crmCityId } : {}),
-            ...(crmRegionId ? { regionId: crmRegionId } : {}),
+            text: `${delivery.cityName}, ${delivery.warehouseName}`,
         };
 
-        // NP delivery data — structure required by CRM integration
-        deliveryData = {
-            tariff: '841339c7-591a-42e2-8233-7a0a00f0ed6f', // "Поштове відділення"
-            pickuppointId: delivery.warehouseRef,
-            pickuppointName: delivery.warehouseName,
-            pickuppointAddress: delivery.warehouseName,
-            serviceType: 'WarehouseWarehouse',
-            receiverCity: delivery.cityName,
-            receiverCityRef: delivery.cityRef,
-            extraData: {
-                technology: 'WarehouseWarehouse',
-                paymentMethod: 'Cash',
-                description: 'Товар',
-                seatsAmount: 1,
-                afterpayPayer: 'receiver',
-                cityRef: delivery.cityRef,
-                cityRefLabel: delivery.cityName,
-            },
-        };
+        // TODO: restore full NP integration after integrators confirm the format
+        // (geo IDs, tariff, extraData, pickuppointId etc.)
+        deliveryData = null;
     }
 
     // Customer comments assembly
