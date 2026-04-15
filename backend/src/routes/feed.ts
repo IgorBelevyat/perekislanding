@@ -54,9 +54,6 @@ router.get('/', asyncHandler(async (req, res) => {
                 // Hardcoded description for peroxide
                 const description = 'Перекис водню 50% (пергідроль) для очищення води у басейнах. Висококонцентрований засіб для ефективної дезінфекції, запобігання «цвітінню» води. Швидко повертає прозорість каламутній воді, не залишає специфічного запаху хлору та не подразнює шкіру при дотриманні дозування. Гарантуємо якість та чистоту продукту.';
 
-                // TODO: replace with real GTIN (EAN-13) when received
-                const gtin = '0000000000000';
-
                 itemsXml = `
 <item>
 <g:id>${peroxideOfferId}</g:id>
@@ -68,7 +65,6 @@ router.get('/', asyncHandler(async (req, res) => {
 <g:price>${priceValue} ${currency}</g:price>
 <g:condition>new</g:condition>
 <g:brand><![CDATA[Інтер-Синтез]]></g:brand>
-<g:gtin>${gtin}</g:gtin>
 </item>`;
             }
 
