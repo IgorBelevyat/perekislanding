@@ -40,6 +40,7 @@ const envSchema = z.object({
     CRM_DELIVERY_TYPE_PICKUP: z.string().optional().default('pickup'),
     CRM_NP_INTEGRATION_CODE: z.string().optional(), // e.g. 'newpost_new_0'
     CRM_SITE_CODE: z.string().optional(),
+    CRM_ORDER_METHOD: z.string().optional().default('lending'), // Спосіб замовлення
 
     // Nova Poshta
     NP_API_KEY: z.string().optional(),

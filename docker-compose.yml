@@ -44,6 +44,7 @@ services:
       CRM_DELIVERY_TYPE_COURIER: ${CRM_DELIVERY_TYPE_COURIER:-courier}
       CRM_DELIVERY_TYPE_PICKUP: ${CRM_DELIVERY_TYPE_PICKUP:-pickup}
       CRM_SITE_CODE: ${CRM_SITE_CODE:-landing-hlorka-ua}
+      CRM_ORDER_METHOD: ${CRM_ORDER_METHOD:-lending}
       SITE_URL: ${SITE_URL:-http://localhost:3000}
       NP_API_KEY: ${NP_API_KEY}
       CRM_NP_INTEGRATION_CODE: ${CRM_NP_INTEGRATION_CODE:-newpost_new_0}

@@ -100,6 +100,7 @@ export async function buildCrmPayload(order: {
         order: {
             externalId: order.id,
             number: shortId,
+            ...(env.CRM_ORDER_METHOD ? { orderMethod: env.CRM_ORDER_METHOD } : {}),
             customerComment,
             firstName: customer.firstName,
             lastName: customer.lastName,

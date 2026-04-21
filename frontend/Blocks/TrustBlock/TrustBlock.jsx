@@ -5,6 +5,9 @@ import LegalModal from '../../Common components/LegalModal/LegalModal';
 import { publicOfferText, privacyPolicyText } from '../../Common components/LegalModal/LegalTexts';
 import { trackContactClick } from '../../utils/analytics';
 import logoImg from '../../Src/assets/images/logo.png';
+import liqpayLogo from '../../Src/assets/images/logo_liqpay_for black@2x.png';
+import visaLogo from '../../Src/assets/images/Visa_Inc._logo_(2021–present).png';
+import mastercardLogo from '../../Src/assets/images/Mastercard-Logo.png';
 import './TrustBlock.css';
 
 const whyUsItems = [
@@ -126,7 +129,14 @@ function TrustBlock() {
                             </div>
                         </div>
 
-                        <p className="footer__copy">© 2026 Hlorka.ua — не тільки дезінфекція</p>
+                        <div className="footer__bottom">
+                            <p className="footer__copy">© 2026 Hlorka.ua — не тільки дезінфекція</p>
+                            <div className="footer__payment-methods">
+                                <img src={visaLogo} alt="Visa" className="footer__payment-img footer__payment-img--visa" />
+                                <img src={mastercardLogo} alt="Mastercard" className="footer__payment-img footer__payment-img--mc" />
+                                <img src={liqpayLogo} alt="LiqPay" className="footer__payment-img footer__payment-img--liqpay" />
+                            </div>
+                        </div>
                     </div>
 
                     {/* Right: CTA */}

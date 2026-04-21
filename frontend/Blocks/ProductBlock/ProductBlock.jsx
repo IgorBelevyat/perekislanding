@@ -98,7 +98,7 @@ function ProductBlock() {
                         <li style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '8px' }}><IconCheckSmall /> <span>Концентрація 50% — максимальна ефективність</span></li>
                         <li style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '8px' }}><IconCheckSmall /> <span>Зручна каністра з клапаном</span></li>
                         <li style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '8px' }}><IconCheckSmall /> <span>Вітчизняне виробництво</span></li>
-                        <li style={{ display: 'flex', alignItems: 'flex-start' }}><IconCheckSmall /> <span>Термін придатності — 12 місяців</span></li>
+                        <li style={{ display: 'flex', alignItems: 'flex-start' }}><IconCheckSmall /> <span>Термін придатності — 36 місяців</span></li>
                     </ul>
 
                     <div className="product__quantity">

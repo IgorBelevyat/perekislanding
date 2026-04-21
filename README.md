@@ -143,6 +143,7 @@ sequenceDiagram
   order: {
     externalId: string,            // UUID замовлення
     number: string,                // 8-значний номер
+    orderMethod?: string,          // Спосіб замовлення (CRM_ORDER_METHOD, default: "lending")
     customerComment?: string,      // Коментарі (набір, безготівковий)
     firstName: string,
     lastName: string,
@@ -868,6 +869,7 @@ Backend: `wget --spider http://127.0.0.1:4000/api/health` кожні 30 сек.
 | `RETAILCRM_URL` | URL | Base URL CRM (`https://hlorka.retailcrm.ua`) |
 | `RETAILCRM_API_KEY` | string | API-ключ CRM |
 | `CRM_SITE_CODE` | string | Код сайту в CRM |
+| `CRM_ORDER_METHOD` | string | Спосіб замовлення в CRM (default: `lending`) |
 | `SITE_URL` | URL | Зовнішній URL сайту (`https://market.hlorka.ua`) |
 | **Nova Poshta** | | |
 | `NP_API_KEY` | string | API-ключ НП |

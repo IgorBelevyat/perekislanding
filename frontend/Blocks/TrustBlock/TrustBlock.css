@@ -180,11 +180,66 @@
     font-weight: 600; /* Match contact links weight */
 }
 
+.footer__bottom {
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+@media (min-width: 640px) {
+    .footer__bottom {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
 .footer__copy {
     font-size: 13px;
     color: rgba(255, 255, 255, 0.35);
-    padding-top: 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer__payment-methods {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    opacity: 1;
+    background: transparent;
+}
+
+.footer__payment-img {
+    width: auto;
+    object-fit: contain;
+}
+
+.footer__payment-img--visa {
+    filter: brightness(0) invert(1);
+    height: 14px;
+}
+
+.footer__payment-img--mc {
+    height: 24px;
+}
+
+.footer__payment-img--liqpay {
+    height: 18px;
+    transform: translateY(0px); /* 2px higher than before */
+}
+
+@media (min-width: 640px) {
+    .footer__payment-img--visa {
+        height: 18px;
+    }
+    .footer__payment-img--mc {
+        height: 32px;
+    }
+    .footer__payment-img--liqpay {
+        height: 24px;
+        transform: translateY(1px); /* 2px higher than the +3px before */
+    }
 }
 
 /* ── Right: CTA ──── */
