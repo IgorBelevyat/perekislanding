@@ -33,22 +33,70 @@ async function main() {
         logger.info(`Health check: http://localhost:${env.PORT}/api/health`);
     });
 
-    // ─── CRM Outbox Worker ─────────────────────────────────────
-    // Retry failed CRM pushes every 3 minutes
-    const CRM_OUTBOX_INTERVAL_MS = 3 * 60 * 1000;
-    const outboxTimer = setInterval(() => {
-        retryFailedCrmOrders().catch(err => {
-            logger.error('CRM outbox worker uncaught error', { error: (err as Error).message });
-        });
+    // ─── CRM Outbox Worker with Backoff ───────────────────────
+    const CRM_OUTBOX_INTERVAL_MS = 3 * 60 * 1000;       // 3 minutes normal
+    const CRM_OUTBOX_BACKOFF_MS = 15 * 60 * 1000;       // 15 minutes after failures
+    const CRM_OUTBOX_MAX_CONSECUTIVE_FAILS = 3;
+
+    let crmConsecutiveFails = 0;
+    let crmBackoffUntil = 0;
+
+    const outboxTimer = setInterval(async () => {
+        // Skip if in backoff period
+        if (Date.now() < crmBackoffUntil) {
+            return;
+        }
+
+        try {
+            await retryFailedCrmOrders();
+            // Reset on success
+            if (crmConsecutiveFails > 0) {
+                logger.info('CRM outbox worker recovered after failures', { previousFails: crmConsecutiveFails });
+            }
+            crmConsecutiveFails = 0;
+        } catch (err) {
+            crmConsecutiveFails++;
+            logger.error('CRM outbox worker error', {
+                error: (err as Error).message,
+                consecutiveFails: crmConsecutiveFails,
+            });
+
+            if (crmConsecutiveFails >= CRM_OUTBOX_MAX_CONSECUTIVE_FAILS) {
+                crmBackoffUntil = Date.now() + CRM_OUTBOX_BACKOFF_MS;
+                logger.warn(`CRM outbox worker backing off for ${CRM_OUTBOX_BACKOFF_MS / 60000} min after ${crmConsecutiveFails} consecutive failures`);
+                crmConsecutiveFails = 0; // Reset counter for next cycle
+            }
+        }
     }, CRM_OUTBOX_INTERVAL_MS);
-    logger.info(`CRM outbox worker started (every ${CRM_OUTBOX_INTERVAL_MS / 1000}s)`);
+    logger.info(`CRM outbox worker started (every ${CRM_OUTBOX_INTERVAL_MS / 1000}s, backoff after ${CRM_OUTBOX_MAX_CONSECUTIVE_FAILS} fails)`);
+
+    // ─── Event Loop Lag Monitor ───────────────────────────────
+    const EL_CHECK_INTERVAL_MS = 5000;  // Check every 5 seconds
+    const EL_WARN_THRESHOLD_MS = 100;   // Warn if lag > 100ms
+    const EL_ERROR_THRESHOLD_MS = 500;  // Error if lag > 500ms
+
+    let elLastCheck = Date.now();
+    const elMonitor = setInterval(() => {
+        const now = Date.now();
+        const expected = elLastCheck + EL_CHECK_INTERVAL_MS;
+        const lag = now - expected;
+        elLastCheck = now;
+
+        if (lag > EL_ERROR_THRESHOLD_MS) {
+            logger.error('Event loop severely blocked', { lagMs: lag });
+        } else if (lag > EL_WARN_THRESHOLD_MS) {
+            logger.warn('Event loop lag detected', { lagMs: lag });
+        }
+    }, EL_CHECK_INTERVAL_MS);
+    elMonitor.unref(); // Don't prevent graceful shutdown
 
     // ─── Graceful shutdown ─────────────────────────────────────
     const shutdown = async (signal: string) => {
         logger.info(`${signal} received — shutting down gracefully`);
 
-        // Stop the outbox worker
+        // Stop workers and monitors
         clearInterval(outboxTimer);
+        clearInterval(elMonitor);
 
         server.close(async () => {
             try {
