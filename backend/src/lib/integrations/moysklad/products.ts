@@ -6,6 +6,10 @@ import { logger } from '../../security/logger';
 import { fetchProduct, fetchProductImages, fetchProductStock, extractId } from './client';
 import type { MsProductData } from './types';
 
+// ─── In-flight deduplication ──────────────────────────────────
+// Prevents parallel duplicate requests to MoySklad for the same product.
+const inFlight = new Map<string, Promise<MsProductData | null>>();
+
 // ─── Mapping Tables ───────────────────────────────────────────
 // Built once at startup from env vars.
 
@@ -96,12 +100,19 @@ export async function getMoySkladProduct(moyskladId: string): Promise<MsProductD
         return null;
     }
 
-    try {
-        return await getOrSet<MsProductData | null>(
-            CacheKeys.msProduct(moyskladId),
-            REDIS_TTL.MS_PRODUCT,
-            async () => {
-                const product = await fetchProduct(moyskladId);
+    // Deduplicate: if a request for this product is already in-flight, reuse it
+    const existing = inFlight.get(moyskladId);
+    if (existing) {
+        return existing;
+    }
+
+    const promise = (async () => {
+        try {
+            return await getOrSet<MsProductData | null>(
+                CacheKeys.msProduct(moyskladId),
+                REDIS_TTL.MS_PRODUCT,
+                async () => {
+                    const product = await fetchProduct(moyskladId);
 
                 // ── Name: "Наименование укр." attribute, fallback product.name ──
                 let name = product.name;
@@ -204,12 +215,20 @@ export async function getMoySkladProduct(moyskladId: string): Promise<MsProductD
             },
             REDIS_TTL.MS_PRODUCT_STALE,
         );
-    } catch (err) {
-        logger.error('Failed to get MoySklad product', {
-            moyskladId,
-            error: (err as Error).message,
-        });
-        return null;
+        } catch (err) {
+            logger.error('Failed to get MoySklad product', {
+                moyskladId,
+                error: (err as Error).message,
+            });
+            return null;
+        }
+    })();
+
+    inFlight.set(moyskladId, promise);
+    try {
+        return await promise;
+    } finally {
+        inFlight.delete(moyskladId);
     }
 }
 
