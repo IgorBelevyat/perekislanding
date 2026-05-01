@@ -63,8 +63,10 @@ export async function fetchProductImages(moyskladId: string): Promise<MsImage[]>
  * Fetch stock report for a specific product by its MoySklad UUID.
  */
 export async function fetchProductStock(moyskladId: string): Promise<number> {
-    const assortmentHref = `${BASE_URL}/entity/product/${moyskladId}`;
-    const data = await msApiFetch<any>(`/report/stock/all?filter=assortment=${encodeURIComponent(assortmentHref)}`);
+    const productHref = `${BASE_URL}/entity/product/${moyskladId}`;
+    const data = await msApiFetch<any>('/report/stock/all', {
+        filter: `product=${productHref}`,
+    });
     const rows = data.rows ?? [];
     if (rows.length > 0) {
         return rows[0].stock ?? 0;

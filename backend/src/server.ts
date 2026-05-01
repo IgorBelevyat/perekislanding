@@ -70,7 +70,7 @@ async function main() {
     }, CRM_OUTBOX_INTERVAL_MS);
     logger.info(`CRM outbox worker started (every ${CRM_OUTBOX_INTERVAL_MS / 1000}s, backoff after ${CRM_OUTBOX_MAX_CONSECUTIVE_FAILS} fails)`);
 
-    // ─── Event Loop Lag Monitor ───────────────────────────────
+    //  Event Loop Lag Monitor
     const EL_CHECK_INTERVAL_MS = 5000;  // Check every 5 seconds
     const EL_WARN_THRESHOLD_MS = 100;   // Warn if lag > 100ms
     const EL_ERROR_THRESHOLD_MS = 500;  // Error if lag > 500ms
@@ -90,7 +90,7 @@ async function main() {
     }, EL_CHECK_INTERVAL_MS);
     elMonitor.unref(); // Don't prevent graceful shutdown
 
-    // ─── Graceful shutdown ─────────────────────────────────────
+    // Graceful shutdown
     const shutdown = async (signal: string) => {
         logger.info(`${signal} received — shutting down gracefully`);
 
