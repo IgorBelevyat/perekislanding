@@ -5,7 +5,7 @@ import './StickyCartBar.css';
 
 function StickyCartBar() {
     const [visible, setVisible] = useState(false);
-    const [price, setPrice] = useState(340); // default fallback
+    const [price, setPrice] = useState(599); // default fallback
     const [name, setName] = useState('Перекис водню 50%, 5 кг'); // default fallback
     const { items, getTotal, setIsCartOpen } = useCart();
 
