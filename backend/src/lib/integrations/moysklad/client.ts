@@ -4,6 +4,31 @@ import type { MsProduct, MsImage } from './types';
 
 const BASE_URL = 'https://api.moysklad.ru/api/remap/1.2';
 
+// ─── Global concurrency limiter ─────────────────────────────────
+// MoySklad limits concurrent requests; we enforce max 2 in-flight.
+const MAX_CONCURRENT = 2;
+let running = 0;
+const queue: Array<() => void> = [];
+
+function acquireSlot(): Promise<void> {
+    if (running < MAX_CONCURRENT) {
+        running++;
+        return Promise.resolve();
+    }
+    return new Promise<void>((resolve) => queue.push(() => {
+        running++;
+        resolve();
+    }));
+}
+
+function releaseSlot(): void {
+    running--;
+    if (queue.length > 0) {
+        const next = queue.shift()!;
+        next();
+    }
+}
+
 /**
  * Low-level authenticated GET request to MoySklad API.
  * Uses Bearer token authentication.
@@ -22,16 +47,24 @@ async function msApiFetch<T = unknown>(
         Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
     }
 
-    const response = await fetch(url.toString(), {
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Accept-Encoding': 'gzip',
-            'Content-Type': 'application/json',
-        },
-        signal: AbortSignal.timeout(15000),
-    });
+    await acquireSlot();
+    let response: Response;
+    try {
+        response = await fetch(url.toString(), {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept-Encoding': 'gzip',
+                'Content-Type': 'application/json',
+            },
+            signal: AbortSignal.timeout(15000),
+        });
+    } catch (err) {
+        releaseSlot();
+        throw err;
+    }
 
     if (!response.ok) {
+        releaseSlot();
         const text = await response.text();
         logger.error('MoySklad API error', {
             path,
@@ -41,6 +74,7 @@ async function msApiFetch<T = unknown>(
         throw new Error(`MoySklad API ${response.status}: ${text.slice(0, 200)}`);
     }
 
+    releaseSlot();
     return response.json() as Promise<T>;
 }
 

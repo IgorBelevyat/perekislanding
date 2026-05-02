@@ -15,7 +15,7 @@ const IconCheckSmall = () => (
 );
 
 const DEFAULT_PRODUCT = {
-    id: 'peroxide-5l',
+    id: '337674164',
     name: 'Перекис водню 50%, 5 л',
     price: 599, // Fallback price
     inStock: true,

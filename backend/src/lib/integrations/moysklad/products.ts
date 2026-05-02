@@ -240,13 +240,13 @@ export async function getMoySkladProducts(
 ): Promise<Map<string, MsProductData>> {
     const results = new Map<string, MsProductData>();
 
-    const promises = moyskladIds.map(async (id) => {
+    // Fetch sequentially to respect MoySklad rate limits
+    for (const id of moyskladIds) {
         const data = await getMoySkladProduct(id);
         if (data) {
             results.set(id, data);
         }
-    });
+    }
 
-    await Promise.all(promises);
     return results;
 }
