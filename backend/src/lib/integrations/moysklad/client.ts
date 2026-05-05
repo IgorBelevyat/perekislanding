@@ -56,7 +56,7 @@ async function msApiFetch<T = unknown>(
                 'Accept-Encoding': 'gzip',
                 'Content-Type': 'application/json',
             },
-            signal: AbortSignal.timeout(15000),
+            signal: AbortSignal.timeout(5000),
         });
     } catch (err) {
         releaseSlot();

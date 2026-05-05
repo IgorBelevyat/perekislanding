@@ -74,6 +74,9 @@ export async function getOrSet<T>(
             if (stale) {
                 try {
                     console.warn(`[Cache] Serving stale data for ${key} (fetcher failed)`);
+                    // Re-cache stale data as primary for 60s to avoid
+                    // repeated 15s timeouts on every subsequent request
+                    await r.setex(key, 60, stale);
                     return JSON.parse(stale) as T;
                 } catch {
                     // corrupted stale, propagate original error
