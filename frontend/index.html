@@ -40,6 +40,17 @@
   <!-- End Google Tag Manager (noscript) -->
   <div id="root"></div>
   <script type="module" src="/Src/main.jsx"></script>
+
+  <!-- Binotel Call Tracking -->
+  <script>
+    (function(d, w, s) {
+      var widgetHash = '%VITE_BINOTEL_WIDGET_HASH%';
+      if (!widgetHash || widgetHash.indexOf('VITE_') !== -1) return;
+      var ctw = d.createElement(s); ctw.type = 'text/javascript'; ctw.async = true;
+      ctw.src = '//widgets.binotel.com/calltracking/widgets/' + widgetHash + '.js';
+      var sn = d.getElementsByTagName(s)[0]; sn.parentNode.insertBefore(ctw, sn);
+    })(document, window, 'script');
+  </script>
 </body>
 
 </html>

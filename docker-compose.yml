@@ -8,6 +8,7 @@ services:
       dockerfile: Dockerfile
       args:
         VITE_GTM_ID: ${VITE_GTM_ID}
+        VITE_BINOTEL_WIDGET_HASH: ${VITE_BINOTEL_WIDGET_HASH}
     ports:
       - "127.0.0.1:3000:80"
     depends_on:
