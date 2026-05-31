@@ -18,7 +18,8 @@ export async function getWarehouses(cityRef: string, query?: string): Promise<NP
                 CityRef: cityRef,
                 Limit: 500,
             });
-            return result.data;
+            // Filter out postomats (parcel lockers) as we don't ship to them
+            return result.data.filter(w => !w.Description.toLowerCase().includes('поштомат'));
         },
     );
 
