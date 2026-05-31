@@ -91,7 +91,7 @@ function BundlesBlock() {
                         <div className="bundle-card__footer">
                             <div className="bundle-card__total">
                                 <span className="bundle-card__total-label">Разом:</span>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <div className="bundle-card__total-right">
                                     {bundle.benefit > 0 && (
                                         <span className="bundle-card__benefit-inline">
                                             Вигода: {bundle.benefit} ₴

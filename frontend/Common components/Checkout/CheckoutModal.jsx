@@ -57,6 +57,8 @@ function CheckoutModal() {
     const [showCourierDropdown, setShowCourierDropdown] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
+    const [errors, setErrors] = useState([]);
+    const [shakeFields, setShakeFields] = useState([]);
     const [safetyAgreed, setSafetyAgreed] = useState(false);
 
     // Update payment method based on delivery type
@@ -143,6 +145,9 @@ function CheckoutModal() {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors.includes(name)) {
+            setErrors(prev => prev.filter(err => err !== name));
+        }
     };
 
     const handleCitySelect = (city) => {
@@ -157,6 +162,9 @@ function CheckoutModal() {
         }));
         setCities([]);
         setShowCityDropdown(false);
+        if (errors.includes('cityQuery')) {
+            setErrors(prev => prev.filter(err => err !== 'cityQuery'));
+        }
     };
 
     const handleWarehouseSelect = (wh) => {
@@ -168,24 +176,51 @@ function CheckoutModal() {
         }));
         setWarehouses([]);
         setShowWarehouseDropdown(false);
+        if (errors.includes('warehouseQuery')) {
+            setErrors(prev => prev.filter(err => err !== 'warehouseQuery'));
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
 
+        const newErrors = [];
+
+        if (!formData.firstName.trim()) newErrors.push('firstName');
+        if (!formData.lastName.trim()) newErrors.push('lastName');
+
         const cleanPhone = formData.phone.replace(/[\s\-\(\)]/g, '');
         const phoneRegex = /^(\+?380|0)\d{9}$/;
-        if (!phoneRegex.test(cleanPhone)) {
-            setError('Введіть коректний номер телефону (+380XXXXXXXXX або 0XXXXXXXXX)');
-            return;
+        if (!phoneRegex.test(cleanPhone)) newErrors.push('phone');
+
+        if (delivery.type === 'nova_poshta') {
+            if (!delivery.cityRef) newErrors.push('cityQuery');
+            if (!delivery.warehouseRef) newErrors.push('warehouseQuery');
+        } else if (delivery.type === 'courier') {
+            if (!delivery.courierStreet.trim()) newErrors.push('courierStreet');
+            if (!delivery.courierHouse.trim()) newErrors.push('courierHouse');
         }
-        if (delivery.type === 'nova_poshta' && (!delivery.cityRef || !delivery.warehouseRef)) {
-            setError('Оберіть місто та відділення Нової Пошти зі списку');
-            return;
+
+        if (formData.paymentMethod === 'cashless') {
+            if (!formData.companyName.trim()) newErrors.push('companyName');
+            if (!formData.edrpou.trim()) newErrors.push('edrpou');
         }
-        if (delivery.type === 'courier' && (!delivery.courierCity || !delivery.courierStreet || !delivery.courierHouse)) {
-            setError('Будь ласка, заповніть всі обов\'язкові поля адреси для кур\'єра');
+
+        if (!safetyAgreed) newErrors.push('safetyAgreed');
+
+        if (newErrors.length > 0) {
+            setErrors(newErrors);
+            setShakeFields(newErrors);
+            setTimeout(() => setShakeFields([]), 500);
+
+            setTimeout(() => {
+                const firstErrorElement = document.querySelector('.checkout-form__input--error, .checkout-form__checkbox-custom--error');
+                if (firstErrorElement) {
+                    firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 50);
+
             return;
         }
 
@@ -197,25 +232,25 @@ function CheckoutModal() {
                     const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
                     return v.toString(16);
                 });
-            
-            const deliveryPayload = delivery.type === 'pickup' 
+
+            const deliveryPayload = delivery.type === 'pickup'
                 ? { type: 'pickup' }
                 : delivery.type === 'courier'
-                ? {
-                    type: 'courier',
-                    city: delivery.courierCity,
-                    street: delivery.courierStreet,
-                    house: delivery.courierHouse,
-                    entrance: delivery.courierEntrance || undefined,
-                    apartment: delivery.courierApartment || undefined
-                }
-                : {
-                    type: 'nova_poshta',
-                    cityRef: delivery.cityRef,
-                    cityName: delivery.cityName,
-                    warehouseRef: delivery.warehouseRef,
-                    warehouseName: delivery.warehouseName
-                };
+                    ? {
+                        type: 'courier',
+                        city: delivery.courierCity,
+                        street: delivery.courierStreet,
+                        house: delivery.courierHouse,
+                        entrance: delivery.courierEntrance || undefined,
+                        apartment: delivery.courierApartment || undefined
+                    }
+                    : {
+                        type: 'nova_poshta',
+                        cityRef: delivery.cityRef,
+                        cityName: delivery.cityName,
+                        warehouseRef: delivery.warehouseRef,
+                        warehouseName: delivery.warehouseName
+                    };
 
             // Get or create persistent customer ID for CRM deduplication
             let customerExternalId = localStorage.getItem('hlorka_customer_id');
@@ -289,40 +324,51 @@ function CheckoutModal() {
                         </div>
                     </div>
 
-                    <form className="checkout-modal__form" onSubmit={handleSubmit}>
+                    <form id="checkout-form" className="checkout-modal__form" onSubmit={handleSubmit} noValidate>
                         {error && <div className="checkout-modal__error">{error}</div>}
 
                         <div className="checkout-form__section">
                             <h4>Контактні дані</h4>
                             <div className="checkout-form__row">
-                                <input
-                                    className="checkout-form__input"
-                                    type="text"
-                                    name="firstName"
-                                    placeholder="Ім'я"
-                                    required
-                                    value={formData.firstName}
-                                    onChange={handleInputChange}
-                                />
-                                <input
-                                    className="checkout-form__input"
-                                    type="text"
-                                    name="lastName"
-                                    placeholder="Прізвище"
-                                    required
-                                    value={formData.lastName}
-                                    onChange={handleInputChange}
-                                />
+                                <div className="checkout-form__floating-group">
+                                    <input
+                                        className={`checkout-form__input ${errors.includes('firstName') ? 'checkout-form__input--error' : ''} ${shakeFields.includes('firstName') ? 'shake' : ''}`}
+                                        type="text"
+                                        name="firstName"
+                                        placeholder=" "
+                                        value={formData.firstName}
+                                        onChange={handleInputChange}
+                                    />
+                                    <label className="checkout-form__floating-label">Ім'я</label>
+                                </div>
+                                <div className="checkout-form__floating-group">
+                                    <input
+                                        className={`checkout-form__input ${errors.includes('lastName') ? 'checkout-form__input--error' : ''} ${shakeFields.includes('lastName') ? 'shake' : ''}`}
+                                        type="text"
+                                        name="lastName"
+                                        placeholder=" "
+                                        value={formData.lastName}
+                                        onChange={handleInputChange}
+                                    />
+                                    <label className="checkout-form__floating-label">Прізвище</label>
+                                </div>
                             </div>
-                            <input
-                                className="checkout-form__input"
-                                type="tel"
-                                name="phone"
-                                placeholder="+380991234567"
-                                required
-                                value={formData.phone}
-                                onChange={handleInputChange}
-                            />
+                            <div className="checkout-form__field">
+                                <div className="checkout-form__floating-group">
+                                    <input
+                                        className={`checkout-form__input ${errors.includes('phone') ? 'checkout-form__input--error' : ''} ${shakeFields.includes('phone') ? 'shake' : ''}`}
+                                        type="tel"
+                                        name="phone"
+                                        placeholder="+380 XX XXX XX XX"
+                                        value={formData.phone}
+                                        onChange={handleInputChange}
+                                    />
+                                    <label className="checkout-form__floating-label">Телефон</label>
+                                </div>
+                                {errors.includes('phone') && (
+                                    <span className="checkout-form__error-text">Введіть номер у форматі +380XXXXXXXXX або 0XXXXXXXXX</span>
+                                )}
+                            </div>
                         </div>
 
                         <div className="checkout-form__section">
@@ -345,18 +391,22 @@ function CheckoutModal() {
                             {delivery.type === 'nova_poshta' && (
                                 <div className="checkout-form__delivery-fields">
                                     <div className="checkout-form__field">
-                                        <input
-                                            className="checkout-form__input"
-                                            type="text"
-                                            placeholder="Введіть місто..."
-                                            value={delivery.cityQuery}
-                                            onChange={e => {
-                                                setDelivery(d => ({ ...d, cityQuery: e.target.value, cityRef: e.target.value === d.cityName ? d.cityRef : '' }));
-                                                setShowCityDropdown(true);
-                                            }}
-                                            onFocus={() => setShowCityDropdown(true)}
-                                            onBlur={() => setTimeout(() => setShowCityDropdown(false), 200)}
-                                        />
+                                        <div className="checkout-form__floating-group">
+                                            <input
+                                                className={`checkout-form__input ${errors.includes('cityQuery') ? 'checkout-form__input--error' : ''} ${shakeFields.includes('cityQuery') ? 'shake' : ''}`}
+                                                type="text"
+                                                placeholder=" "
+                                                value={delivery.cityQuery}
+                                                onChange={e => {
+                                                    setDelivery(d => ({ ...d, cityQuery: e.target.value, cityRef: e.target.value === d.cityName ? d.cityRef : '' }));
+                                                    setShowCityDropdown(true);
+                                                    if (errors.includes('cityQuery')) setErrors(prev => prev.filter(err => err !== 'cityQuery'));
+                                                }}
+                                                onFocus={() => setShowCityDropdown(true)}
+                                                onBlur={() => setTimeout(() => setShowCityDropdown(false), 200)}
+                                            />
+                                            <label className="checkout-form__floating-label">Місто доставки</label>
+                                        </div>
                                         {isSearchingCities && showCityDropdown && <span className="checkout-form__loader">Шукаємо...</span>}
                                         {showCityDropdown && cities.length > 0 && (
                                             <ul className="checkout-form__dropdown">
@@ -370,19 +420,23 @@ function CheckoutModal() {
                                     </div>
 
                                     <div className="checkout-form__field">
-                                        <input
-                                            className="checkout-form__input"
-                                            type="text"
-                                            placeholder="Відділення або поштомат..."
-                                            value={delivery.warehouseQuery}
-                                            onChange={e => {
-                                                setDelivery(d => ({ ...d, warehouseQuery: e.target.value, warehouseRef: e.target.value === d.warehouseName ? d.warehouseRef : '' }));
-                                                setShowWarehouseDropdown(true);
-                                            }}
-                                            onFocus={() => setShowWarehouseDropdown(true)}
-                                            onBlur={() => setTimeout(() => setShowWarehouseDropdown(false), 200)}
-                                            disabled={!delivery.cityRef}
-                                        />
+                                        <div className="checkout-form__floating-group">
+                                            <input
+                                                className={`checkout-form__input ${errors.includes('warehouseQuery') ? 'checkout-form__input--error' : ''} ${shakeFields.includes('warehouseQuery') ? 'shake' : ''}`}
+                                                type="text"
+                                                placeholder=" "
+                                                value={delivery.warehouseQuery}
+                                                onChange={e => {
+                                                    setDelivery(d => ({ ...d, warehouseQuery: e.target.value, warehouseRef: e.target.value === d.warehouseName ? d.warehouseRef : '' }));
+                                                    setShowWarehouseDropdown(true);
+                                                    if (errors.includes('warehouseQuery')) setErrors(prev => prev.filter(err => err !== 'warehouseQuery'));
+                                                }}
+                                                onFocus={() => setShowWarehouseDropdown(true)}
+                                                onBlur={() => setTimeout(() => setShowWarehouseDropdown(false), 200)}
+                                                disabled={!delivery.cityRef}
+                                            />
+                                            <label className="checkout-form__floating-label">Відділення</label>
+                                        </div>
                                         {isSearchingWarehouses && showWarehouseDropdown && <span className="checkout-form__loader">Шукаємо...</span>}
                                         {showWarehouseDropdown && warehouses.length > 0 && (
                                             <ul className="checkout-form__dropdown">
@@ -401,12 +455,12 @@ function CheckoutModal() {
                                 <div className="checkout-form__delivery-fields">
                                     <div className="checkout-form__row">
                                         <div className="checkout-form__field" style={{ position: 'relative', width: '100%' }}>
-                                            <div 
-                                                className="checkout-form__input" 
-                                                style={{ 
-                                                    display: 'flex', 
-                                                    alignItems: 'center', 
-                                                    justifyContent: 'space-between', 
+                                            <div
+                                                className="checkout-form__input"
+                                                style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'space-between',
                                                     cursor: 'pointer',
                                                     background: '#fff',
                                                     userSelect: 'none'
@@ -414,29 +468,29 @@ function CheckoutModal() {
                                                 onClick={() => setShowCourierDropdown(!showCourierDropdown)}
                                             >
                                                 <span>{delivery.courierCity}</span>
-                                                <svg 
-                                                    width="12" 
-                                                    height="8" 
-                                                    viewBox="0 0 12 8" 
-                                                    fill="none" 
+                                                <svg
+                                                    width="12"
+                                                    height="8"
+                                                    viewBox="0 0 12 8"
+                                                    fill="none"
                                                     style={{
                                                         transform: showCourierDropdown ? 'rotate(180deg)' : 'none',
                                                         transition: 'transform 0.2s ease'
                                                     }}
                                                 >
-                                                    <path d="M1 1.5L6 6.5L11 1.5" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                    <path d="M1 1.5L6 6.5L11 1.5" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                                                 </svg>
                                             </div>
                                             {showCourierDropdown && (
                                                 <>
-                                                    <div 
-                                                        style={{ position: 'fixed', inset: 0, zIndex: 9 }} 
-                                                        onClick={() => setShowCourierDropdown(false)} 
+                                                    <div
+                                                        style={{ position: 'fixed', inset: 0, zIndex: 9 }}
+                                                        onClick={() => setShowCourierDropdown(false)}
                                                     />
                                                     <ul className="checkout-form__dropdown" style={{ zIndex: 10, marginTop: '4px' }}>
                                                         {COURIER_CITIES.map(city => (
-                                                            <li 
-                                                                key={city} 
+                                                            <li
+                                                                key={city}
                                                                 onClick={() => {
                                                                     setDelivery(d => ({ ...d, courierCity: city }));
                                                                     setShowCourierDropdown(false);
@@ -456,12 +510,24 @@ function CheckoutModal() {
                                         </div>
                                     </div>
                                     <div className="checkout-form__row">
-                                        <input className="checkout-form__input" type="text" placeholder="Вулиця" value={delivery.courierStreet} onChange={e => setDelivery(d => ({ ...d, courierStreet: e.target.value }))} required />
+                                        <div className="checkout-form__floating-group">
+                                            <input className={`checkout-form__input ${errors.includes('courierStreet') ? 'checkout-form__input--error' : ''} ${shakeFields.includes('courierStreet') ? 'shake' : ''}`} type="text" placeholder=" " value={delivery.courierStreet} onChange={e => { setDelivery(d => ({ ...d, courierStreet: e.target.value })); if (errors.includes('courierStreet')) setErrors(prev => prev.filter(err => err !== 'courierStreet')); }} />
+                                            <label className="checkout-form__floating-label">Вулиця</label>
+                                        </div>
                                     </div>
                                     <div className="checkout-form__row">
-                                        <input className="checkout-form__input checkout-form__input--group" type="text" placeholder="Будинок" value={delivery.courierHouse} onChange={e => setDelivery(d => ({ ...d, courierHouse: e.target.value }))} required />
-                                        <input className="checkout-form__input checkout-form__input--group" type="text" placeholder="Під'їзд" value={delivery.courierEntrance} onChange={e => setDelivery(d => ({ ...d, courierEntrance: e.target.value }))} />
-                                        <input className="checkout-form__input checkout-form__input--group" type="text" placeholder="Квартира" value={delivery.courierApartment} onChange={e => setDelivery(d => ({ ...d, courierApartment: e.target.value }))} />
+                                        <div className="checkout-form__floating-group">
+                                            <input className={`checkout-form__input checkout-form__input--group ${errors.includes('courierHouse') ? 'checkout-form__input--error' : ''} ${shakeFields.includes('courierHouse') ? 'shake' : ''}`} type="text" placeholder=" " value={delivery.courierHouse} onChange={e => { setDelivery(d => ({ ...d, courierHouse: e.target.value })); if (errors.includes('courierHouse')) setErrors(prev => prev.filter(err => err !== 'courierHouse')); }} />
+                                            <label className="checkout-form__floating-label">Будинок</label>
+                                        </div>
+                                        <div className="checkout-form__floating-group">
+                                            <input className="checkout-form__input checkout-form__input--group" type="text" placeholder=" " value={delivery.courierEntrance} onChange={e => setDelivery(d => ({ ...d, courierEntrance: e.target.value }))} />
+                                            <label className="checkout-form__floating-label">Під'їзд</label>
+                                        </div>
+                                        <div className="checkout-form__floating-group">
+                                            <input className="checkout-form__input checkout-form__input--group" type="text" placeholder=" " value={delivery.courierApartment} onChange={e => setDelivery(d => ({ ...d, courierApartment: e.target.value }))} />
+                                            <label className="checkout-form__floating-label">Квартира</label>
+                                        </div>
                                     </div>
                                 </div>
                             )}
@@ -512,26 +578,30 @@ function CheckoutModal() {
                             {formData.paymentMethod === 'cashless' && (
                                 <div style={{ marginTop: '1rem' }}>
                                     <div className="checkout-form__row">
-                                        <input
-                                            className="checkout-form__input"
-                                            type="text"
-                                            name="companyName"
-                                            placeholder="Назва організації *"
-                                            value={formData.companyName}
-                                            onChange={handleInputChange}
-                                            required={formData.paymentMethod === 'cashless'}
-                                        />
+                                        <div className="checkout-form__floating-group">
+                                            <input
+                                                className={`checkout-form__input ${errors.includes('companyName') ? 'checkout-form__input--error' : ''} ${shakeFields.includes('companyName') ? 'shake' : ''}`}
+                                                type="text"
+                                                name="companyName"
+                                                placeholder=" "
+                                                value={formData.companyName}
+                                                onChange={handleInputChange}
+                                            />
+                                            <label className="checkout-form__floating-label">Назва організації *</label>
+                                        </div>
                                     </div>
                                     <div className="checkout-form__row">
-                                        <input
-                                            className="checkout-form__input"
-                                            type="text"
-                                            name="edrpou"
-                                            placeholder="Код ЄДРПОУ *"
-                                            value={formData.edrpou}
-                                            onChange={handleInputChange}
-                                            required={formData.paymentMethod === 'cashless'}
-                                        />
+                                        <div className="checkout-form__floating-group">
+                                            <input
+                                                className={`checkout-form__input ${errors.includes('edrpou') ? 'checkout-form__input--error' : ''} ${shakeFields.includes('edrpou') ? 'shake' : ''}`}
+                                                type="text"
+                                                name="edrpou"
+                                                placeholder=" "
+                                                value={formData.edrpou}
+                                                onChange={handleInputChange}
+                                            />
+                                            <label className="checkout-form__floating-label">Код ЄДРПОУ *</label>
+                                        </div>
                                     </div>
                                     <div className="checkout-form__delivery-info" style={{ marginTop: '0.75rem' }}>
                                         <p>Для безготівкої оплати менеджер звяжеться з вами за номером телефону.</p>
@@ -547,32 +617,39 @@ function CheckoutModal() {
                             {delivery.type === 'pickup' && <p className="checkout-form__hint">Для самовивозу можлива лише онлайн або безготівкова оплата.</p>}
                         </div>
 
-                        <div className="checkout-form__agreement">
-                            <label className="checkout-form__checkbox">
-                                <input 
-                                    type="checkbox" 
-                                    checked={safetyAgreed} 
-                                    onChange={(e) => setSafetyAgreed(e.target.checked)} 
-                                    required 
-                                />
-                                <span className="checkout-form__checkbox-custom">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
-                                        <polyline points="20 6 9 17 4 12" />
-                                    </svg>
-                                </span>
-                                <span className="checkout-form__checkbox-text">
-                                    Я ознайомився(-лась) з <a href="#safety-rules" onClick={(e) => { 
-                                        window.dispatchEvent(new Event('open-safety-rules'));
-                                        resetCheckout();
-                                    }}>правилами безпечного використання</a>
-                                </span>
-                            </label>
-                        </div>
-
-                        <Button type="submit" variant="cta" size="lg" fullWidth disabled={isSubmitting || !safetyAgreed}>
-                            {isSubmitting ? 'Обробка...' : 'Підтвердити замовлення'}
-                        </Button>
                     </form>
+                </div>
+
+                <div className="checkout-modal__footer">
+                    <div className="checkout-form__agreement">
+                        <label className="checkout-form__checkbox">
+                            <input
+                                type="checkbox"
+                                checked={safetyAgreed}
+                                onChange={(e) => {
+                                    setSafetyAgreed(e.target.checked);
+                                    if (errors.includes('safetyAgreed')) {
+                                        setErrors(prev => prev.filter(err => err !== 'safetyAgreed'));
+                                    }
+                                }}
+                            />
+                            <span className={`checkout-form__checkbox-custom ${errors.includes('safetyAgreed') ? 'checkout-form__checkbox-custom--error' : ''} ${shakeFields.includes('safetyAgreed') ? 'shake' : ''}`}>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                            </span>
+                            <span className="checkout-form__checkbox-text">
+                                Я ознайомився(-лась) з <a href="#safety-rules" onClick={(e) => {
+                                    window.dispatchEvent(new Event('open-safety-rules'));
+                                    resetCheckout();
+                                }}>правилами безпечного використання</a>
+                            </span>
+                        </label>
+                    </div>
+
+                    <Button form="checkout-form" type="submit" variant="cta" fullWidth disabled={isSubmitting} className="checkout-modal__submit-btn">
+                        {isSubmitting ? 'Обробка...' : 'Підтвердити замовлення'}
+                    </Button>
                 </div>
             </div>
         </div>

@@ -5,7 +5,7 @@ import './StickyCartBar.css';
 
 function StickyCartBar() {
     const [visible, setVisible] = useState(false);
-    const [price, setPrice] = useState(599); // default fallback
+    const [price, setPrice] = useState(649); // default fallback
     const [name, setName] = useState('Перекис водню 50%, 5 кг'); // default fallback
     const { items, getTotal, setIsCartOpen } = useCart();
 
@@ -22,7 +22,12 @@ function StickyCartBar() {
         }).catch(err => console.error('Failed to fetch price for sticky bar:', err));
 
         const handleScroll = () => {
-            setVisible(window.scrollY > 600);
+            const bundlesEl = document.getElementById('bundles');
+            if (bundlesEl) {
+                setVisible(bundlesEl.getBoundingClientRect().bottom < 100);
+            } else {
+                setVisible(window.scrollY > 1200);
+            }
         };
         window.addEventListener('scroll', handleScroll, { passive: true });
         return () => {
@@ -37,16 +42,16 @@ function StickyCartBar() {
         return (
             <div className="sticky-cart" onClick={() => setIsCartOpen(true)}>
                 <div className="sticky-cart__inner">
-                    <div className="sticky-cart__info">
-                        <span className="sticky-cart__product">У кошику {items.length} товар(ів)</span>
+                    <span className="sticky-cart__product">У кошику {items.length} товар(ів)</span>
+                    <div className="sticky-cart__action-row">
                         <span className="sticky-cart__price">{getTotal()} грн</span>
+                        <button
+                            className="sticky-cart__btn"
+                            onClick={(e) => { e.stopPropagation(); setIsCartOpen(true); }}
+                        >
+                            Оформити
+                        </button>
                     </div>
-                    <button
-                        className="sticky-cart__btn"
-                        onClick={(e) => { e.stopPropagation(); setIsCartOpen(true); }}
-                    >
-                        Оформити
-                    </button>
                 </div>
             </div>
         );
@@ -55,16 +60,16 @@ function StickyCartBar() {
     return (
         <div className="sticky-cart">
             <div className="sticky-cart__inner">
-                <div className="sticky-cart__info">
-                    <span className="sticky-cart__product">{name}</span>
+                <span className="sticky-cart__product">{name}</span>
+                <div className="sticky-cart__action-row">
                     <span className="sticky-cart__price">від {price} грн</span>
+                    <button
+                        className="sticky-cart__btn"
+                        onClick={() => document.getElementById('product')?.scrollIntoView({ behavior: 'smooth' })}
+                    >
+                        До товару
+                    </button>
                 </div>
-                <button
-                    className="sticky-cart__btn"
-                    onClick={() => document.getElementById('product')?.scrollIntoView({ behavior: 'smooth' })}
-                >
-                    Обрати
-                </button>
             </div>
         </div>
     );

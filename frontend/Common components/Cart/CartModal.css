@@ -124,7 +124,7 @@
     background: #FF7A00;
     color: #fff;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     font-family: 'Montserrat', sans-serif;
     font-size: 16px;
     font-weight: 700;
@@ -150,7 +150,7 @@
     background: transparent;
     color: #0096B8;
     border: 1px solid #0096B8;
-    border-radius: 8px;
+    border-radius: 12px;
     font-family: 'Montserrat', sans-serif;
     font-size: 14px;
     font-weight: 600;
@@ -175,7 +175,7 @@
     padding: 12px;
     background: transparent;
     border: 1px solid #0096B8;
-    border-radius: 8px;
+    border-radius: 12px;
     font-family: 'Montserrat', sans-serif;
     font-size: 14px;
     font-weight: 600;
@@ -434,7 +434,7 @@
     padding: 12px;
     background: transparent;
     border: 1px solid #0096B8;
-    border-radius: 8px;
+    border-radius: 12px;
     color: #0096B8;
     font-family: 'Montserrat', sans-serif;
     font-size: 14px;
@@ -446,4 +446,68 @@
 .cart-history__reorder:hover {
     background: #F4FAFC;
     color: #0096B8;
+}
+
+@media (max-width: 340px) {
+    .cart-modal__header {
+        padding: 16px;
+    }
+    .cart-modal__title {
+        font-size: 1rem;
+    }
+    .cart-modal__items {
+        padding: 12px 16px;
+        gap: 8px;
+    }
+    .cart-bundle__header {
+        padding: 8px 10px;
+    }
+    .cart-bundle__title {
+        font-size: 13px;
+    }
+    .cart-bundle__tag {
+        font-size: 9px;
+        padding: 2px 6px;
+    }
+    .cart-item {
+        padding: 10px;
+        gap: 8px;
+    }
+    .cart-item__name {
+        font-size: 12px;
+    }
+    .cart-item__price {
+        font-size: 11px;
+    }
+    .cart-item__qty-btn {
+        width: 24px;
+        height: 24px;
+        font-size: 14px;
+    }
+    .cart-item__qty {
+        font-size: 13px;
+        min-width: 20px;
+    }
+    .cart-modal__total {
+        padding: 12px 16px;
+        font-size: 14px;
+    }
+    .cart-modal__total strong {
+        font-size: 18px;
+    }
+    .cart-modal__benefit {
+        padding: 0 16px 12px;
+        font-size: 14px;
+    }
+    .cart-modal__checkout {
+        margin: 0 16px 10px;
+        padding: 12px;
+        font-size: 14px;
+    }
+    .cart-modal__continue {
+        margin: 0 16px 12px;
+        padding: 10px;
+        width: calc(100% - 32px);
+        font-size: 13px;
+    }
 }

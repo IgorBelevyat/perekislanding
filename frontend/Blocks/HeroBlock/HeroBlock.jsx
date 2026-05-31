@@ -1,6 +1,6 @@
 import SectionWrapper from '../../Common components/SectionWrapper/SectionWrapper';
 import Button from '../../Common components/Button/Button';
-import heroPool from '../../Src/assets/images/hero-pool.png';
+import heroPool from '../../Src/assets/images/hero-pool.jpg';
 import './HeroBlock.css';
 
 function HeroBlock() {
@@ -9,7 +9,7 @@ function HeroBlock() {
             icon: (
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" /></svg>
             ),
-            text: 'Без запаху хлору — комфорт для всієї сім\'ї',
+            text: 'Без запаху хлору — комфорт для всіх',
         },
         {
             icon: (
@@ -65,7 +65,6 @@ function HeroBlock() {
                             Купити
                         </Button>
                     </div>
-                    <p className="hero__cta-note"><span className="hero__cta-note-star">*</span>без дзвінків і консультацій</p>
                 </div>
 
                 <div className="hero__image-wrapper">

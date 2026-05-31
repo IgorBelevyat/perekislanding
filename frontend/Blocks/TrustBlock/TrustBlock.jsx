@@ -16,7 +16,7 @@ const whyUsItems = [
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="16" height="20" x="4" y="2" rx="2" ry="2" /><path d="M9 22v-4h6v4" /><path d="M8 6h.01" /><path d="M16 6h.01" /><path d="M8 10h.01" /><path d="M16 10h.01" /><path d="M8 14h.01" /><path d="M16 14h.01" /></svg>
         ),
         title: 'Вітчизняний виробник',
-        text: 'Власне виробництво, гарантія якості',
+        text: 'Гарантія якості',
     },
     {
         icon: (
@@ -74,7 +74,7 @@ function TrustBlock() {
     return (
         <>
             {/* ── "Чому саме ми?" block ──── */}
-            <SectionWrapper bg="light" id="trust">
+            <SectionWrapper bg="white" id="trust">
                 <h2 className="why-us__title">Нас обирають тому що:</h2>
                 <div className="why-us__grid">
                     {whyUsItems.map((item, i) => (
@@ -122,7 +122,7 @@ function TrustBlock() {
                             <div className="footer__col">
                                 <h4 className="footer__col-title">Важливі посилання</h4>
                                 <ul className="footer__list">
-                                <li><a href="https://hlorka.ua" className="footer__link footer__link--ups" target="_blank" rel="noopener noreferrer">Посилання на сайт</a></li>
+                                    <li><a href="https://hlorka.ua" className="footer__link footer__link--ups" target="_blank" rel="noopener noreferrer">Посилання на сайт</a></li>
                                     <li><a href="#" onClick={(e) => openLegalModal("Публічна оферта", publicOfferText, e)} className="footer__link footer__link--ups">Публічна оферта</a></li>
                                     <li><a href="#" onClick={(e) => openLegalModal("Політика конфіденційності", privacyPolicyText, e)} className="footer__link footer__link--ups">Політика конфіденційності</a></li>
                                 </ul>
@@ -156,8 +156,8 @@ function TrustBlock() {
                     </div>
                 </div>
             </footer>
-            
-            <LegalModal 
+
+            <LegalModal
                 isOpen={legalModalConfig.isOpen}
                 title={legalModalConfig.title}
                 content={legalModalConfig.content}

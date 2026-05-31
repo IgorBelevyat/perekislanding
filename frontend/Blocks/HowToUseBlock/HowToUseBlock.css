@@ -34,21 +34,59 @@
 }
 
 .howto-step {
-    text-align: center;
     position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    text-align: left;
+    gap: 16px;
+}
+
+@media (min-width: 769px) {
+    .howto-step {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0;
+    }
+}
+
+.howto-step__content {
+    display: flex;
+    flex-direction: column;
+    padding-top: 8px; /* Slight padding to align with the start of the tall icon */
+    padding-bottom: 8px;
 }
 
 .howto-step__icon {
-    margin-bottom: 16px;
-    display: inline-flex;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 56px;
+    background: #E0F4F9;
+    border-radius: 28px;
+}
+
+@media (min-width: 769px) {
+    .howto-step__icon {
+        height: 56px;
+        margin-bottom: 16px;
+    }
 }
 
 .howto-step__num {
     font-size: 14px;
     font-weight: 800;
     color: #0096B8;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     letter-spacing: 1px;
+}
+
+@media (min-width: 769px) {
+    .howto-step__num {
+        margin-bottom: 8px;
+    }
 }
 
 .howto-step__title {

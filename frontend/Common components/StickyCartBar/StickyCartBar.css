@@ -32,25 +32,26 @@
     max-width: 1200px;
     margin: 0 auto;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-}
-
-.sticky-cart__info {
-    display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 8px;
 }
 
 .sticky-cart__product {
     font-size: 13px;
     font-weight: 600;
     color: #003B5C;
+    width: 100%;
+}
+
+.sticky-cart__action-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
 }
 
 .sticky-cart__price {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 800;
     color: #003B5C;
 }
@@ -60,7 +61,7 @@
     color: #fff;
     border: none;
     border-radius: 8px;
-    padding: 12px 32px;
+    padding: 8px 24px;
     font-family: 'Montserrat', sans-serif;
     font-size: 15px;
     font-weight: 700;

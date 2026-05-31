@@ -61,7 +61,7 @@ function FaqBlock() {
     };
 
     return (
-        <SectionWrapper bg="light" id="faq">
+        <SectionWrapper bg="white" id="faq">
             <h2 className="faq__title">Часті запитання</h2>
             <div className="faq__list">
                 {faqData.map((item, i) => (

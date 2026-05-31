@@ -88,7 +88,7 @@ function SafetyBlock() {
     };
 
     return (
-        <SectionWrapper bg="white" id="safety">
+        <SectionWrapper bg="light" id="safety">
             <h2 className="safety__title">Правила безпечного використання</h2>
             <p className="safety__subtitle">
                 Коротко про безпечне використання та перевірку води перед купанням

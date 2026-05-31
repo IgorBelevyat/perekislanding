@@ -17,7 +17,7 @@ const IconCheckSmall = () => (
 const DEFAULT_PRODUCT = {
     id: '337674164',
     name: 'Перекис водню 50%, 5 л',
-    price: 599, // Fallback price
+    price: 649, // Fallback price
     inStock: true,
     availability: '',
 };
@@ -101,14 +101,22 @@ function ProductBlock() {
                         <li style={{ display: 'flex', alignItems: 'flex-start' }}><IconCheckSmall /> <span>Термін придатності — 36 місяців</span></li>
                     </ul>
 
-                    <div className="product__quantity">
-                        <button className="product__qty-btn" onClick={() => setQuantity(q => Math.max(1, q - 1))} disabled={isLoading}>−</button>
-                        <span className="product__qty-value">{quantity}</span>
-                        <button className="product__qty-btn" onClick={() => setQuantity(q => q + 1)} disabled={isLoading}>+</button>
+                    <div className="product__action-row">
+                        <div className="product__quantity">
+                            <button className="product__qty-btn" onClick={() => setQuantity(q => Math.max(1, q - 1))} disabled={isLoading}>−</button>
+                            <span className="product__qty-value">{quantity}</span>
+                            <button className="product__qty-btn" onClick={() => setQuantity(q => q + 1)} disabled={isLoading}>+</button>
+                        </div>
+
+                        <div className="product__total">
+                            <span className="product__total-label">Разом:</span>
+                            <strong className="product__total-value">{product.price * quantity} грн</strong>
+                        </div>
                     </div>
 
-                    <div className="product__total">
-                        Разом: <strong>{product.price * quantity} грн</strong>
+                    <div className={`product__bundles-hint ${quantity > 1 ? 'is-visible' : ''}`} onClick={() => document.getElementById('bundles')?.scrollIntoView({ behavior: 'smooth' })}>
+                        <span>Можливо, переглянете набори?</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
                     </div>
 
                     <Button variant="cta" size="lg" fullWidth onClick={handleAdd} disabled={isLoading}>

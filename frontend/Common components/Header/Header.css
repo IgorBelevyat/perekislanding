@@ -158,7 +158,27 @@
 }
 
 /* ── Mobile ──────────────────── */
+.header__overlay {
+    display: none;
+}
+
 @media (max-width: 768px) {
+    .header__overlay {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 35, 54, 0.4);
+        z-index: 99;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+
+    .header__overlay--open {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
     .header {
         position: fixed;
         width: 100%;

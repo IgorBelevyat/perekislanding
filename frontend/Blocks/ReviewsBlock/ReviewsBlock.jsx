@@ -26,7 +26,7 @@ const reviews = [
         name: 'Аріна А.',
         city: 'Вінниця',
         text: 'Дуже швидко відправили. Товар гарно запакований, дуже гарна ціна і якість на вищому рівні!!!',
-        rating: 5,
+        rating: 4,
     },
     {
         name: 'Наталя П.',
@@ -61,7 +61,7 @@ function ReviewsBlock() {
     };
 
     return (
-        <SectionWrapper bg="white" id="reviews">
+        <SectionWrapper bg="light" id="reviews">
             <div className="reviews">
                 <h2 className="reviews__title">Відгуки наших клієнтів</h2>
 

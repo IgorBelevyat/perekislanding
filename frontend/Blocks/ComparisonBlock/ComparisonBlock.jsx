@@ -27,7 +27,7 @@ const data = [
 
 function ComparisonBlock() {
     return (
-        <SectionWrapper bg="white" id="comparison">
+        <SectionWrapper bg="light" id="comparison">
             <h2 className="comparison__title">Чому власники басейнів обирають перекис замість хлору</h2>
 
             {/* Desktop Table */}

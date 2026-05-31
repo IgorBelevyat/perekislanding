@@ -46,9 +46,9 @@
     left: 12px;
     background: #FF7A00;
     color: #fff;
-    font-size: 12px;
+    font-size: clamp(10px, 3vw, 12px);
     font-weight: 700;
-    padding: 6px 14px;
+    padding: clamp(4px, 1.5vw, 6px) clamp(8px, 3vw, 14px);
     border-radius: 8px;
     text-transform: uppercase;
     letter-spacing: 0.3px;
@@ -76,15 +76,17 @@
 
 .product__price-row {
     display: flex;
-    align-items: baseline;
+    align-items: center; /* changed from baseline to center so badge looks good if wrapped */
+    flex-wrap: wrap;
     gap: 12px;
     margin-bottom: 20px;
 }
 
 .product__price {
-    font-size: 2rem;
+    font-size: clamp(1.75rem, 8vw, 2rem);
     font-weight: 800;
     color: #003B5C;
+    white-space: nowrap;
 }
 
 .product__stock-badge {
@@ -136,24 +138,32 @@
     color: #374151;
 }
 
-/* Quantity */
+/* Quantity & Total Row */
+.product__action-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(8px, 4vw, 16px);
+    margin-bottom: 24px;
+}
+
 .product__quantity {
     display: flex;
     align-items: center;
     gap: 0;
-    margin-bottom: 16px;
     border: 1px solid #E5E7EB;
     border-radius: 8px;
     overflow: hidden;
     width: fit-content;
+    flex-shrink: 0;
 }
 
 .product__qty-btn {
-    width: 44px;
-    height: 44px;
+    width: clamp(36px, 10vw, 44px);
+    height: clamp(36px, 10vw, 44px);
     border: none;
     background: #F4FAFC;
-    font-size: 20px;
+    font-size: clamp(16px, 5vw, 20px);
     font-weight: 600;
     color: #003B5C;
     cursor: pointer;
@@ -165,22 +175,72 @@
 }
 
 .product__qty-value {
-    width: 56px;
+    width: clamp(40px, 12vw, 56px);
     text-align: center;
-    font-size: 18px;
+    font-size: clamp(15px, 4.5vw, 18px);
     font-weight: 700;
     color: #003B5C;
 }
 
 .product__total {
-    font-size: 1rem;
-    color: #6B7280;
-    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 }
 
-.product__total strong {
+.product__total-label {
+    font-size: 11px;
+    color: #4B5563;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.product__total-value {
     color: #003B5C;
-    font-size: 1.25rem;
+    font-size: clamp(1.125rem, 6vw, 1.5rem);
+    font-weight: 800;
+    white-space: nowrap;
+    line-height: 1;
+}
+
+/* Bundles Hint Banner */
+.product__bundles-hint {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: #F4FAFC;
+    color: #0096B8;
+    border: 1px dashed #BEE5F0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    overflow: hidden;
+    box-sizing: border-box;
+    
+    /* Hidden State */
+    max-height: 0;
+    opacity: 0;
+    margin-bottom: 0;
+    padding: 0 16px;
+    transform: translateY(-8px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-color: transparent;
+}
+
+.product__bundles-hint.is-visible {
+    max-height: 60px;
+    opacity: 1;
+    margin-bottom: 24px;
+    padding: 12px 16px;
+    transform: translateY(0);
+    border-color: #BEE5F0;
+}
+
+.product__bundles-hint:hover {
+    background: #E0F4F9;
+    color: #007B99;
 }
 
 .product__trust {

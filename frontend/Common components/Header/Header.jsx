@@ -43,10 +43,12 @@ function Header() {
     const totalItems = items.length;
 
     return (
-        <header
-            className={`header ${!isScrolled && !menuOpen ? 'header--transparent' : ''}`}
-            style={{ '--fade-progress': menuOpen ? 1 : fadeProgress }}
-        >
+        <>
+            <div className={`header__overlay ${menuOpen ? 'header__overlay--open' : ''}`} onClick={() => setMenuOpen(false)}></div>
+            <header
+                className={`header ${!isScrolled && !menuOpen ? 'header--transparent' : ''}`}
+                style={{ '--fade-progress': menuOpen ? 1 : fadeProgress }}
+            >
             <div className="header__inner">
                 <a href="#" className="header__logo" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                     <img src={logoImg} alt="Hlorka Logo" className="header__logo-img" />
@@ -91,6 +93,7 @@ function Header() {
                 </div>
             </div>
         </header>
+        </>
     );
 }
 

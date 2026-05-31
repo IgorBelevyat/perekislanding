@@ -90,7 +90,7 @@ function CalculatorBlock() {
     }, [inputMode, poolShape]);
 
     return (
-        <SectionWrapper bg="light" id="calculator">
+        <SectionWrapper bg="white" id="calculator">
             <div className="calculator">
                 <h2 className="calculator__title">Розрахуйте точне дозування <br /> саме під ваш басейн</h2>
                 <p className="calculator__subtitle">

@@ -1,7 +1,6 @@
 import { CartProvider } from '../Stores/CartContext';
 import Header from '../Common components/Header/Header';
 import HeroBlock from '../Blocks/HeroBlock/HeroBlock';
-import ProblemBlock from '../Blocks/ProblemBlock/ProblemBlock';
 import CalculatorBlock from '../Blocks/CalculatorBlock/CalculatorBlock';
 import ComparisonBlock from '../Blocks/ComparisonBlock/ComparisonBlock';
 import HowToUseBlock from '../Blocks/HowToUseBlock/HowToUseBlock';
@@ -23,13 +22,12 @@ function App() {
             <Header />
             <main>
                 <HeroBlock />
-                <ProblemBlock />
-                <CalculatorBlock />
-                <ComparisonBlock />
-                <HowToUseBlock />
                 <ProductBlock />
                 <BundlesBlock />
+                <CalculatorBlock />
                 <ReviewsBlock />
+                <HowToUseBlock />
+                <ComparisonBlock />
                 <FaqBlock />
                 <SafetyBlock />
             </main>
