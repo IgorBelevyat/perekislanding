@@ -251,3 +251,35 @@
         gap: 16px;
     }
 }
+
+@media (max-width: 300px) {
+    .safety__title {
+        font-size: 1.15rem;
+    }
+    .safety__subtitle {
+        font-size: 13px;
+    }
+    .safety-item__header {
+        padding: 14px;
+        font-size: 13px;
+        min-height: 60px;
+    }
+    .safety-item__intro {
+        font-size: 12px;
+        padding: 10px 12px;
+    }
+    .safety-item__section-title {
+        font-size: 13px;
+    }
+    .safety-item__section p {
+        font-size: 12px;
+    }
+    .safety-item__list li {
+        font-size: 12px;
+    }
+    .safety-item__section--warning,
+    .safety-item__section--danger,
+    .safety-item__section--note {
+        padding: 12px;
+    }
+}

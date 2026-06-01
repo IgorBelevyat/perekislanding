@@ -125,3 +125,14 @@
     color: #1F2937;
     font-weight: 500;
 }
+
+@media (max-width: 300px) {
+    .comparison__title {
+        font-size: 1.15rem;
+    }
+    .comparison__benefits-list li {
+        font-size: 13px;
+        padding: 12px;
+        gap: 8px;
+    }
+}

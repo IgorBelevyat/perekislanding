@@ -259,6 +259,28 @@
     }
 }
 
+@media (max-width: 300px) {
+    .hero__title {
+        font-size: 1.125rem; /* ~18px */
+        line-height: 1.2;
+    }
+    .hero__title-sub {
+        font-size: 0.75rem; /* 12px */
+    }
+    .hero__subtitle {
+        display: none;
+    }
+    .hero__benefit {
+        font-size: 11px;
+    }
+    .hero__benefit-icon {
+        font-size: 16px;
+    }
+    .hero__cta-note {
+        font-size: 11px;
+    }
+}
+
 /* ── Image (right) ──── */
 .hero__image-wrapper {
     position: absolute;

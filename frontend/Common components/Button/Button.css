@@ -43,6 +43,21 @@
     width: 100%;
 }
 
+@media (max-width: 300px) {
+    .btn--sm {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+    .btn--md {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+    .btn--lg {
+        padding: 12px 24px;
+        font-size: 15px;
+    }
+}
+
 /* ── Primary (бірюзовий) ──── */
 .btn--primary {
     background-color: #0096B8;

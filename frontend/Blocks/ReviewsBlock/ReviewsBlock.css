@@ -167,3 +167,31 @@
     font-size: 13px;
     color: #6B7280;
 }
+
+@media (max-width: 300px) {
+    .reviews__title {
+        font-size: 1.15rem;
+    }
+    .review-card {
+        flex: 0 0 260px;
+        padding: 16px;
+        gap: 12px;
+    }
+    .review-card__star {
+        font-size: 14px;
+    }
+    .review-card__text {
+        font-size: 12px;
+    }
+    .review-card__name {
+        font-size: 12px;
+    }
+    .review-card__city {
+        font-size: 11px;
+    }
+    .review-card__avatar {
+        width: 30px;
+        height: 30px;
+        font-size: 13px;
+    }
+}

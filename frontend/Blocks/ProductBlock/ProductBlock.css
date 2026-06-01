@@ -246,6 +246,45 @@
 .product__trust {
     margin-top: 16px;
     font-size: 13px;
-    color: #6B7280;
     text-align: center;
+}
+
+@media (max-width: 300px) {
+    .product__name {
+        font-size: 1rem;
+        margin-bottom: 12px;
+    }
+    .product__price-row {
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+    .product__price {
+        font-size: 1.5rem;
+    }
+    .product__stock-badge {
+        font-size: 11px;
+        padding: 3px 8px;
+    }
+    .product__features {
+        font-size: 12px;
+        margin-bottom: 16px;
+    }
+    .product__action-row {
+        gap: 8px;
+    }
+    .product__qty-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+    .product__qty-value {
+        width: 36px;
+        font-size: 14px;
+    }
+    .product__total-label {
+        font-size: 10px;
+    }
+    .product__total-value {
+        font-size: 1.125rem;
+    }
 }

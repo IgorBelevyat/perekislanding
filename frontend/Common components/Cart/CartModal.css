@@ -511,3 +511,99 @@
         font-size: 13px;
     }
 }
+
+@media (max-width: 300px) {
+    .cart-modal__header {
+        padding: 12px;
+    }
+    .cart-modal__title {
+        font-size: 0.95rem;
+    }
+    .cart-modal__items {
+        padding: 10px 12px;
+    }
+    .cart-bundle__header {
+        padding: 6px 8px;
+    }
+    .cart-bundle__title {
+        font-size: 12px;
+    }
+    .cart-bundle__tag {
+        font-size: 8px;
+        padding: 2px 4px;
+    }
+    .cart-item {
+        padding: 8px;
+    }
+    .cart-item__name {
+        font-size: 11px;
+    }
+    .cart-item__price {
+        font-size: 10px;
+    }
+    .cart-item__qty-btn {
+        width: 20px;
+        height: 20px;
+        font-size: 12px;
+    }
+    .cart-item__qty {
+        font-size: 12px;
+        min-width: 16px;
+    }
+    .cart-modal__total {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+    .cart-modal__total strong {
+        font-size: 16px;
+    }
+    .cart-modal__benefit {
+        padding: 0 12px 10px;
+        font-size: 12px;
+    }
+    .cart-modal__checkout {
+        margin: 0 12px 8px;
+        padding: 10px;
+        font-size: 13px;
+    }
+    .cart-modal__continue {
+        margin: 0 12px 10px;
+        padding: 8px;
+        width: calc(100% - 24px);
+        font-size: 12px;
+    }
+    .cart-modal__history-toggle {
+        padding: 10px 12px;
+    }
+    .cart-modal__history-btn {
+        padding: 8px;
+        font-size: 12px;
+    }
+    .cart-history {
+        padding: 0 12px 12px;
+    }
+    .cart-history__order {
+        padding: 10px;
+    }
+    .cart-history__date {
+        font-size: 11px;
+    }
+    .cart-history__item {
+        font-size: 11px;
+    }
+    .cart-history__bundle-title {
+        font-size: 11px;
+    }
+    .cart-history__total {
+        font-size: 12px;
+    }
+    .cart-history__benefit-tag {
+        font-size: 9px;
+        padding: 3px 6px;
+    }
+    .cart-history__reorder {
+        margin-top: 8px;
+        padding: 8px;
+        font-size: 12px;
+    }
+}

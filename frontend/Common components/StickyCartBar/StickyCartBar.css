@@ -73,3 +73,19 @@
 .sticky-cart__btn:hover {
     background: #E56D00;
 }
+
+@media (max-width: 300px) {
+    .sticky-cart {
+        padding: 8px 12px;
+    }
+    .sticky-cart__product {
+        font-size: 11px;
+    }
+    .sticky-cart__price {
+        font-size: 15px;
+    }
+    .sticky-cart__btn {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+}

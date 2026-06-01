@@ -256,3 +256,24 @@
         /* override the global background-color */
     }
 }
+
+@media (max-width: 300px) {
+    .header__inner {
+        height: 56px;
+        padding: 0 10px;
+    }
+    .header__logo-img {
+        max-width: 140px;
+        height: 32px;
+    }
+    .header__actions {
+        gap: 12px;
+    }
+    .header__cart-badge {
+        width: 16px;
+        height: 16px;
+        font-size: 10px;
+        top: -2px;
+        right: -4px;
+    }
+}

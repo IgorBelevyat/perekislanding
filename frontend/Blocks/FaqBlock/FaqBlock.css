@@ -84,3 +84,17 @@
     line-height: 1.7;
     color: #6B7280;
 }
+
+@media (max-width: 300px) {
+    .faq__title {
+        font-size: 1.15rem;
+    }
+    .faq-item__question {
+        font-size: 13px;
+        padding: 14px 16px;
+    }
+    .faq-item__answer {
+        font-size: 12px;
+        padding: 0 16px 14px;
+    }
+}

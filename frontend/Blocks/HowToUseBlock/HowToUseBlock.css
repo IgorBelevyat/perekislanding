@@ -117,3 +117,29 @@
         opacity: 0.5;
     }
 }
+
+@media (max-width: 300px) {
+    .howto__title {
+        font-size: 1.15rem;
+    }
+    .howto__subtitle {
+        font-size: 13px;
+        margin-bottom: 32px;
+    }
+    .howto-step {
+        gap: 12px;
+    }
+    .howto-step__icon {
+        width: 48px;
+        border-radius: 24px;
+    }
+    .howto-step__num {
+        font-size: 12px;
+    }
+    .howto-step__title {
+        font-size: 15px;
+    }
+    .howto-step__text {
+        font-size: 13px;
+    }
+}

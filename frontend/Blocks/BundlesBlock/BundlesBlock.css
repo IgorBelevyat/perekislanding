@@ -318,3 +318,25 @@
     background: #DBEAFE;
     color: #2563EB;
 }
+
+@media (max-width: 300px) {
+    .bundle-card {
+        padding: 16px;
+    }
+    .bundle-card__tier {
+        font-size: 1.15rem;
+    }
+    .bundle-card__desc {
+        font-size: 12px;
+        margin-bottom: 16px;
+    }
+    .bundle-card__product {
+        font-size: 11px;
+    }
+    .bundle-card__total-price {
+        font-size: 1.15rem;
+    }
+    .bundle-card__total-label {
+        font-size: 11px;
+    }
+}

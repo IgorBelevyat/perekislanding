@@ -586,4 +586,64 @@
         gap: 4px;
     }
 }
+
+@media (max-width: 300px) {
+    .calc-tabs__btn {
+        padding: 8px 10px;
+        font-size: 11px;
+    }
+    .calc-shape-toggle__btn {
+        padding: 8px 10px;
+        font-size: 11px;
+    }
+    .calc-input__field {
+        font-size: 14px;
+        padding: 10px 14px;
+    }
+    .calc-result__scenarios .btn {
+        font-size: 12px;
+        padding: 10px 12px;
+    }
+    .calc-upsell {
+        padding: 10px 8px;
+        gap: 6px;
+    }
+    .calc-upsell__title {
+        font-size: 12px;
+    }
+    .calc-upsell__contents {
+        font-size: 10px;
+    }
+    .calc-upsell__price {
+        font-size: 1rem;
+    }
+    .calc-upsell__benefit {
+        font-size: 8px;
+        padding: 2px 4px;
+    }
+    .calc-result__value {
+        font-size: 1.5rem;
+    }
+    .calc-result__label {
+        font-size: 11px;
+    }
+    .mode-option {
+        padding: 12px;
+    }
+    .mode-option__title {
+        font-size: 13px;
+    }
+    .mode-option__desc {
+        font-size: 11px;
+    }
+    .calc-result__trust {
+        font-size: 11px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .calc-result__trust span {
+        margin: 0;
+    }
+}
 
